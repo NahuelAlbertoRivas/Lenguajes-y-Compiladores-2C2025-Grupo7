@@ -1,4 +1,14 @@
-# Plantilla para TP Integrador usando Flex y Bison (C)
+# Trabajo Práctico Integrador de Lenguajes y Compiladores
+
+## Información General
+El siguiente repositorio contiene el Compilador desarrollado en el lenguaje C por el Grupo Nº7.
+
+### Integrantes: 
+*  Antonioli, Iván Oscar
+*  Arias, Kevin Nahuel 
+*  Di Nicco, Luis Demetrio 
+*  Gemellaro, Octavio Dion
+*  Rivas, Nahuel Alberto
 
 ## Prerequisitos. 
 
