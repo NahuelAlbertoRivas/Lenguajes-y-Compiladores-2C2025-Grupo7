@@ -18,8 +18,7 @@
 /* Variables Globales */
 FILE  *yyin;
 int yylval;
-char *yyltext;
-
+char *yyltext; 
 
 int yyerror(void);
 
@@ -65,7 +64,7 @@ OP_AND              "AND"
 OP_OR               "OR"
 OP_NOT              "NOT"
 
-/* Regex: Simbolos Especiales
+/* Regex: Simbolos Especiales*/
 PAR_ABR             "("
 PAR_CIE		        ")"
 COR_ABR             "["
@@ -114,22 +113,52 @@ ID			        {LETRA}({LETRA}|{DIGITO})*
 /*---------------------------------------------*/
 
 %%
+{IF}			    {printf("\nPalabra Reservada: %s\n", yytext);return IF;}
+{WHILE}			    {printf("\nPalabra Reservada: %s\n", yytext);return WHILE;}
+{ELSE}			    {printf("\nPalabra Reservada: %s\n", yytext);return ELSE;}
+{WRITE}			    {printf("\nPalabra Reservada: %s\n", yytext);return WRITE;}
+{READ}			    {printf("\nPalabra Reservada: %s\n", yytext);return READ;}
+{INIT}			    {printf("\nPalabra Reservada: %s\n", yytext);return INIT;}
+{TD_INT}			{printf("\nPalabra Reservada: %s\n", yytext);return TD_INT;}
+{TD_FLOAT}			{printf("\nPalabra Reservada: %s\n", yytext);return TD_FLOAT;}
+{TD_STRING}			{printf("\nPalabra Reservada: %s\n", yytext);return TD_STRING;}
+{TD_BOOLEAN}	    {printf("\nPalabra Reservada: %s\n", yytext);return TD_BOOLEAN;}
 
-{CTE}			    {printf("\nConstante: %s\n", yytext);return CTE;}
-{ID}			    printf("\nIdentificador: %s\n", yytext);return ID;}
+{OP_AND}		    {printf("\nOperador: %s\n", yytext);return OP_AND;}
+{OP_OR}		        {printf("\nOperador: %s\n", yytext);return OP_OR;}
+{OP_NOT}		    {printf("\nOperador: %s\n", yytext);return OP_NOT;}
+
+{CTE_INT}			{printf("\nConstante: %s\n", yytext);return CTE_INT;}
+{CTE_REAL_POS}		{printf("\nConstante: %s\n", yytext);return CTE_REAL_POS;}
+{CTE_STRING}		{printf("\nConstante: %s\n", yytext);return CTE_STRING;}
+{ID}			    {printf("\nIdentificador: %s\n", yytext);return ID;}
+
 {OP_SUM}		    {printf("\nSuma: %s\n", yytext);return OP_SUM;}
-{OP_AS}			    {printf("\nAsignacion: %s\n", yytext);return OP_AS;}
+{OP_ASIG}			{printf("\nAsignacion: %s\n", yytext);return OP_ASIG;}
 {OP_MUL}		    {printf("\nMultiplicacion: %s\n", yytext);return OP_MUL;}
 {OP_RES}		    {printf("\nResta: %s\n", yytext);return OP_RES;}
 {OP_DIV}		    {printf("\nDivision: %s\n", yytext);return OP_DIV;}
-{PA}			    {printf("\nParAbre: %s\n", yytext);return PA;}
-{PC}			    {printf("\nParCierra: %s\n", yytext);return PC;}
+
+{PAR_ABR}			{printf("\nParAbre: %s\n", yytext);return PAR_ABR;}
+{PAR_CIE}			{printf("\nParCierra: %s\n", yytext);return PAR_CIE;}
+{PUNTO_COMA}        {printf("\nPunto y Coma: %s\n", yytext);return PUNTO_COMA;}
+{COR_ABR}           {printf("\nCorchete Abre: %s\n", yytext);return COR_ABR;}
+{COR_CIE}           {printf("\nCorchete Cierra: %s\n", yytext);return COR_CIE;}
+{LLA_ABR}           {printf("\nLLave abre: %s\n", yytext);return LLA_ABR;}
+{LLA_CIE}           {printf("\nLLave cierra: %s\n", yytext);return LLA_CIE;}
+
+{CMP_MAYOR}			{printf("\nComparador: %s\n", yytext);return CMP_MAYOR;}
+{CMP_MENOR}			{printf("\nComparador: %s\n", yytext);return CMP_MENOR;}
+{CMP_MAYOR_IGUAL}	{printf("\nComparador: %s\n", yytext);return CMP_MAYOR_IGUAL;}
+{CMP_MENOR_IGUAL}	{printf("\nComparador: %s\n", yytext);return CMP_MENOR_IGUAL;}
+{CMP_DISTINTO}		{printf("\nComparador: %s\n", yytext);return CMP_DISTINTO;}
+{CMP_ES_IGUAL}		{printf("\nComparador: %s\n", yytext);return CMP_ES_IGUAL;}
 
 "\n"      		
-"\t"
-"\n\t"
+"\t"            
+"\n\t"          
 " "             		
-"\r\n"
+"\r\n"     
 .			        { printf( "ERROR LEXICO : Caracter no reconocido: %s\n", yytext ); exit (0);}
 
 %%
