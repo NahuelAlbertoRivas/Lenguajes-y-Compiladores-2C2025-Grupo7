@@ -104,8 +104,8 @@ ESCAPE              ({ESCAPE_SIMPLE}|{ESCAPE_OCTAL}|{ESCAPE_HEX})
 CARACTER            ({CARACTER_SIMPLE}|{ESCAPE})
 
 CTE_INT		        {DIGITO}+
-CTE_REAL_POS        {DIGITO}+{PUNTO}{DIGITO}+ | {DIGITO}+{PUNTO}{DIGITO}* | {DIGITO}*{PUNTO}{DIGITO}+
-CTE_STRING          {COMILLA_DOBLE}{CARACTER}*{COMILLA_DOBLE}
+CTE_REAL_POS        ({DIGITO}+{PUNTO}{DIGITO}+|{DIGITO}+{PUNTO}{DIGITO}*|{DIGITO}*{PUNTO}{DIGITO}+)
+CTE_STRING          {COMILLA_DOBLE}{CARACTER_SIMPLE}*{COMILLA_DOBLE}
 ID			        {LETRA}({LETRA}|{DIGITO})*
 
 /*---------------------------------------------*/
@@ -123,22 +123,18 @@ ID			        {LETRA}({LETRA}|{DIGITO})*
 {TD_FLOAT}			{printf("\nPalabra Reservada: %s\n", yytext);return TD_FLOAT;}
 {TD_STRING}			{printf("\nPalabra Reservada: %s\n", yytext);return TD_STRING;}
 {TD_BOOLEAN}	    {printf("\nPalabra Reservada: %s\n", yytext);return TD_BOOLEAN;}
-
 {OP_AND}		    {printf("\nOperador: %s\n", yytext);return OP_AND;}
 {OP_OR}		        {printf("\nOperador: %s\n", yytext);return OP_OR;}
 {OP_NOT}		    {printf("\nOperador: %s\n", yytext);return OP_NOT;}
-
 {CTE_INT}			{printf("\nConstante: %s\n", yytext);return CTE_INT;}
 {CTE_REAL_POS}		{printf("\nConstante: %s\n", yytext);return CTE_REAL_POS;}
 {CTE_STRING}		{printf("\nConstante: %s\n", yytext);return CTE_STRING;}
 {ID}			    {printf("\nIdentificador: %s\n", yytext);return ID;}
-
 {OP_SUM}		    {printf("\nSuma: %s\n", yytext);return OP_SUM;}
 {OP_ASIG}			{printf("\nAsignacion: %s\n", yytext);return OP_ASIG;}
 {OP_MUL}		    {printf("\nMultiplicacion: %s\n", yytext);return OP_MUL;}
 {OP_RES}		    {printf("\nResta: %s\n", yytext);return OP_RES;}
 {OP_DIV}		    {printf("\nDivision: %s\n", yytext);return OP_DIV;}
-
 {PAR_ABR}			{printf("\nParAbre: %s\n", yytext);return PAR_ABR;}
 {PAR_CIE}			{printf("\nParCierra: %s\n", yytext);return PAR_CIE;}
 {PUNTO_COMA}        {printf("\nPunto y Coma: %s\n", yytext);return PUNTO_COMA;}
@@ -146,14 +142,12 @@ ID			        {LETRA}({LETRA}|{DIGITO})*
 {COR_CIE}           {printf("\nCorchete Cierra: %s\n", yytext);return COR_CIE;}
 {LLA_ABR}           {printf("\nLLave abre: %s\n", yytext);return LLA_ABR;}
 {LLA_CIE}           {printf("\nLLave cierra: %s\n", yytext);return LLA_CIE;}
-
 {CMP_MAYOR}			{printf("\nComparador: %s\n", yytext);return CMP_MAYOR;}
 {CMP_MENOR}			{printf("\nComparador: %s\n", yytext);return CMP_MENOR;}
 {CMP_MAYOR_IGUAL}	{printf("\nComparador: %s\n", yytext);return CMP_MAYOR_IGUAL;}
 {CMP_MENOR_IGUAL}	{printf("\nComparador: %s\n", yytext);return CMP_MENOR_IGUAL;}
 {CMP_DISTINTO}		{printf("\nComparador: %s\n", yytext);return CMP_DISTINTO;}
 {CMP_ES_IGUAL}		{printf("\nComparador: %s\n", yytext);return CMP_ES_IGUAL;}
-
 "\n"      		
 "\t"            
 "\n\t"          
@@ -166,3 +160,10 @@ ID			        {LETRA}({LETRA}|{DIGITO})*
 /*---------------------------------------------*/
 /* Seccion Codigo */
 /*---------------------------------------------*/
+
+/* int main()
+{
+    // if(())
+
+    return 0;
+} */
