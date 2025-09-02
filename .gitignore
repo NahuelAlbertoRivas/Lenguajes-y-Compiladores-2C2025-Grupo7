@@ -64,3 +64,4 @@ y.output
 y.tab.h
 compilador
 LexicoO.l
+SintacticoO.l

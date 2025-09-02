@@ -50,6 +50,10 @@ OP_SUM		        "+"
 OP_MUL              "*"
 OP_RES		        "-"
 OP_DIV              "/"
+OP_MOD              "%"
+
+OP_UN_INC		    "++"
+OP_UN_DEC           "--"
 
 /* Regex: Comparadores */
 CMP_MAYOR            ">"
@@ -78,6 +82,7 @@ PUNTO_COMA          ";"
 NUMERAL             "#"
 COMILLA_DOBLE       "\""
 COMILLA_SIMPLE      "\'"
+UNDERSCORE          "_"
 
 /* Regex: Palabras Reservadas */
 WHILE               "while"
@@ -96,6 +101,9 @@ INIT                "init"
 FN_EQUALEXPRESSIONS "equalExpressions"
 FN_ISZERO           "isZero"
 
+/* Regex: COMENTARIO*/
+COMMENT             "#+".*"+#"
+
 /* Regex: TOKENS*/
 ESCAPE_SIMPLE       \\[\'\"\\\?abfnrtv]   
 ESCAPE_OCTAL        \\{OCTAL}{1,3}       
@@ -106,7 +114,7 @@ CARACTER            ({CARACTER_SIMPLE}|{ESCAPE})
 CTE_INT		        {DIGITO}+
 CTE_REAL_POS        ({DIGITO}+{PUNTO}{DIGITO}+|{DIGITO}+{PUNTO}{DIGITO}*|{DIGITO}*{PUNTO}{DIGITO}+)
 CTE_STRING          {COMILLA_DOBLE}{CARACTER_SIMPLE}*{COMILLA_DOBLE}
-ID			        {LETRA}({LETRA}|{DIGITO})*
+ID			        {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 
 /*---------------------------------------------*/
 /* Seccion Definición de Reglas */
@@ -148,6 +156,7 @@ ID			        {LETRA}({LETRA}|{DIGITO})*
 {CMP_MENOR_IGUAL}	{printf("\nComparador: %s\n", yytext);return CMP_MENOR_IGUAL;}
 {CMP_DISTINTO}		{printf("\nComparador: %s\n", yytext);return CMP_DISTINTO;}
 {CMP_ES_IGUAL}		{printf("\nComparador: %s\n", yytext);return CMP_ES_IGUAL;}
+{COMMENT}		    {printf("\nComentario ignorado: %s\n", yytext);}
 "\n"      		
 "\t"            
 "\n\t"          
@@ -156,14 +165,3 @@ ID			        {LETRA}({LETRA}|{DIGITO})*
 .			        { printf( "ERROR LEXICO : Caracter no reconocido: %s\n", yytext ); exit (0);}
 
 %%
-
-/*---------------------------------------------*/
-/* Seccion Codigo */
-/*---------------------------------------------*/
-
-/* int main()
-{
-    // if(())
-
-    return 0;
-} */
