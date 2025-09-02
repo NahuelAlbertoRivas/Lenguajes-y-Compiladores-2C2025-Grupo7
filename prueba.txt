@@ -1,2 +1,12 @@
-c:=d*(e-21)/4
-
+#+ esto es un programa +#
+c:=d*(ef-21)/4+j
+if(d<4) b:=a
+while(h<20)
+#+ dgjjdgi +#
+{ #+ fds +#
+	if( (ar0 / rem) == est_com )
+	{
+		sig := base * rend
+		traseCur(ar0)
+	}
+}
