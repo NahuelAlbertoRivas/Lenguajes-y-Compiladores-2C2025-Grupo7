@@ -1,6 +1,13 @@
 #+ esto es un programa +#
-c:=d*(ef-21)/4+j
-if(d<4) b:=a
+init {
+	a1, b1, a, b, ar0 : Float
+	var1, c, d, h, j, d, e : Int
+	p1, p2, p3 : String
+	D : Boolean
+}
+D := regIniSAT1(p2, p3, ar0, a)
+c:=d*(e-21)/4+j
+if(NOT(d<4) AND (getSC(c) OR loadW(p1, a1) AND D)) b:=a
 while(h<20)
 #+ dgjjdgi +#
 { #+ fds +#
@@ -9,4 +16,20 @@ while(h<20)
 		sig := base * rend
 		traseCur(ar0)
 	}
+	else
+		c := sat(ppm(a) + 5)
+}
+if(chkStat(ar0, sig, a))
+	return stat
+else
+{
+	n_code := reportAndFix()
+	if(verifyTs(getRaw(c)))
+		broad++
+	if(NOT c)
+		if(getCS())
+			closeConnection()
+		else
+			n_code--
+	return receiveAns(n_code)
 }
