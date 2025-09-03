@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "y.tab.h"
 int yystopparser=0;
-FILE  *yyin;
+extern FILE  *yyin; // Tuve que declararlo como extern para que compile
 
 int yyerror();
 int yylex();
@@ -14,7 +14,7 @@ int yylex();
 %}
 
 %token CTE_INT
-%token CTE_REAL_POS
+%token CTE_REAL
 %token CTE_STRING
 %token ID
 

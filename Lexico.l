@@ -14,13 +14,19 @@
 #include <string.h> /* Libreria para el manejo de strings*/
 
 /* Defines */
+#define TAM_MAX_STRING 50
 
 /* Variables Globales */
 FILE  *yyin;
-int yylval;
+extern int yylval; // Tuve que declararlo como extern para que compile
 char *yyltext; 
 
 int yyerror(void);
+
+/* Funciones Auxiliares*/
+int validar_entero(const char* lexema);
+int validar_real(const char* lexema);
+int validar_string(const char* lexema);
 
 %}
 
@@ -112,7 +118,7 @@ ESCAPE              ({ESCAPE_SIMPLE}|{ESCAPE_OCTAL}|{ESCAPE_HEX})
 CARACTER            ({CARACTER_SIMPLE}|{ESCAPE})
 
 CTE_INT		        {DIGITO}+
-CTE_REAL_POS        ({DIGITO}+{PUNTO}{DIGITO}+|{DIGITO}+{PUNTO}{DIGITO}*|{DIGITO}*{PUNTO}{DIGITO}+)
+CTE_REAL            ({DIGITO}+{PUNTO}{DIGITO}+|{DIGITO}+{PUNTO}{DIGITO}*|{DIGITO}*{PUNTO}{DIGITO}+)
 CTE_STRING          {COMILLA_DOBLE}{CARACTER_SIMPLE}*{COMILLA_DOBLE}
 ID			        {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 
@@ -134,9 +140,6 @@ ID			        {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {OP_AND}		    {printf("\nOperador: %s\n", yytext);return OP_AND;}
 {OP_OR}		        {printf("\nOperador: %s\n", yytext);return OP_OR;}
 {OP_NOT}		    {printf("\nOperador: %s\n", yytext);return OP_NOT;}
-{CTE_INT}			{printf("\nConstante: %s\n", yytext);return CTE_INT;}
-{CTE_REAL_POS}		{printf("\nConstante: %s\n", yytext);return CTE_REAL_POS;}
-{CTE_STRING}		{printf("\nConstante: %s\n", yytext);return CTE_STRING;}
 {ID}			    {printf("\nIdentificador: %s\n", yytext);return ID;}
 {OP_SUM}		    {printf("\nSuma: %s\n", yytext);return OP_SUM;}
 {OP_ASIG}			{printf("\nAsignacion: %s\n", yytext);return OP_ASIG;}
@@ -157,6 +160,11 @@ ID			        {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {CMP_DISTINTO}		{printf("\nComparador: %s\n", yytext);return CMP_DISTINTO;}
 {CMP_ES_IGUAL}		{printf("\nComparador: %s\n", yytext);return CMP_ES_IGUAL;}
 {COMMENT}		    {printf("\nComentario ignorado: %s\n", yytext);}
+
+{CTE_INT}               { return validar_entero(yytext); }
+{CTE_REAL}              { return validar_real(yytext); }
+{CTE_STRING}            { return validar_string(yytext); }
+
 "\n"      		
 "\t"            
 "\n\t"          
@@ -165,3 +173,42 @@ ID			        {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 .			        { printf( "ERROR LEXICO : Caracter no reconocido: %s\n", yytext ); exit (0);}
 
 %%
+
+/*---------------------------------------------*/
+/* Seccion Codigo */
+/*---------------------------------------------*/
+
+int validar_entero(const char* lexema) {
+    errno = 0;
+    long value = strtol(lexema, NULL, 10);
+
+    if (errno == ERANGE || value < SHRT_MIN || value > SHRT_MAX) {
+        fprintf(stderr, "ERROR: Constante entera fuera de rango (maximo 16 bits): %s\n", lexema);
+        exit(1);
+    }
+    printf("\nConstante entera: %s\n", lexema);
+    return CTE_INT;
+}
+
+int validar_real(const char* lexema) {
+    errno = 0;
+    float value = strtof(lexema, NULL);
+
+    if (errno == ERANGE || value > FLT_MAX || value < -FLT_MAX) {
+        fprintf(stderr, "ERROR: Constante real fuera de rango (maximo 32 bits): %s\n", lexema);
+        exit(1);
+    }
+    printf("\nConstante real: %s\n", lexema);
+    return CTE_REAL
+;
+}
+
+int validar_string(const char* lexema) {
+    size_t len = strlen(lexema);
+    if (len < 2 || len - 2 > TAM_MAX_STRING) {
+        fprintf(stderr, "ERROR: Constante string demasiado larga (maximo 50): %s\n", lexema);
+        exit(1);
+    }
+    printf("\nConstante string: %s\n", lexema);
+    return CTE_STRING;
+}
