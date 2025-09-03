@@ -125,6 +125,8 @@ INIT                    "init"
 FN_EQUALEXPRESSIONS     "equalExpressions"
 FN_ISZERO               "isZero"
 
+RET                 "return"
+
 /* Regex: COMENTARIO*/
 COMMENT                 "#+".*"+#"
 
@@ -184,7 +186,6 @@ ID			            {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {CTE_INT}               { return validar_entero(yytext); }
 {CTE_REAL}              { return validar_real(yytext); }
 {CTE_STRING}            { return validar_string(yytext); }
-
 
 "\n"      		
 "\t"            

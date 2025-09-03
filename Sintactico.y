@@ -1,5 +1,5 @@
 // Usa Lexico_ClasePractica
-//Solo expresiones sin ()
+//Solo expresion_aritmeticaes sin ()
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -164,7 +164,7 @@ expresion_relacional:
     | expresion_aritmetica CMP_MENOR expresion_aritmetica {printf("    Expresion_aritmetica<Expresion_aritmetica es expresion_relacional\n");}
     | expresion_aritmetica CMP_ES_IGUAL expresion_aritmetica {printf("    Expresion_aritmetica==Expresion_aritmetica es expresion_relacional\n");}
     ;
-
+    
 expresion_aritmetica:
     termino {printf("    Termino es Expresion_Aritmetica\n");}
     | OP_RES expresion_aritmetica %prec MENOS_UNARIO {printf("    - Expresion_Aritmetica es Expresion_aritmetica\n");}
