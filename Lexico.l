@@ -101,6 +101,8 @@ INIT                "init"
 FN_EQUALEXPRESSIONS "equalExpressions"
 FN_ISZERO           "isZero"
 
+RET                 "return"
+
 /* Regex: COMENTARIO*/
 COMMENT             "#+".*"+#"
 
@@ -127,6 +129,7 @@ ID			        {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {WRITE}			    {printf("\nPalabra Reservada: %s\n", yytext);return WRITE;}
 {READ}			    {printf("\nPalabra Reservada: %s\n", yytext);return READ;}
 {INIT}			    {printf("\nPalabra Reservada: %s\n", yytext);return INIT;}
+{RET}			    {printf("\nPalabra Reservada: %s\n", yytext);return RET;}
 {TD_INT}			{printf("\nPalabra Reservada: %s\n", yytext);return TD_INT;}
 {TD_FLOAT}			{printf("\nPalabra Reservada: %s\n", yytext);return TD_FLOAT;}
 {TD_STRING}			{printf("\nPalabra Reservada: %s\n", yytext);return TD_STRING;}
@@ -143,13 +146,18 @@ ID			        {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {OP_MUL}		    {printf("\nMultiplicacion: %s\n", yytext);return OP_MUL;}
 {OP_RES}		    {printf("\nResta: %s\n", yytext);return OP_RES;}
 {OP_DIV}		    {printf("\nDivision: %s\n", yytext);return OP_DIV;}
+{OP_UN_INC}		    {printf("\nIncremento Unario: %s\n", yytext);return OP_UN_INC;}
+{OP_UN_DEC}		    {printf("\nDecremento Unario: %s\n", yytext);return OP_UN_DEC;}
 {PAR_ABR}			{printf("\nParAbre: %s\n", yytext);return PAR_ABR;}
 {PAR_CIE}			{printf("\nParCierra: %s\n", yytext);return PAR_CIE;}
+{COMA}              {printf("\nComa: %s\n", yytext);return COMA;}
+{DOS_PUNTOS}        {printf("\nDos Puntos: %s\n", yytext);return DOS_PUNTOS;}
 {PUNTO_COMA}        {printf("\nPunto y Coma: %s\n", yytext);return PUNTO_COMA;}
 {COR_ABR}           {printf("\nCorchete Abre: %s\n", yytext);return COR_ABR;}
 {COR_CIE}           {printf("\nCorchete Cierra: %s\n", yytext);return COR_CIE;}
 {LLA_ABR}           {printf("\nLLave abre: %s\n", yytext);return LLA_ABR;}
 {LLA_CIE}           {printf("\nLLave cierra: %s\n", yytext);return LLA_CIE;}
+{OP_NOT}		    {printf("\nOperador Not: %s\n", yytext);return OP_NOT;}
 {CMP_MAYOR}			{printf("\nComparador: %s\n", yytext);return CMP_MAYOR;}
 {CMP_MENOR}			{printf("\nComparador: %s\n", yytext);return CMP_MENOR;}
 {CMP_MAYOR_IGUAL}	{printf("\nComparador: %s\n", yytext);return CMP_MAYOR_IGUAL;}
