@@ -4,17 +4,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "y.tab.h"
+//#include "tablaBck.h" /* Archivo para la tabla de simbolos */
+
 int yystopparser=0;
-FILE  *yyin;
+extern FILE  *yyin; // Tuve que declararlo como extern para que compile
 
 int yyerror();
 int yylex();
 
-
+// extern Tabla tabla;
 %}
 
 %token CTE_INT
-%token CTE_REAL_POS
+%token CTE_REAL
 %token CTE_STRING
 %token ID
 
@@ -60,6 +62,16 @@ int yylex();
 
 %token NUMERAL
 
+
+%token FN_EQUALEXPRESSIONS
+%token FN_ISZERO  
+
+//y := equalExpressions(a + b, 5, b * 2, 3 + 2, a + b)
+//Y := isZero( s*7+1-h/2 )   
+
+//if(equalExpressions(a + b, 5, b * 2, 3 + 2, a + b) == TRUE)
+//while(isZero( s*7+1-h/2 )  == TRUE)
+
 %%
 
 programa:
@@ -99,7 +111,21 @@ sentencia:
     | bucle {printf(" FIN WHILE\n");}
     | llamada_func {printf(" FIN LLAMADA_FUNC\n");}
     | retornar {printf(" FIN RETORNAR\n");}
+    | entrada_salida {printf(" FIN RETORNAR\n");}
+    | def_lista_vars {printf(" Lista var es sentencia\n");}
     ;
+
+entrada_salida: 
+    WRITE PAR_ABR elemento PAR_CIE {printf("    WRITE (elem)  es entrada_salida\n");}
+    |  READ PAR_ABR ID PAR_CIE {printf("    READ(ID) es entrada_salida\n");}
+	;
+
+elemento: 
+    ID {printf("    ID es elemento\n");}
+    | CTE_INT {printf("    CTE_INT es elemento\n");}
+    | CTE_REAL {printf("    CTE_INT es elemento\n");}
+    | CTE_STRING {printf("    CTE_INT es elemento\n");}
+	;
 
 asignacion: 
     ID OP_ASIG expresion {printf("    ID := Expresion_Aritmetica es Asignacion\n");}
@@ -138,7 +164,7 @@ expresion_relacional:
     | expresion_aritmetica CMP_MENOR expresion_aritmetica {printf("    Expresion_aritmetica<Expresion_aritmetica es expresion_relacional\n");}
     | expresion_aritmetica CMP_ES_IGUAL expresion_aritmetica {printf("    Expresion_aritmetica==Expresion_aritmetica es expresion_relacional\n");}
     ;
-
+    
 expresion_aritmetica:
     termino {printf("    Termino es Expresion_Aritmetica\n");}
     | OP_RES expresion_aritmetica %prec MENOS_UNARIO {printf("    - Expresion_Aritmetica es Expresion_aritmetica\n");}
@@ -150,7 +176,7 @@ termino:
     factor {printf("    Factor es Termino\n");}
     | termino OP_MUL factor {printf("     Termino*Factor es Termino\n");}
     | termino OP_DIV factor {printf("     Termino/Factor es Termino\n");}
-    | termino OP_MOD factor {printf("     Termino%Factor es Termino\n");}
+    | termino OP_MOD factor {printf("     Termino%sFactor es Termino\n","%");}
     ;
 
 factor: 
@@ -166,8 +192,13 @@ lista_args:
     ;
 
 llamada_func:
-    ID PAR_ABR lista_args PAR_CIE {printf("    ID(Lista_Args) es Llamada_Func \n");}
-    | ID PAR_ABR PAR_CIE {printf("    ID() es Llamada_Func \n");}
+    funcion_especial PAR_ABR lista_args PAR_CIE {printf("    ID(Lista_Args) es Llamada_Func \n");}
+    | ID PAR_ABR PAR_CIE {printf("    ID() es Llamada_Func \n");} // Revisar esta regla!!
+    ;
+
+funcion_especial:
+    FN_EQUALEXPRESSIONS {printf("    FN_EQUALEXPRESSIONS es funcion especial isEqualExpressions\n");}
+    | FN_ISZERO {printf("    FN_ISZERO() es funcion especial isZero\n");}
     ;
 
 retornar:
@@ -179,6 +210,7 @@ retornar:
 
 int main(int argc, char *argv[])
 {
+    //inicializarTabla(&tabla); 
     if((yyin = fopen(argv[1], "rt"))==NULL)
     {
         printf("\nNo se puede abrir el archivo de prueba: %s\n", argv[1]);
