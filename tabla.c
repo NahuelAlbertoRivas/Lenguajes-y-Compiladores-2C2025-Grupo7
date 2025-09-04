@@ -75,6 +75,8 @@ void agregarATabla(Tabla *tabla, const char* nombre, char* tipo_token){
         strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
 
         free(nombre1); // si no lo vas a usar más
+
+        tabla->nFilas++;
     }
 
         guardarTablaEnArchivo(tabla, "Salida.txt");
