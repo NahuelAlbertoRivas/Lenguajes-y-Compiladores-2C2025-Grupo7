@@ -183,7 +183,9 @@ ID			            {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {CMP_ES_IGUAL}		    {printf("\nComparador: %s\n", yytext);return CMP_ES_IGUAL;}
 {COMMENT}		        {printf("\nComentario ignorado: %s\n", yytext);}
 {COMA}		            {printf("\nComa: %s\n", yytext);return COMA;}
-{DOS_PUNTOS}            {printf("\nDos puntos: %s\n", yytext);return PUNTO_COMA;}
+{DOS_PUNTOS}            {printf("\nDos puntos: %s\n", yytext);return DOS_PUNTOS;}
+{OP_UN_INC}		    {printf("\nIncremento Unario: %s\n", yytext);return OP_UN_INC;}
+{OP_UN_DEC}		    {printf("\nDecremento Unario: %s\n", yytext);return OP_UN_DEC;}
 
 {CTE_INT}               { return validar_entero(yytext); }
 {CTE_REAL}              { return validar_real(yytext); }

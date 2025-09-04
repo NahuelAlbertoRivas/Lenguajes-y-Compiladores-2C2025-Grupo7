@@ -83,10 +83,6 @@ lista_sentencias:
     | lista_sentencias sentencia {printf("    Lista_Sentencias Sentencia es Lista_Sentencias\n");}
     ;
 
-lista_vars:
-    ID {printf("    ID es Lista_Vars\n");}
-    | lista_vars COMA ID {printf("    Lista_Vars , ID es Lista_Vars\n");}
-
 tipo_dato:
     TD_BOOLEAN {printf("    TD_BOOLEAN es Tipo_Dato\n");}
     | TD_INT {printf("    TD_INT es Tipo_Dato\n");}
@@ -94,10 +90,13 @@ tipo_dato:
     | TD_STRING {printf("    TD_STRING es Tipo_Dato\n");}
     ;
 
-def_lista_vars:
-    lista_vars DOS_PUNTOS tipo_dato {printf("    Def_Lista_Vars Lista_Vars es Def_Lista_Vars\n");}
-    | def_lista_vars lista_vars DOS_PUNTOS tipo_dato {printf("    Def_Lista_Vars Lista_Vars es Def_Lista_Vars\n");}
-    ;
+lista_id:
+    ID {printf("    ID es lista_id\n");}
+    | lista_id COMA ID {printf("    {lista_id} COMA ID es Lista_Id\n");}
+
+bloque_asig:
+    lista_id DOS_PUNTOS tipo_dato {printf("    lista_var es Bloque_Asig\n");}
+    | bloque_asig lista_id DOS_PUNTOS tipo_dato {printf("    Bloque_Asig { lista_var } es Bloque_Asig\n");}
 
 def_init:
     INIT LLA_ABR bloque_asig LLA_CIE {printf("    INIT { bloque_asig } es Def_Init\n");}
@@ -172,7 +171,8 @@ factor:
     ID {printf("    ID es Factor \n");}
     | CTE_INT {printf("    CTE_INT es Factor\n");}
     | PAR_ABR expresion PAR_CIE {printf("    Expresion entre parentesis es Factor\n");}
-    | CTE_STRING {printf("    CTE_INT es elemento\n");} 
+    | CTE_STRING {printf("    CTE_INT es elemento\n");}
+    
     | llamada_func {printf("    Llamada_Func es Factor\n");}
     ;
 
@@ -220,4 +220,3 @@ int yyerror(void)
     printf("Error Sintactico\n");
     exit (1);
 }
-
