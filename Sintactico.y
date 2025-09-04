@@ -3,8 +3,8 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "y.tab.h"
-//#include "tablaBck.h" /* Archivo para la tabla de simbolos */
+#include "y.tab.h" 
+#include "tabla.h" /* Archivo para la tabla de simbolos */
 
 int yystopparser=0;
 extern FILE  *yyin; // Tuve que declararlo como extern para que compile
@@ -12,7 +12,6 @@ extern FILE  *yyin; // Tuve que declararlo como extern para que compile
 int yyerror();
 int yylex();
 
-// extern Tabla tabla;
 %}
 
 %token CTE_INT
@@ -84,11 +83,6 @@ lista_sentencias:
     | lista_sentencias sentencia {printf("    Lista_Sentencias Sentencia es Lista_Sentencias\n");}
     ;
 
-lista_vars:
-    ID {printf("    ID es Lista_Vars\n");}
-    | lista_vars COMA ID {printf("    Lista_Vars , ID es Lista_Vars\n");}
-    ;
-
 tipo_dato:
     TD_BOOLEAN {printf("    TD_BOOLEAN es Tipo_Dato\n");}
     | TD_INT {printf("    TD_INT es Tipo_Dato\n");}
@@ -96,14 +90,19 @@ tipo_dato:
     | TD_STRING {printf("    TD_STRING es Tipo_Dato\n");}
     ;
 
-def_lista_vars:
-    lista_vars DOS_PUNTOS tipo_dato {printf("    Def_Lista_Vars Lista_Vars es Def_Lista_Vars\n");}
-    | def_lista_vars lista_vars DOS_PUNTOS tipo_dato {printf("    Def_Lista_Vars Lista_Vars es Def_Lista_Vars\n");}
-    ;
+lista_id:
+    ID {printf("    ID es lista_id\n");}
+    | lista_id COMA ID {printf("    {lista_id} COMA ID es Lista_Id\n");}
+
+lista_var:
+    lista_id DOS_PUNTOS tipo_dato {printf("    {lista_id} DOS_PUNTOS es lista_var\n");}
+
+bloque_asig:
+    lista_var  {printf("    lista_var es Bloque_Asig\n");}
+    | bloque_asig lista_var {printf("    Bloque_Asig { lista_var } es Bloque_Asig\n");}
 
 def_init:
-    INIT LLA_ABR def_lista_vars LLA_CIE {printf("    INIT { Def_Lista_Vars } es Def_Init\n");}
-    ;
+    INIT LLA_ABR bloque_asig LLA_CIE {printf("    INIT { bloque_asig } es Def_Init\n");}
 
 sentencia:  	   
 	asignacion {printf(" FIN ASIGNACION\n");} 
@@ -112,19 +111,11 @@ sentencia:
     | llamada_func {printf(" FIN LLAMADA_FUNC\n");}
     | retornar {printf(" FIN RETORNAR\n");}
     | entrada_salida {printf(" FIN RETORNAR\n");}
-    | def_lista_vars {printf(" Lista var es sentencia\n");}
     ;
 
 entrada_salida: 
-    WRITE PAR_ABR elemento PAR_CIE {printf("    WRITE (elem)  es entrada_salida\n");}
+    WRITE PAR_ABR factor PAR_CIE {printf("    WRITE (elem)  es entrada_salida\n");}
     |  READ PAR_ABR ID PAR_CIE {printf("    READ(ID) es entrada_salida\n");}
-	;
-
-elemento: 
-    ID {printf("    ID es elemento\n");}
-    | CTE_INT {printf("    CTE_INT es elemento\n");}
-    | CTE_REAL {printf("    CTE_INT es elemento\n");}
-    | CTE_STRING {printf("    CTE_INT es elemento\n");}
 	;
 
 asignacion: 
@@ -183,6 +174,8 @@ factor:
     ID {printf("    ID es Factor \n");}
     | CTE_INT {printf("    CTE_INT es Factor\n");}
     | PAR_ABR expresion PAR_CIE {printf("    Expresion entre parentesis es Factor\n");}
+    | CTE_STRING {printf("    CTE_INT es elemento\n");}
+    
     | llamada_func {printf("    Llamada_Func es Factor\n");}
     ;
 
@@ -207,10 +200,11 @@ retornar:
 
 %%
 
+Tabla tabla;
 
 int main(int argc, char *argv[])
 {
-    //inicializarTabla(&tabla); 
+    iniciar_tabla(&tabla); 
     if((yyin = fopen(argv[1], "rt"))==NULL)
     {
         printf("\nNo se puede abrir el archivo de prueba: %s\n", argv[1]);

@@ -2,7 +2,7 @@
 init {
 	a1, b1, a, b, ar0 : Float
 	var1, c, d, h, j, d, e : Int
-	p1, p2, p3 : String
+	p1, p2, p3 : String 
 	D : Boolean
 }
 D := regIniSAT1(p2, p3, ar0, a)
