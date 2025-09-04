@@ -13,13 +13,16 @@
 #include <limits.h> /* Libreria para el manejo de enteros, tiene el maximo de tamaño de enteros de 16 bits*/
 #include <string.h> /* Libreria para el manejo de strings*/
 
-// #include "tablaBck.h" /* Archivo para la tabla de simbolos */
+#include "tabla.h" /* Archivo para la tabla de simbolos */
 
 /* Defines */
 #define TAM_MAX_STRING 50
 
 /* Variables Globales */
 FILE  *yyin;
+
+extern Tabla tabla;
+
 extern int yylval; // Tuve que declararlo como extern para que compile
 char *yyltext; 
 
@@ -38,8 +41,7 @@ typedef struct {
 typedef struct {
     InformacionToken *filas; // arreglo dinámico de tokens
     int nFilas;              // cantidad actual de filas
-} Tabla;
-Tabla tabla;*/
+} Tabla; */
 
 /* Funciones Auxiliares*/
 int validar_entero(const char* lexema);
@@ -160,7 +162,7 @@ ID			            {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {OP_AND}		        {printf("\nOperador: %s\n", yytext);return OP_AND;}
 {OP_OR}		            {printf("\nOperador: %s\n", yytext);return OP_OR;}
 {OP_NOT}		        {printf("\nOperador: %s\n", yytext);return OP_NOT;}
-{ID}			        {printf("\nIdentificador: %s\n", yytext);return ID;}
+{ID}			        {printf("\nIdentificador: %s\n", yytext); agregarATabla(&tabla, yytext, "CTE_STRING"); return ID;}
 {OP_SUM}		        {printf("\nSuma: %s\n", yytext);return OP_SUM;}
 {OP_ASIG}			    {printf("\nAsignacion: %s\n", yytext);return OP_ASIG;}
 {OP_MUL}		        {printf("\nMultiplicacion: %s\n", yytext);return OP_MUL;}
@@ -181,7 +183,9 @@ ID			            {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {CMP_ES_IGUAL}		    {printf("\nComparador: %s\n", yytext);return CMP_ES_IGUAL;}
 {COMMENT}		        {printf("\nComentario ignorado: %s\n", yytext);}
 {COMA}		            {printf("\nComa: %s\n", yytext);return COMA;}
-{DOS_PUNTOS}            {printf("\nDos puntos: %s\n", yytext);return PUNTO_COMA;}
+{DOS_PUNTOS}            {printf("\nDos puntos: %s\n", yytext);return DOS_PUNTOS;}
+{OP_UN_INC}		    {printf("\nIncremento Unario: %s\n", yytext);return OP_UN_INC;}
+{OP_UN_DEC}		    {printf("\nDecremento Unario: %s\n", yytext);return OP_UN_DEC;}
 
 {CTE_INT}               { return validar_entero(yytext); }
 {CTE_REAL}              { return validar_real(yytext); }
@@ -234,7 +238,8 @@ int validar_real(const char* lexema) {
         exit(1);
     }
     printf("\nConstante real: %s\n", lexema);
-    return CTE_REAL
+    agregarATabla(&tabla, lexema, "CTE_REAL");
+    return CTE_REAL;
 ;
 }
 
@@ -245,6 +250,7 @@ int validar_string(const char* lexema) {
         exit(1);
     }
     printf("\nConstante string: %s\n", lexema);
+    agregarATabla(&tabla, lexema, "CTE_STRING");
     return CTE_STRING;
 }
 

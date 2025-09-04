@@ -2,36 +2,31 @@
 init {
 	a1, b1, a, b, ar0 : Float
 	var1, c, d, h, j, d, e : Int
-	p1, p2, p3 : String
+	p1, p2, p3 : String 
 	D : Boolean
 }
-D := regIniSAT1(p2, p3, ar0, a)
+#+D := regIniSAT1(p2, p3, ar0, a)+#
 c:=d*(e-21)/4+j
-if(NOT(d<4) AND (getSC(c) OR loadW(p1, a1) AND D)) b:=a
 while(h<20)
 #+ Este es un comentario que se tiene que ignorar +#
 { #+ Este es otro comentario que se tiene que ignorar +#
 	if( (ar0 / rem) == est_com )
 	{
 		sig := base * rend
-		traseCur(ar0)
 	}
 	else
-		c := sat(ppm(a) + 5)
+		c := 5
 }
-if(chkStat(ar0, sig, a))
-	return stat
+if(a==0){a:=5}
 else
 {
 	n_code := reportAndFix()
-	if(verifyTs(getRaw(c)))
+	if( 5 == 5)
 		broad++
 	if(NOT c)
-		if(getCS())
-			closeConnection()
-		else
+		c := 3
+	else
 			n_code--
-	return receiveAns(n_code)
 }
 
 write(var1)
@@ -47,12 +42,12 @@ write(5)
 #+ while [a > b] { write("a es mas grande que b") a := a + 1 } +#
 
 #+ Esta es un if incorrecta +#
-#+ 	if( (a == b ) 	
-		a=c   		
-	else if			
-		c=A			
-	else		
-		a=c2		+#
+#+ 	if( (a == b ) 	+#
+#+		a=c   +#		
+#+	else if	+#		
+#+		c=A	+#		
+#+	else	+#	
+#+		a=c2	+#	
 
 #+ Esta es una resta incorrecta +#
 #+ x =: 27 - c +#
@@ -72,7 +67,7 @@ write(5)
 #+ Esta es una salida incorrecta+#
 #+ write var1 +#
 
-#+ Esta es una declaracion de variables incorrecta+#
+#+ Esta es una declaracion de variables incorrecta +#
 #+ int a,b,c +#
 
 #+ Esta es un tipo de dato int que supera el rango maximo +#
@@ -87,11 +82,11 @@ write(5)
 #+ Este es un comentario erroneo +#
 #+ // comentario +#
 
-#+ Esta es un condicional AND incorrecto+#
+#+ Esta es un condicional AND incorrecto +#
 #+ AND(var1,var2) +#
 
 #+ Este es un condicional OR incorrecto +#
 #+ if (a > b || c > b) +#
 
-#+ Esta es un condicional NOT incorrecto+#
+#+ Esta es un condicional NOT incorrecto +#
 #+  a = !b +#

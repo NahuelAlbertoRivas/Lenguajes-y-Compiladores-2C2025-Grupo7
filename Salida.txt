@@ -1,0 +1,40 @@
+--------------------------------------------------------------------------------
+| Nombre               | Valor                | Longitud   | TipoDato   |
+--------------------------------------------------------------------------------
+| -                    | a1                   | 0          | CTE_STRING |
+| -                    | b1                   | 0          | CTE_STRING |
+| -                    | a                    | 0          | CTE_STRING |
+| -                    | b                    | 0          | CTE_STRING |
+| -                    | ar0                  | 0          | CTE_STRING |
+| -                    | var1                 | 0          | CTE_STRING |
+| -                    | c                    | 0          | CTE_STRING |
+| -                    | d                    | 0          | CTE_STRING |
+| -                    | h                    | 0          | CTE_STRING |
+| -                    | j                    | 0          | CTE_STRING |
+| -                    | d                    | 0          | CTE_STRING |
+| -                    | e                    | 0          | CTE_STRING |
+| -                    | p1                   | 0          | CTE_STRING |
+| -                    | p2                   | 0          | CTE_STRING |
+| -                    | p3                   | 0          | CTE_STRING |
+| -                    | D                    | 0          | CTE_STRING |
+| -                    | c                    | 0          | CTE_STRING |
+| -                    | d                    | 0          | CTE_STRING |
+| -                    | e                    | 0          | CTE_STRING |
+| -                    | j                    | 0          | CTE_STRING |
+| -                    | h                    | 0          | CTE_STRING |
+| -                    | ar0                  | 0          | CTE_STRING |
+| -                    | rem                  | 0          | CTE_STRING |
+| -                    | est_com              | 0          | CTE_STRING |
+| -                    | sig                  | 0          | CTE_STRING |
+| -                    | base                 | 0          | CTE_STRING |
+| -                    | rend                 | 0          | CTE_STRING |
+| -                    | c                    | 0          | CTE_STRING |
+| -                    | a                    | 0          | CTE_STRING |
+| -                    | a                    | 0          | CTE_STRING |
+| -                    | n_code               | 0          | CTE_STRING |
+| -                    | reportAndFix         | 0          | CTE_STRING |
+| -                    | broad                | 0          | CTE_STRING |
+| -                    | n_code               | 0          | CTE_STRING |
+| -                    | var1                 | 0          | CTE_STRING |
+| -                    | var1                 | 0          | CTE_STRING |
+--------------------------------------------------------------------------------

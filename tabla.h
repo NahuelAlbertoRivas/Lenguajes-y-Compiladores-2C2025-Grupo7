@@ -1,68 +1,30 @@
+#ifndef TABLA_H
+#define TABLA_H
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-// Estructura para manejar la tabla dinámica
+#define TAM_TABLA 1000
+
+// Estructura para cada entrada en la tabla de símbolos
 typedef struct {
     char *nombre;
     char *valor; 
-    int *longitud;   
+    int longitud;   
     char *tipoDato;
 } InformacionToken;
 
+// Tabla de símbolos dinámica
 typedef struct {
-    InformacionToken **filas;      // Puntero a punteros (cada fila)
-    int nFilas;       // Cantidad actual de filas
-    int columnas;     // Cantidad fija de columnas
+    InformacionToken filas[TAM_TABLA]; // arreglo dinámico de tokens
+    int nFilas;              // cantidad actual de filas
 } Tabla;
 
-// Inicializar tabla
-void inicializarTabla(Tabla *t, int columnas) {
-    t->filas = NULL;
-    t->nFilas = 0;
-    t->columnas = columnas;
-}
+void iniciar_tabla(Tabla *tabla);
+void normalizarReal(const char *entrada, char *salida, size_t tam_salida);
+void agregarATabla(Tabla *tabla, const char* nombre, char* tipo_token);
+int existe_en_tabla(Tabla *tabla, char *valor);
+void guardarTablaEnArchivo(const Tabla *tabla, const char *nombreArchivo);
 
-// Insertar una fila en la tabla
-void insertarEnTabla(Tabla *t, InformacionToken *info) {
-    // Aumentamos espacio para un puntero más
-    t->filas = realloc(t->filas, (t->nFilas + 1) * sizeof(int*));
-    if (t->filas == NULL) {
-        perror("Error en realloc");
-        exit(1);
-    }
-
-    // Reservamos espacio para la nueva fila
-    t->filas[t->nFilas] = malloc(t->columnas *sizeof(InformacionToken));
-    if (t->filas[t->nFilas] == NULL) {
-        perror("Error en malloc fila");
-        exit(1);
-    }
-
-    // Copiamos los valores a la nueva fila
-    for (int j = 0; j < t->columnas; j++) {
-        t->filas[t->nFilas][j] = valor[j];
-    }
-
-    // Incrementamos el contador de filas
-    t->nFilas++;
-}
-
-// Mostrar la tabla
-void mostrarTabla(Tabla *t) {
-    for (int i = 0; i < t->nFilas; i++) {
-        for (int j = 0; j < t->columnas; j++) {
-            printf("%d ", t->filas[i][j]);
-        }
-        printf("\n");
-    }
-}
-
-// Liberar memoria
-void liberarTabla(Tabla *t) {
-    for (int i = 0; i < t->nFilas; i++) {
-        free(t->filas[i]);
-    }
-    free(t->filas);
-    t->filas = NULL;
-    t->nFilas = 0;
-}
+#endif
