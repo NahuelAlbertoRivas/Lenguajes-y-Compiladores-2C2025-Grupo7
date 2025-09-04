@@ -27,7 +27,7 @@ void normalizarReal(const char *entrada, char *salida, size_t tam_salida) {
 
 void agregarATabla(Tabla *tabla, const char* nombre, char* tipo_token){
 
-	char salida[100];
+	char salida[10000];
 
     if(bandera == 0){
         bandera = 1;
@@ -40,25 +40,44 @@ void agregarATabla(Tabla *tabla, const char* nombre, char* tipo_token){
     }
     
     if(strcmp(tipo_token, "CTE_STRING") == 0){
-            if (!nombre || !salida) return;
-
-        for (int i = 0; nombre[i] != '\0'; i++) {
-            salida[i] = tolower((unsigned char) nombre[i]);
+        for (int i = 0; i < strlen(nombre)-1; i++) {
+            salida[i]=tolower((unsigned char) nombre[i]);
         }
-        salida[strlen(nombre)] = '\0';  // terminador
+        salida[strlen(nombre)] = '\0';
     }
 
     if (existe_en_tabla(tabla, salida) == FALSE){
+        /*
         int lexemas_ingresados = tabla->nFilas;
-        char* nombre1 = malloc((strlen(nombre)+2)*sizeof(char));
+        char* nombre1 = malloc((strlen(nombre)+4)*sizeof(char));
         strcpy(nombre1,nombre);
-        strcpy(nombre1,strcat("_",nombre1));
+        strcpy(nombre1,strcat("_",nombre1)); // se rompe aca
         strcpy(tabla->filas[lexemas_ingresados].valor, nombre);
         strcpy(tabla->filas[lexemas_ingresados].valor, nombre);
         strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+        */
+
+        int lexemas_ingresados = tabla->nFilas;
+
+        // Reservamos memoria para el nuevo nombre con "_" al inicio
+        char* nombre1 = malloc(strlen(nombre) + 2); // +1 para "_" +1 para '\0'
+        if (!nombre1) { perror("malloc"); return; }
+
+        nombre1[0] = '_';                 // primer carácter "_"
+        strcpy(nombre1 + 1, nombre);      // copiamos el resto
+        // nombre1 ahora es "_nombre"
+
+        // Reservamos memoria para los campos de la tabla
+        tabla->filas[lexemas_ingresados].valor = malloc(strlen(nombre) + 1);
+        tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
+
+        strcpy(tabla->filas[lexemas_ingresados].valor, nombre);
+        strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+
+        free(nombre1); // si no lo vas a usar más
     }
 
-    guardarTablaEnArchivo(tabla, "Salida.txt");
+        guardarTablaEnArchivo(tabla, "Salida.txt");
 }
 
 int existe_en_tabla(Tabla *tabla, char *valor) {
