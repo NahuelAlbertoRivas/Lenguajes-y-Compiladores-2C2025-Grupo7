@@ -17,6 +17,7 @@
 
 /* Defines */
 #define TAM_MAX_STRING 50
+#define TAM_MAX_ID     100
 
 /* Variables Globales */
 FILE  *yyin;
@@ -28,25 +29,12 @@ char *yyltext;
 
 int yyerror(void);
 
-/*
-// Estructura para cada entrada en la tabla de símbolos
-typedef struct {
-    char *nombre;
-    char *valor; 
-    int longitud;   
-    char *tipoDato;
-} InformacionToken;
-
-// Tabla de símbolos dinámica
-typedef struct {
-    InformacionToken *filas; // arreglo dinámico de tokens
-    int nFilas;              // cantidad actual de filas
-} Tabla; */
 
 /* Funciones Auxiliares*/
 int validar_entero(const char* lexema);
 int validar_real(const char* lexema);
 int validar_string(const char* lexema);
+int validar_id(const char* lexema);
 
 %}
 
@@ -123,11 +111,13 @@ TD_BOOLEAN              "Boolean"
 WRITE                   "write"
 READ                    "read"
 INIT                    "init"
+TRUE                    "true"
+FALSE                   "false"
 
 FN_EQUALEXPRESSIONS     "equalExpressions"
 FN_ISZERO               "isZero"
 
-RET                 "return"
+RET                     "return"
 
 /* Regex: COMENTARIO*/
 COMMENT                 "#+".*"+#"
@@ -162,7 +152,11 @@ ID			            {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {OP_AND}		        {printf("\nOperador: %s\n", yytext);return OP_AND;}
 {OP_OR}		            {printf("\nOperador: %s\n", yytext);return OP_OR;}
 {OP_NOT}		        {printf("\nOperador: %s\n", yytext);return OP_NOT;}
-{ID}			        {printf("\nIdentificador: %s\n", yytext); agregarATabla(&tabla, yytext, "CTE_STRING"); return ID;}
+{FN_ISZERO}		        {printf("\nPalabra Reservada: %s\n", yytext);return FN_ISZERO;}
+{FN_EQUALEXPRESSIONS}	{printf("\nPalabra Reservada: %s\n", yytext);return FN_EQUALEXPRESSIONS;}
+{TRUE}	                {printf("\nPalabra Reservada: %s\n", yytext);return TRUE;}
+{FALSE}	                {printf("\nPalabra Reservada: %s\n", yytext);return FALSE;}
+{ID}			        {return validar_id(yytext);}
 {OP_SUM}		        {printf("\nSuma: %s\n", yytext);return OP_SUM;}
 {OP_ASIG}			    {printf("\nAsignacion: %s\n", yytext);return OP_ASIG;}
 {OP_MUL}		        {printf("\nMultiplicacion: %s\n", yytext);return OP_MUL;}
@@ -181,23 +175,22 @@ ID			            {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {CMP_MENOR_IGUAL}	    {printf("\nComparador: %s\n", yytext);return CMP_MENOR_IGUAL;}
 {CMP_DISTINTO}		    {printf("\nComparador: %s\n", yytext);return CMP_DISTINTO;}
 {CMP_ES_IGUAL}		    {printf("\nComparador: %s\n", yytext);return CMP_ES_IGUAL;}
-{COMMENT}		        {printf("\nComentario ignorado: %s\n", yytext);}
+{COMMENT}		        {/*printf("\nComentario ignorado: %s\n", yytext);*/}
 {COMA}		            {printf("\nComa: %s\n", yytext);return COMA;}
 {DOS_PUNTOS}            {printf("\nDos puntos: %s\n", yytext);return DOS_PUNTOS;}
-{OP_UN_INC}		    {printf("\nIncremento Unario: %s\n", yytext);return OP_UN_INC;}
-{OP_UN_DEC}		    {printf("\nDecremento Unario: %s\n", yytext);return OP_UN_DEC;}
+{OP_UN_INC}		        {printf("\nIncremento Unario: %s\n", yytext);return OP_UN_INC;}
+{OP_UN_DEC}		        {printf("\nDecremento Unario: %s\n", yytext);return OP_UN_DEC;}
 
 {CTE_INT}               { return validar_entero(yytext); }
 {CTE_REAL}              { return validar_real(yytext); }
 {CTE_STRING}            { return validar_string(yytext); }
 
-"\n"      		
-"\t"            
-"\n\t"          
-" "             		
-"\r\n"     
+"\n"
+"\t"
+"\n\t"
+" "
+"\r\n"
 .			            { printf( "ERROR LEXICO : Caracter no reconocido: %s\n", yytext ); exit (0);}
-
 %%
 
 /*---------------------------------------------*/
@@ -212,21 +205,12 @@ int validar_entero(const char* lexema) {
         fprintf(stderr, "ERROR: Constante entera fuera de rango (maximo 16 bits): %s\n", lexema);
         exit(1);
     }
+
+    printf("\nConstante entera: %s\n", lexema);
+    agregar_a_tabla(&tabla, lexema, "CTE_INT");
     
     return CTE_INT;
 }
-
-/*printf("\nConstante entera: %s\n", lexema);
-    
-    char nombre[100];
-    strcpy(nombre, "_");
-    strcat(nombre, lexema);
-
-    char longitud[100];
-    sprintf(longitud, "%d", (int)strlen(lexema));
-    
-    insertarEnTabla(&tabla, nombre, lexema, (int)strlen(lexema), "CTE_INT");
-    mostrarTabla(&tabla);**/
 
 
 int validar_real(const char* lexema) {
@@ -238,7 +222,7 @@ int validar_real(const char* lexema) {
         exit(1);
     }
     printf("\nConstante real: %s\n", lexema);
-    agregarATabla(&tabla, lexema, "CTE_REAL");
+    agregar_a_tabla(&tabla, lexema, "CTE_REAL");
     return CTE_REAL;
 ;
 }
@@ -250,27 +234,17 @@ int validar_string(const char* lexema) {
         exit(1);
     }
     printf("\nConstante string: %s\n", lexema);
-    agregarATabla(&tabla, lexema, "CTE_STRING");
+    agregar_a_tabla(&tabla, lexema, "CTE_STRING");
     return CTE_STRING;
 }
 
-
-/*
-{ID}            {
-    if(fa_validarLongitudID(yytext) == TRUE){
-        insertarEnLista(&listaSimbolos, yytext, tID);
-    }
-    strcpy(yylval.string_val, yytext); 
-    return ID;
-    }
-
-    int fa_validarLongitudID(char* ptr) {
-    long valor = strlen(ptr);
-
-    if ( valor < 1 || valor > ID_LARGO_MAX) {
-        printf ("[%d] Error, largo de ID fuera de rango\n", yylineno);
+int validar_id(const char* lexema) {
+    size_t len = strlen(lexema);
+    if (len < 0 || len > TAM_MAX_ID) {
+        fprintf(stderr, "ERROR: ID demasiado largao (maximo 100): %s\n", lexema);
         exit(1);
     }
-
+    printf("\nIdentificador: %s\n", lexema);
+    agregar_a_tabla(&tabla, lexema, "ID");
     return ID;
-} */
+}

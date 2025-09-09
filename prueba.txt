@@ -6,6 +6,15 @@ init {
 	D : Boolean
 }
 #+D := regIniSAT1(p2, p3, ar0, a)+#
+a1 := 5
+a1 := 5
+a1 := 5
+a1 := 3.5
+p1 := "hola"
+p1 := "hola"
+p2 := "chau"
+D  := true
+ar0 := 1
 c:=d*(e-21)/4+j
 while(h<20)
 #+ Este es un comentario que se tiene que ignorar +#
@@ -17,7 +26,7 @@ while(h<20)
 	else
 		c := 5
 }
-if(a==0){a:=5}
+if(a==0 AND b<c){a:=5}
 else
 {
 	n_code := reportAndFix()

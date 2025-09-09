@@ -16,7 +16,7 @@ void iniciar_tabla(Tabla *tabla) {
     tabla->nFilas = 0;
 }
 
-void normalizarReal(const char *entrada, char *salida, size_t tam_salida) {
+void normalizar_real(const char *entrada, char *salida, size_t tam_salida) {
     // Convertimos la cadena a float (32 bits)
     float numero = strtof(entrada, NULL);
 
@@ -25,9 +25,10 @@ void normalizarReal(const char *entrada, char *salida, size_t tam_salida) {
     snprintf(salida, tam_salida, "%.6f", numero);
 }
 
-void agregarATabla(Tabla *tabla, const char* nombre, char* tipo_token){
+void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
 
-	char salida[10000];
+    char salida[10000];
+    char nombre2[10000] = "";
 
     if(bandera == 0){
         bandera = 1;
@@ -35,65 +36,110 @@ void agregarATabla(Tabla *tabla, const char* nombre, char* tipo_token){
     }
     
     if(strcmp(tipo_token, "CTE_REAL") == 0){
-        //char salida[100];
-        normalizarReal(nombre, salida, sizeof(salida));
+        normalizar_real(nombre, salida, sizeof(salida));
     }
     
     if(strcmp(tipo_token, "CTE_STRING") == 0){
-        for (int i = 0; i < strlen(nombre)-1; i++) {
+        for (int i = 0; i < strlen(nombre); i++) {
             salida[i]=tolower((unsigned char) nombre[i]);
         }
         salida[strlen(nombre)] = '\0';
     }
 
-    if (existe_en_tabla(tabla, salida) == FALSE){
-        /*
+    if (strcmp(tipo_token, "CTE_INT") == 0) {
+        int numero = atoi(nombre); // convertir la cadena 'nombre' a entero
+        snprintf(salida, sizeof(salida), "%d", numero); // pasar el entero a 'salida'
+    }
+
+    if(strcmp(tipo_token, "ID") == 0){
+        for (int i = 0; i < strlen(nombre); i++) {
+            salida[i]=tolower((unsigned char) nombre[i]);
+        }
+        salida[strlen(nombre)] = '\0';
+    }
+
+    
+    if (existe_en_tabla(tabla, salida, tipo_token) == FALSE){
         int lexemas_ingresados = tabla->nFilas;
-        char* nombre1 = malloc((strlen(nombre)+4)*sizeof(char));
-        strcpy(nombre1,nombre);
-        strcpy(nombre1,strcat("_",nombre1)); // se rompe aca
-        strcpy(tabla->filas[lexemas_ingresados].valor, nombre);
-        strcpy(tabla->filas[lexemas_ingresados].valor, nombre);
-        strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
-        */
+            char* nombre1 = malloc(strlen(nombre) + 1); // +1 para "_" +1 para '\0'
+        if(strcmp(tipo_token, "ID") == 0){
+            if (!nombre1) { perror("malloc"); return; }
+            // Asignar memoria
+            tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 1);
+            tabla->filas[lexemas_ingresados].valor = malloc(2);
+            tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
+            
+            //Rellenar valores
+            strcpy(nombre1, nombre);            
+            strcpy(tabla->filas[lexemas_ingresados].nombre, nombre1);
+            strcpy(tabla->filas[lexemas_ingresados].valor, "-");
+            strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+            free(nombre1);
+        } else {
+            char* nombre1 = malloc(strlen(nombre) + 2); // +1 para "_" +1 para '\0'
+            if (!nombre1) { perror("malloc"); return; }
+            // Asignación de memoria
+            tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 1);
+            tabla->filas[lexemas_ingresados].valor = malloc(strlen(nombre) + 1);
+            tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
+            tabla->filas[lexemas_ingresados].longitud = (int) strlen(nombre);
 
-        int lexemas_ingresados = tabla->nFilas;
-
-        // Reservamos memoria para el nuevo nombre con "_" al inicio
-        char* nombre1 = malloc(strlen(nombre) + 2); // +1 para "_" +1 para '\0'
-        if (!nombre1) { perror("malloc"); return; }
-
-        nombre1[0] = '_';                 // primer carácter "_"
-        strcpy(nombre1 + 1, nombre);      // copiamos el resto
-        // nombre1 ahora es "_nombre"
-
-        // Reservamos memoria para los campos de la tabla
-        tabla->filas[lexemas_ingresados].valor = malloc(strlen(nombre) + 1);
-        tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
-
-        strcpy(tabla->filas[lexemas_ingresados].valor, nombre);
-        strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
-
-        free(nombre1); // si no lo vas a usar más
+            //Rellenar valores
+            strcpy(nombre1, "_");
+            strcpy(nombre1 + 1, nombre);
+            strcpy(tabla->filas[lexemas_ingresados].nombre, nombre1);
+            strcpy(tabla->filas[lexemas_ingresados].valor, nombre);
+            strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+            free(nombre1);
+        }
 
         tabla->nFilas++;
     }
 
-        guardarTablaEnArchivo(tabla, "Salida.txt");
+    guardar_tabla_en_archivo(tabla, "Salida.txt");
 }
 
-int existe_en_tabla(Tabla *tabla, char *valor) {
-    for (int i = 0; i < tabla->nFilas; i++) {
-        if (strcmp(tabla->filas[i].valor, valor) == 0) {
-            return TRUE; 
+int existe_en_tabla(Tabla *tabla, char *valor, char* tipo_token) {
+
+    if(strcmp(tipo_token, "ID") == 0){
+        for (int i = 0; i < tabla->nFilas; i++) {      
+            if (strcmp(tabla->filas[i].nombre, valor) == 0) {
+                return TRUE; 
+            }
         }
-    }
-    return FALSE; 
+        return FALSE; 
+
+    } else if(strcmp(tipo_token, "CTE_REAL") == 0) {
+        normalizar_real(valor, valor, sizeof(valor));
+
+        for (int i = 0; i < tabla->nFilas; i++) {      
+            if (strcmp(tabla->filas[i].nombre, valor) == 0) {
+                return TRUE; 
+            }
+        }
+
+        return FALSE; 
+
+    } else{
+
+        for (int i = 0; i < tabla->nFilas; i++) {      
+            char *nombre_tabla = tabla->filas[i].nombre;
+
+            if (nombre_tabla[0] == '_') {
+                nombre_tabla++; // mover puntero al siguiente carácter
+            }
+
+            if (strcmp(nombre_tabla, valor) == 0) {
+                return TRUE; 
+            }
+        }
+        return FALSE; 
+
+     }
+
 }
 
-
-
-void mostrarTabla(const Tabla *tabla) {
+void mostrar_tabla(const Tabla *tabla) {
     printf("--------------------------------------------------------------------------------\n");
     printf("| %-20s | %-20s | %-10s | %-10s |\n", 
            "Nombre", "Valor", "Longitud", "TipoDato");
@@ -110,7 +156,7 @@ void mostrarTabla(const Tabla *tabla) {
     printf("--------------------------------------------------------------------------------\n");
 }
 
-void guardarTablaEnArchivo(const Tabla *tabla, const char *nombreArchivo) {
+void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
     FILE *f = fopen(nombreArchivo, "w");
     if (!f) {
         perror("Error al abrir el archivo");
