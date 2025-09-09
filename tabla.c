@@ -27,7 +27,7 @@ void normalizar_real(const char *entrada, char *salida, size_t tam_salida) {
 
 void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
 
-    char salida[10000];
+    char salida[10000] = "";
     char nombre2[10000] = "";
 
     if(bandera == 0){
@@ -36,7 +36,8 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
     }
     
     if(strcmp(tipo_token, "CTE_REAL") == 0){
-        normalizar_real(nombre, salida, sizeof(salida));
+        //normalizar_real(nombre, salida, sizeof(salida));
+        strcpy(salida, nombre);
     }
     
     if(strcmp(tipo_token, "CTE_STRING") == 0){
@@ -110,14 +111,17 @@ int existe_en_tabla(Tabla *tabla, char *valor, char* tipo_token) {
         return FALSE; 
 
     } else if(strcmp(tipo_token, "CTE_REAL") == 0) {
-        normalizar_real(valor, valor, sizeof(valor));
-
         for (int i = 0; i < tabla->nFilas; i++) {      
-            if (strcmp(tabla->filas[i].nombre, valor) == 0) {
+            char *nombre_tabla = tabla->filas[i].nombre;
+
+            if (nombre_tabla[0] == '_') {
+                nombre_tabla++; // mover puntero al siguiente carácter
+            }
+
+            if (strcmp(nombre_tabla, valor) == 0) {
                 return TRUE; 
             }
         }
-
         return FALSE; 
 
     } else{
@@ -140,20 +144,20 @@ int existe_en_tabla(Tabla *tabla, char *valor, char* tipo_token) {
 }
 
 void mostrar_tabla(const Tabla *tabla) {
-    printf("--------------------------------------------------------------------------------\n");
-    printf("| %-20s | %-20s | %-10s | %-10s |\n", 
+    printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
+    printf("| %-50s | %-50s | %-10s | %-10s |\n", 
            "Nombre", "Valor", "Longitud", "TipoDato");
-    printf("--------------------------------------------------------------------------------\n");
+    printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
 
     for (int i = 0; i < tabla->nFilas; i++) {
-        printf("| %-20s | %-20s | %-10d | %-10s |\n",
+        printf("| %-50s | %-50s | %-10d | %-10s |\n",
                tabla->filas[i].nombre ? tabla->filas[i].nombre : "-",
                tabla->filas[i].valor  ? tabla->filas[i].valor  : "-",
                tabla->filas[i].longitud,
                tabla->filas[i].tipoDato ? tabla->filas[i].tipoDato : "-");
     }
 
-    printf("--------------------------------------------------------------------------------\n");
+    printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
 }
 
 void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
@@ -163,20 +167,20 @@ void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
         return;
     }
 
-    fprintf(f, "--------------------------------------------------------------------------------\n");
-    fprintf(f, "| %-20s | %-20s | %-10s | %-10s |\n", 
+    fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(f, "| %-50s | %-50s | %-10s | %-10s |\n", 
             "Nombre", "Valor", "Longitud", "TipoDato");
-    fprintf(f, "--------------------------------------------------------------------------------\n");
+    fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
 
     for (int i = 0; i < tabla->nFilas; i++) {
-        fprintf(f, "| %-20s | %-20s | %-10d | %-10s |\n",
+        fprintf(f, "| %-50s | %-50s | %-10d | %-10s |\n",
                 tabla->filas[i].nombre ? tabla->filas[i].nombre : "-",
                 tabla->filas[i].valor  ? tabla->filas[i].valor  : "-",
                 tabla->filas[i].longitud,
                 tabla->filas[i].tipoDato ? tabla->filas[i].tipoDato : "-");
     }
 
-    fprintf(f, "--------------------------------------------------------------------------------\n");
+    fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
 
     fclose(f);
 }

@@ -1,40 +1,66 @@
---------------------------------------------------------------------------------
-| Nombre               | Valor                | Longitud   | TipoDato   |
---------------------------------------------------------------------------------
-| -                    | a1                   | 0          | CTE_STRING |
-| -                    | b1                   | 0          | CTE_STRING |
-| -                    | a                    | 0          | CTE_STRING |
-| -                    | b                    | 0          | CTE_STRING |
-| -                    | ar0                  | 0          | CTE_STRING |
-| -                    | var1                 | 0          | CTE_STRING |
-| -                    | c                    | 0          | CTE_STRING |
-| -                    | d                    | 0          | CTE_STRING |
-| -                    | h                    | 0          | CTE_STRING |
-| -                    | j                    | 0          | CTE_STRING |
-| -                    | d                    | 0          | CTE_STRING |
-| -                    | e                    | 0          | CTE_STRING |
-| -                    | p1                   | 0          | CTE_STRING |
-| -                    | p2                   | 0          | CTE_STRING |
-| -                    | p3                   | 0          | CTE_STRING |
-| -                    | D                    | 0          | CTE_STRING |
-| -                    | c                    | 0          | CTE_STRING |
-| -                    | d                    | 0          | CTE_STRING |
-| -                    | e                    | 0          | CTE_STRING |
-| -                    | j                    | 0          | CTE_STRING |
-| -                    | h                    | 0          | CTE_STRING |
-| -                    | ar0                  | 0          | CTE_STRING |
-| -                    | rem                  | 0          | CTE_STRING |
-| -                    | est_com              | 0          | CTE_STRING |
-| -                    | sig                  | 0          | CTE_STRING |
-| -                    | base                 | 0          | CTE_STRING |
-| -                    | rend                 | 0          | CTE_STRING |
-| -                    | c                    | 0          | CTE_STRING |
-| -                    | a                    | 0          | CTE_STRING |
-| -                    | a                    | 0          | CTE_STRING |
-| -                    | n_code               | 0          | CTE_STRING |
-| -                    | reportAndFix         | 0          | CTE_STRING |
-| -                    | broad                | 0          | CTE_STRING |
-| -                    | n_code               | 0          | CTE_STRING |
-| -                    | var1                 | 0          | CTE_STRING |
-| -                    | var1                 | 0          | CTE_STRING |
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
+| Nombre                                             | Valor                                              | Longitud   | TipoDato   |
+-------------------------------------------------------------------------------------------------------------------------------------
+| a1                                                 | -                                                  | 0          | ID         |
+| b1                                                 | -                                                  | 0          | ID         |
+| a                                                  | -                                                  | 0          | ID         |
+| b                                                  | -                                                  | 0          | ID         |
+| ar0                                                | -                                                  | 0          | ID         |
+| var1                                               | -                                                  | 0          | ID         |
+| c                                                  | -                                                  | 0          | ID         |
+| d                                                  | -                                                  | 0          | ID         |
+| h                                                  | -                                                  | 0          | ID         |
+| i                                                  | -                                                  | 0          | ID         |
+| j                                                  | -                                                  | 0          | ID         |
+| e                                                  | -                                                  | 0          | ID         |
+| f                                                  | -                                                  | 0          | ID         |
+| s                                                  | -                                                  | 0          | ID         |
+| contador                                           | -                                                  | 0          | ID         |
+| p1                                                 | -                                                  | 0          | ID         |
+| p2                                                 | -                                                  | 0          | ID         |
+| p3                                                 | -                                                  | 0          | ID         |
+| y                                                  | -                                                  | 0          | ID         |
+| res                                                | -                                                  | 0          | ID         |
+| _1                                                 | 1                                                  | 1          | CTE_INT    |
+| _2                                                 | 2                                                  | 1          | CTE_INT    |
+| _99999.992187500                                   | 99999.992187500                                    | 15         | CTE_REAL   |
+| _99.000000000                                      | 99.000000000                                       | 12         | CTE_REAL   |
+| _0.999899983                                       | 0.999899983                                        | 11         | CTE_REAL   |
+| _"@sdADaSjfla%dfg"                                 | "@sdADaSjfla%dfg"                                  | 17         | CTE_STRING |
+| _"asldk  fh sjf"                                   | "asldk  fh sjf"                                    | 15         | CTE_STRING |
+| _0                                                 | 0                                                  | 1          | CTE_INT    |
+| _5                                                 | 5                                                  | 1          | CTE_INT    |
+| _"a es mas grande que b"                           | "a es mas grande que b"                            | 23         | CTE_STRING |
+| _"a es mas chico o igual a b"                      | "a es mas chico o igual a b"                       | 28         | CTE_STRING |
+| _"a es mas grande que b y c es mas grande que b"   | "a es mas grande que b y c es mas grande que b"    | 47         | CTE_STRING |
+| _"a no es mas grande que b"                        | "a no es mas grande que b"                         | 26         | CTE_STRING |
+| _"a es mas grande que b y c"                       | "a es mas grande que b y c"                        | 27         | CTE_STRING |
+| _3                                                 | 3                                                  | 1          | CTE_INT    |
+| x                                                  | -                                                  | 0          | ID         |
+| _27                                                | 27                                                 | 2          | CTE_INT    |
+| r                                                  | -                                                  | 0          | ID         |
+| _500                                               | 500                                                | 3          | CTE_INT    |
+| _34                                                | 34                                                 | 2          | CTE_INT    |
+| z                                                  | -                                                  | 0          | ID         |
+| base                                               | -                                                  | 0          | ID         |
+| _44                                                | 44                                                 | 2          | CTE_INT    |
+| _10                                                | 10                                                 | 2          | CTE_INT    |
+| _"El contador vale 10"                             | "El contador vale 10"                              | 21         | CTE_STRING |
+| _7                                                 | 7                                                  | 1          | CTE_INT    |
+| _"La expresion es igual a cero"                    | "La expresion es igual a cero"                     | 30         | CTE_STRING |
+| _0.500000000                                       | 0.500000000                                        | 11         | CTE_REAL   |
+| _5.500000000                                       | 5.500000000                                        | 11         | CTE_REAL   |
+| _"hola"                                            | "hola"                                             | 6          | CTE_STRING |
+| _"chau"                                            | "chau"                                             | 6          | CTE_STRING |
+| _21                                                | 21                                                 | 2          | CTE_INT    |
+| _4                                                 | 4                                                  | 1          | CTE_INT    |
+| _20                                                | 20                                                 | 2          | CTE_INT    |
+| rem                                                | -                                                  | 0          | ID         |
+| est_com                                            | -                                                  | 0          | ID         |
+| sig                                                | -                                                  | 0          | ID         |
+| rend                                               | -                                                  | 0          | ID         |
+| n_code                                             | -                                                  | 0          | ID         |
+| reportAndFix                                       | -                                                  | 0          | ID         |
+| broad                                              | -                                                  | 0          | ID         |
+| _"Sintaxis OK"                                     | "Sintaxis OK"                                      | 13         | CTE_STRING |
+-------------------------------------------------------------------------------------------------------------------------------------

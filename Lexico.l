@@ -212,6 +212,13 @@ int validar_entero(const char* lexema) {
     return CTE_INT;
 }
 
+void normalizar_real_lexico(const char *entrada, char *salida, size_t tam_salida) {
+    // Convertimos la cadena a float (32 bits)
+    float numero = strtof(entrada, NULL);
+
+    // Imprimimos con 6 decimales fijos (ajusta según consigna)
+    snprintf(salida, tam_salida, "%.9f", numero);
+}
 
 int validar_real(const char* lexema) {
     errno = 0;
@@ -221,10 +228,16 @@ int validar_real(const char* lexema) {
         fprintf(stderr, "ERROR: Constante real fuera de rango (maximo 32 bits): %s\n", lexema);
         exit(1);
     }
-    printf("\nConstante real: %s\n", lexema);
-    agregar_a_tabla(&tabla, lexema, "CTE_REAL");
+
+    char normalizado[64];
+    normalizar_real_lexico(lexema, normalizado, sizeof(normalizado));
+
+    printf("\nConstante real: %s (normalizado: %s)\n", lexema, normalizado);
+
+    // Guardar el valor normalizado, no el lexema original
+    agregar_a_tabla(&tabla, normalizado, "CTE_REAL");
+
     return CTE_REAL;
-;
 }
 
 int validar_string(const char* lexema) {
