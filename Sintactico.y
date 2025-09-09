@@ -14,6 +14,11 @@ int yylex();
 
 %}
 
+%token FN_EQUALEXPRESSIONS
+%token FN_ISZERO
+%token TRUE
+%token FALSE
+
 %token CTE_INT
 %token CTE_REAL
 %token CTE_STRING
@@ -60,10 +65,6 @@ int yylex();
 %right OP_NOT
 
 %token NUMERAL
-
-
-%token FN_EQUALEXPRESSIONS
-%token FN_ISZERO  
 
 //y := equalExpressions(a + b, 5, b * 2, 3 + 2, a + b)
 //Y := isZero( s*7+1-h/2 )   
@@ -119,6 +120,8 @@ asignacion:
     ID OP_ASIG expresion {printf("    ID := Expresion_Aritmetica es Asignacion\n");}
     | ID OP_UN_INC {printf("    ID++ es Asignacion\n");}
     | ID OP_UN_DEC {printf("    ID-- es Asignacion\n");}
+    | ID OP_ASIG FALSE {printf("    ID := Expresion_False es Asignacion\n");}
+    | ID OP_ASIG TRUE {printf("    ID := Expresion_True es Asignacion\n");}
 	;
 
 bloque_asociado:
@@ -170,9 +173,9 @@ termino:
 factor: 
     ID {printf("    ID es Factor \n");}
     | CTE_INT {printf("    CTE_INT es Factor\n");}
+    | CTE_REAL {printf("    CTE_REAL es Factor\n");}
     | PAR_ABR expresion PAR_CIE {printf("    Expresion entre parentesis es Factor\n");}
-    | CTE_STRING {printf("    CTE_INT es elemento\n");}
-    
+    | CTE_STRING {printf("    CTE_STRING es Factor\n");} 
     | llamada_func {printf("    Llamada_Func es Factor\n");}
     ;
 
