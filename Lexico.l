@@ -139,47 +139,47 @@ ID			            {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 /*---------------------------------------------*/
 
 %%
-{IF}			        {printf("\nPalabra Reservada: %s\n", yytext);return IF;}
-{WHILE}			        {printf("\nPalabra Reservada: %s\n", yytext);return WHILE;}
-{ELSE}			        {printf("\nPalabra Reservada: %s\n", yytext);return ELSE;}
-{WRITE}			        {printf("\nPalabra Reservada: %s\n", yytext);return WRITE;}
-{READ}			        {printf("\nPalabra Reservada: %s\n", yytext);return READ;}
-{INIT}			        {printf("\nPalabra Reservada: %s\n", yytext);return INIT;}
-{TD_INT}			    {printf("\nPalabra Reservada: %s\n", yytext);return TD_INT;}
-{TD_FLOAT}			    {printf("\nPalabra Reservada: %s\n", yytext);return TD_FLOAT;}
-{TD_STRING}			    {printf("\nPalabra Reservada: %s\n", yytext);return TD_STRING;}
-{TD_BOOLEAN}	        {printf("\nPalabra Reservada: %s\n", yytext);return TD_BOOLEAN;}
-{OP_AND}		        {printf("\nOperador: %s\n", yytext);return OP_AND;}
-{OP_OR}		            {printf("\nOperador: %s\n", yytext);return OP_OR;}
-{OP_NOT}		        {printf("\nOperador: %s\n", yytext);return OP_NOT;}
-{FN_ISZERO}		        {printf("\nPalabra Reservada: %s\n", yytext);return FN_ISZERO;}
-{FN_EQUALEXPRESSIONS}	{printf("\nPalabra Reservada: %s\n", yytext);return FN_EQUALEXPRESSIONS;}
-{TRUE}	                {printf("\nPalabra Reservada: %s\n", yytext);return TRUE;}
-{FALSE}	                {printf("\nPalabra Reservada: %s\n", yytext);return FALSE;}
+{IF}			        {return IF;}
+{WHILE}			        {return WHILE;}
+{ELSE}			        {return ELSE;}
+{WRITE}			        {return WRITE;}
+{READ}			        {return READ;}
+{INIT}			        {return INIT;}
+{TD_INT}			    {return TD_INT;}
+{TD_FLOAT}			    {return TD_FLOAT;}
+{TD_STRING}			    {return TD_STRING;}
+{TD_BOOLEAN}	        {return TD_BOOLEAN;}
+{OP_AND}		        {return OP_AND;}
+{OP_OR}		            {return OP_OR;}
+{OP_NOT}		        {return OP_NOT;}
+{FN_ISZERO}		        {return FN_ISZERO;}
+{FN_EQUALEXPRESSIONS}	{return FN_EQUALEXPRESSIONS;}
+{TRUE}	                {return TRUE;}
+{FALSE}	                {return FALSE;}
 {ID}			        {return validar_id(yytext);}
-{OP_SUM}		        {printf("\nSuma: %s\n", yytext);return OP_SUM;}
-{OP_ASIG}			    {printf("\nAsignacion: %s\n", yytext);return OP_ASIG;}
-{OP_MUL}		        {printf("\nMultiplicacion: %s\n", yytext);return OP_MUL;}
-{OP_RES}		        {printf("\nResta: %s\n", yytext);return OP_RES;}
-{OP_DIV}		        {printf("\nDivision: %s\n", yytext);return OP_DIV;}
-{PAR_ABR}			    {printf("\nParAbre: %s\n", yytext);return PAR_ABR;}
-{PAR_CIE}			    {printf("\nParCierra: %s\n", yytext);return PAR_CIE;}
-{PUNTO_COMA}            {printf("\nPunto y Coma: %s\n", yytext);return PUNTO_COMA;}
-{COR_ABR}               {printf("\nCorchete Abre: %s\n", yytext);return COR_ABR;}
-{COR_CIE}               {printf("\nCorchete Cierra: %s\n", yytext);return COR_CIE;}
-{LLA_ABR}               {printf("\nLLave abre: %s\n", yytext);return LLA_ABR;}
-{LLA_CIE}               {printf("\nLLave cierra: %s\n", yytext);return LLA_CIE;}
-{CMP_MAYOR}			    {printf("\nComparador: %s\n", yytext);return CMP_MAYOR;}
-{CMP_MENOR}			    {printf("\nComparador: %s\n", yytext);return CMP_MENOR;}
-{CMP_MAYOR_IGUAL}	    {printf("\nComparador: %s\n", yytext);return CMP_MAYOR_IGUAL;}
-{CMP_MENOR_IGUAL}	    {printf("\nComparador: %s\n", yytext);return CMP_MENOR_IGUAL;}
-{CMP_DISTINTO}		    {printf("\nComparador: %s\n", yytext);return CMP_DISTINTO;}
-{CMP_ES_IGUAL}		    {printf("\nComparador: %s\n", yytext);return CMP_ES_IGUAL;}
-{COMMENT}		        {/*printf("\nComentario ignorado: %s\n", yytext);*/}
-{COMA}		            {printf("\nComa: %s\n", yytext);return COMA;}
-{DOS_PUNTOS}            {printf("\nDos puntos: %s\n", yytext);return DOS_PUNTOS;}
-{OP_UN_INC}		        {printf("\nIncremento Unario: %s\n", yytext);return OP_UN_INC;}
-{OP_UN_DEC}		        {printf("\nDecremento Unario: %s\n", yytext);return OP_UN_DEC;}
+{OP_SUM}		        {return OP_SUM;}
+{OP_ASIG}			    {return OP_ASIG;}
+{OP_MUL}		        {return OP_MUL;}
+{OP_RES}		        {return OP_RES;}
+{OP_DIV}		        {return OP_DIV;}
+{PAR_ABR}			    {return PAR_ABR;}
+{PAR_CIE}			    {return PAR_CIE;}
+{PUNTO_COMA}            {return PUNTO_COMA;}
+{COR_ABR}               {return COR_ABR;}
+{COR_CIE}               {return COR_CIE;}
+{LLA_ABR}               {return LLA_ABR;}
+{LLA_CIE}               {return LLA_CIE;}
+{CMP_MAYOR}			    {return CMP_MAYOR;}
+{CMP_MENOR}			    {return CMP_MENOR;}
+{CMP_MAYOR_IGUAL}	    {return CMP_MAYOR_IGUAL;}
+{CMP_MENOR_IGUAL}	    {return CMP_MENOR_IGUAL;}
+{CMP_DISTINTO}		    {return CMP_DISTINTO;}
+{CMP_ES_IGUAL}		    {return CMP_ES_IGUAL;}
+{COMMENT}		        {}
+{COMA}		            {return COMA;}
+{DOS_PUNTOS}            {return DOS_PUNTOS;}
+{OP_UN_INC}		        {return OP_UN_INC;}
+{OP_UN_DEC}		        {return OP_UN_DEC;}
 
 {CTE_INT}               { return validar_entero(yytext); }
 {CTE_REAL}              { return validar_real(yytext); }
@@ -205,18 +205,14 @@ int validar_entero(const char* lexema) {
         fprintf(stderr, "ERROR: Constante entera fuera de rango (maximo 16 bits): %s\n", lexema);
         exit(1);
     }
-
-    printf("\nConstante entera: %s\n", lexema);
     agregar_a_tabla(&tabla, lexema, "CTE_INT");
     
     return CTE_INT;
 }
 
 void normalizar_real_lexico(const char *entrada, char *salida, size_t tam_salida) {
-    // Convertimos la cadena a float (32 bits)
     float numero = strtof(entrada, NULL);
 
-    // Imprimimos con 6 decimales fijos (ajusta según consigna)
     snprintf(salida, tam_salida, "%.9f", numero);
 }
 
@@ -231,10 +227,6 @@ int validar_real(const char* lexema) {
 
     char normalizado[64];
     normalizar_real_lexico(lexema, normalizado, sizeof(normalizado));
-
-    printf("\nConstante real: %s (normalizado: %s)\n", lexema, normalizado);
-
-    // Guardar el valor normalizado, no el lexema original
     agregar_a_tabla(&tabla, normalizado, "CTE_REAL");
 
     return CTE_REAL;
@@ -246,7 +238,6 @@ int validar_string(const char* lexema) {
         fprintf(stderr, "ERROR: Constante string demasiado larga (maximo 50): %s\n", lexema);
         exit(1);
     }
-    printf("\nConstante string: %s\n", lexema);
     agregar_a_tabla(&tabla, lexema, "CTE_STRING");
     return CTE_STRING;
 }
@@ -257,7 +248,6 @@ int validar_id(const char* lexema) {
         fprintf(stderr, "ERROR: ID demasiado largao (maximo 100): %s\n", lexema);
         exit(1);
     }
-    printf("\nIdentificador: %s\n", lexema);
     agregar_a_tabla(&tabla, lexema, "ID");
     return ID;
 }
