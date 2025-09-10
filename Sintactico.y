@@ -75,127 +75,123 @@ int yylex();
 %%
 
 programa:
-    lista_sentencias {printf("    Lista_Sentencias es Programa\n");}
+    lista_sentencias {printf("R1. Lista_Sentencias es Programa\n");}
     ;
 
 lista_sentencias:
-    def_init {printf("    Def_Init es Lista_Sentencias\n");}
-    | sentencia {printf("    Sentencia es Lista_Sentencias\n");}
-    | lista_sentencias sentencia {printf("    Lista_Sentencias Sentencia es Lista_Sentencias\n");}
+    def_init {printf("\tR2. Def_Init es Lista_Sentencias\n");}
+    | sentencia {printf("\tR3. Sentencia es Lista_Sentencias\n");}
+    | lista_sentencias sentencia {printf("\tR4. Lista_Sentencias Sentencia es Lista_Sentencias\n");}
     ;
 
 tipo_dato:
-    TD_BOOLEAN {printf("    TD_BOOLEAN es Tipo_Dato\n");}
-    | TD_INT {printf("    TD_INT es Tipo_Dato\n");}
-    | TD_FLOAT {printf("    TD_FLOAT es Tipo_Dato\n");}
-    | TD_STRING {printf("    TD_STRING es Tipo_Dato\n");}
+    TD_BOOLEAN {printf("\t\t\t\tR5. TD_BOOLEAN es Tipo_Dato\n");}
+    | TD_INT {printf("\t\t\t\tR6. TD_INT es Tipo_Dato\n");}
+    | TD_FLOAT {printf("\t\t\t\tR7. TD_FLOAT es Tipo_Dato\n");}
+    | TD_STRING {printf("\t\t\t\tR8. TD_STRING es Tipo_Dato\n");}
     ;
 
 lista_id:
-    ID {printf("    ID es lista_id\n");}
-    | lista_id COMA ID {printf("    {lista_id} COMA ID es Lista_Id\n");}
+    ID {printf("\t\t\t\tR9. ID es lista_id\n");}
+    | lista_id COMA ID {printf("\t\t\t\tR10. lista_id COMA ID es Lista_Id\n");}
 
 bloque_asig:
-    lista_id DOS_PUNTOS tipo_dato {printf("    lista_var es Bloque_Asig\n");}
-    | bloque_asig lista_id DOS_PUNTOS tipo_dato {printf("    Bloque_Asig { lista_var } es Bloque_Asig\n");}
+    lista_id DOS_PUNTOS tipo_dato {printf("\t\t\tR11. lista_id : tipo_dato es Bloque_Asig\n");}
+    | bloque_asig lista_id DOS_PUNTOS tipo_dato {printf("\t\t\tR12. Bloque_Asig lista_id : tipo_dato es Bloque_Asig\n");}
 
 def_init:
-    INIT LLA_ABR bloque_asig LLA_CIE {printf("    INIT { bloque_asig } es Def_Init\n");}
+    INIT LLA_ABR bloque_asig LLA_CIE {printf("\t\tR13. INIT { bloque_asig } es Def_Init\n");}
 
 sentencia:  	   
-	asignacion {printf(" FIN ASIGNACION\n");} 
-    | condicional_si {printf(" FIN CONDICIONAL_SI\n");}
-    | bucle {printf(" FIN WHILE\n");}
-    | llamada_func {printf(" FIN LLAMADA_FUNC\n");}
-    | retornar {printf(" FIN RETORNAR\n");}
-    | entrada_salida {printf(" FIN RETORNAR\n");}
+	asignacion {printf("\t\tR14. Asignación es sentencia\n");} 
+    | condicional_si {printf("\t\tR15. Condicional_si es sentencia\n");}
+    | bucle {printf("\t\tR16. While es sentencia\n");}
+    | llamada_func {printf("\t\tR17. LLamada_func es sentencia\n");}
+    | retornar {printf("\t\tR18. retornar es sentencia \n");}
+    | entrada_salida {printf("\t\tR19. entrada_salida es sentencia\n");}
     ;
 
 entrada_salida: 
-    WRITE PAR_ABR factor PAR_CIE {printf("    WRITE (elem)  es entrada_salida\n");}
-    |  READ PAR_ABR ID PAR_CIE {printf("    READ(ID) es entrada_salida\n");}
+    WRITE PAR_ABR factor PAR_CIE {printf("\t\t\tR20. WRITE (factor)  es entrada_salida\n");}
+    |  READ PAR_ABR ID PAR_CIE {printf("\t\t\tR21. READ(ID) es entrada_salida\n");}
 	;
 
 asignacion: 
-    ID OP_ASIG expresion {printf("    ID := Expresion_Aritmetica es Asignacion\n");}
-    | ID OP_UN_INC {printf("    ID++ es Asignacion\n");}
-    | ID OP_UN_DEC {printf("    ID-- es Asignacion\n");}
-    | ID OP_ASIG FALSE {printf("    ID := Expresion_False es Asignacion\n");}
-    | ID OP_ASIG TRUE {printf("    ID := Expresion_True es Asignacion\n");}
+    ID OP_ASIG expresion {printf("\t\t\tR22. ID:= Expresion_Aritmetica es Asignacion\n");}
+    | ID OP_UN_INC {printf("\t\t\tR23. ID++ es Asignacion\n");}
+    | ID OP_UN_DEC {printf("\t\t\tR24. ID-- es Asignacion\n");}
+    | ID OP_ASIG FALSE {printf("\t\t\tR25. ID := Expresion_False es Asignacion\n");}
+    | ID OP_ASIG TRUE {printf("\t\t\tR26. ID := Expresion_True es Asignacion\n");}
 	;
 
 bloque_asociado:
-    sentencia {printf("    Sentencia es Bloque_Asociado\n");}
-    | LLA_ABR lista_sentencias LLA_CIE {printf("    { Lista_Sentencias } es Bloque_Asociado\n");}
+    sentencia {printf("\t\t\t\tR27. Sentencia es Bloque_Asociado\n");}
+    | LLA_ABR lista_sentencias LLA_CIE {printf("\t\t\t\tR28. { Lista_Sentencias } es Bloque_Asociado\n");}
     ;
 
 condicional_si:
-    IF PAR_ABR expresion PAR_CIE bloque_asociado %prec MENOS_QUE_ELSE {printf("    if(Expresion) Bloque_Asociado es Condicional_Si\n");}
-    | IF PAR_ABR expresion PAR_CIE bloque_asociado ELSE bloque_asociado  {printf("    if(Expresion) Bloque_Asociado else Bloque_Asociado es Condicional_Si\n");}
+    IF PAR_ABR expresion PAR_CIE bloque_asociado %prec MENOS_QUE_ELSE {printf("\t\t\tR29. if(Expresion) Bloque_Asociado es Condicional_Si\n");}
+    | IF PAR_ABR expresion PAR_CIE bloque_asociado ELSE bloque_asociado  {printf("\t\t\tR30. if(Expresion) Bloque_Asociado else Bloque_Asociado es Condicional_Si\n");}
     ;
 
 expresion: 
-    expresion_aritmetica {printf("    Expresion_Aritmetica es Expresion\n");}
-    | expresion_relacional {printf("    Expresion_Relacional es Expresion\n");}
-    | expresion_logica {printf("    Expresion_Logica es Expresion\n");}
+    expresion_aritmetica {printf("\t\t\t\tR31. Expresion_Aritmetica es Expresion\n");}
+    | expresion_relacional {printf("\t\t\t\tR32. Expresion_Relacional es Expresion\n");}
+    | expresion_logica {printf("\t\t\t\tR33. Expresion_Logica es Expresion\n");}
 	;
 
 bucle:
-    WHILE PAR_ABR expresion PAR_CIE bloque_asociado {printf("    while(Expresion) Bloque_Asociado es Bucle\n");}
+    WHILE PAR_ABR expresion PAR_CIE bloque_asociado {printf("\t\t\tR34. while(Expresion) Bloque_Asociado es Bucle\n");}
     ;
 
 expresion_logica:
-    expresion OP_AND expresion {printf("    Expresion AND Expresion es Expresion_Logica\n");}
-    | expresion OP_OR expresion {printf("    Expresion OR Expresion es Expresion_Logica\n");}
-    | OP_NOT expresion %prec NEGACION {printf("    NOT Expresion es Expresion_Logica\n");}
+    expresion OP_AND expresion {printf("\t\t\t\t\tR35. Expresion AND Expresion es Expresion_Logica\n");}
+    | expresion OP_OR expresion {printf("\t\t\t\t\tR36. Expresion OR Expresion es Expresion_Logica\n");}
+    | OP_NOT expresion %prec NEGACION {printf("\t\t\t\t\tR37. NOT Expresion es Expresion_Logica\n");}
     ;
 
 expresion_relacional:
-    expresion_aritmetica CMP_MAYOR expresion_aritmetica {printf("    Expresion_aritmetica>Expresion_aritmetica es expresion_relacional\n");}
-    | expresion_aritmetica CMP_MENOR expresion_aritmetica {printf("    Expresion_aritmetica<Expresion_aritmetica es expresion_relacional\n");}
-    | expresion_aritmetica CMP_ES_IGUAL expresion_aritmetica {printf("    Expresion_aritmetica==Expresion_aritmetica es expresion_relacional\n");}
+    expresion_aritmetica CMP_MAYOR expresion_aritmetica {printf("\t\t\t\t\tR38. Expresion_aritmetica > Expresion_aritmetica es expresion_relacional\n");}
+    | expresion_aritmetica CMP_MENOR expresion_aritmetica {printf("\t\t\t\t\tR39. Expresion_aritmetica < Expresion_aritmetica es expresion_relacional\n");}
+    | expresion_aritmetica CMP_ES_IGUAL expresion_aritmetica {printf("\t\t\t\t\tR40. Expresion_aritmetica == Expresion_aritmetica es expresion_relacional\n");}
     ;
     
 expresion_aritmetica:
-    termino {printf("    Termino es Expresion_Aritmetica\n");}
-    | OP_RES expresion_aritmetica %prec MENOS_UNARIO {printf("    - Expresion_Aritmetica es Expresion_aritmetica\n");}
-	| expresion_aritmetica OP_SUM termino {printf("    Expresion_aritmetica+Termino es Expresion_aritmetica\n");}
-	| expresion_aritmetica OP_RES termino {printf("    Expresion_aritmetica-Termino es Expresion_aritmetica\n");}
+    termino {printf("\t\t\t\t\tR41. Termino es Expresion_Aritmetica\n");}
+    | OP_RES expresion_aritmetica %prec MENOS_UNARIO {printf("\t\t\t\t\tR42. - Expresion_Aritmetica es Expresion_aritmetica\n");}
+	| expresion_aritmetica OP_SUM termino {printf("\t\t\t\t\tR43. Expresion_aritmetica + Termino es Expresion_aritmetica\n");}
+	| expresion_aritmetica OP_RES termino {printf("\t\t\t\t\tR44. Expresion_aritmetica - Termino es Expresion_aritmetica\n");}
     ;
 
 termino: 
-    factor {printf("    Factor es Termino\n");}
-    | termino OP_MUL factor {printf("     Termino*Factor es Termino\n");}
-    | termino OP_DIV factor {printf("     Termino/Factor es Termino\n");}
-    | termino OP_MOD factor {printf("     Termino%sFactor es Termino\n","%");}
+    factor {printf("\t\t\t\t\t\tR45. Factor es Termino\n");}
+    | termino OP_MUL factor {printf("\t\t\t\t\t\tR46. Termino*Factor es Termino\n");}
+    | termino OP_DIV factor {printf("\t\t\t\t\t\tR47. Termino/Factor es Termino\n");}
+    | termino OP_MOD factor {printf("\t\t\t\t\t\tR48. Termino%sFactor es Termino\n","%");}
     ;
 
 factor: 
-    ID {printf("    ID es Factor \n");}
-    | CTE_INT {printf("    CTE_INT es Factor\n");}
-    | CTE_REAL {printf("    CTE_REAL es Factor\n");}
-    | PAR_ABR expresion PAR_CIE {printf("    Expresion entre parentesis es Factor\n");}
-    | CTE_STRING {printf("    CTE_STRING es Factor\n");} 
-    | llamada_func {printf("    Llamada_Func es Factor\n");}
+    ID {printf("\t\t\t\t\t\t\tR49. ID es Factor \n");}
+    | CTE_INT {printf("\t\t\t\t\t\t\tR50. CTE_INT es Factor\n");}
+    | CTE_REAL {printf("\t\t\t\t\t\t\tR51. CTE_REAL es Factor\n");}
+    | PAR_ABR expresion PAR_CIE {printf("\t\t\t\t\t\t\tR52. Expresion entre parentesis es Factor\n");}
+    | CTE_STRING {printf("\t\t\t\t\t\t\tR53. CTE_STRING es Factor\n");} 
+    | llamada_func {printf("\t\t\t\t\t\t\tR54. Llamada_Func es Factor\n");}
     ;
 
 lista_args:
     expresion
-    | lista_args COMA expresion {printf("    Lista_Args , ID es Lista_Args \n");}
+    | lista_args COMA expresion {printf("\t\t\t\tR55. Lista_Args , ID es Lista_Args \n");}
     ;
 
 llamada_func:
-    funcion_especial PAR_ABR lista_args PAR_CIE {printf("    ID(Lista_Args) es Llamada_Func \n");}
-    | ID PAR_ABR PAR_CIE {printf("    ID() es Llamada_Func \n");} // Revisar esta regla!!
-    ;
-
-funcion_especial:
-    FN_EQUALEXPRESSIONS {printf("    FN_EQUALEXPRESSIONS es funcion especial isEqualExpressions\n");}
-    | FN_ISZERO {printf("    FN_ISZERO() es funcion especial isZero\n");}
+    FN_EQUALEXPRESSIONS PAR_ABR lista_args PAR_CIE {printf("\t\t\tR56. funcion_especial(Lista_Args) es Llamada_Func \n");}
+    | FN_ISZERO PAR_ABR expresion PAR_CIE {printf("\t\t\tR56. funcion_especial(Lista_Args) es Llamada_Func \n");}
+    | ID PAR_ABR PAR_CIE {printf("\t\t\tR57. ID() es Llamada_Func \n");} // Revisar esta regla!!
     ;
 
 retornar:
-    RET expresion {printf("    RET Expresion es Retornar \n");}
+    RET expresion {printf("\t\t\tR60. RET Expresion es Retornar \n");}
     ;
 
 %%
