@@ -23,9 +23,9 @@
 | res                                                | -                                                  | 0          | ID         |
 | _1                                                 | 1                                                  | 1          | CTE_INT    |
 | _2                                                 | 2                                                  | 1          | CTE_INT    |
-| _99999.992187500                                   | 99999.992187500                                    | 15         | CTE_REAL   |
+| _99999.990000000                                   | 99999.990000000                                    | 15         | CTE_REAL   |
 | _99.000000000                                      | 99.000000000                                       | 12         | CTE_REAL   |
-| _0.999899983                                       | 0.999899983                                        | 11         | CTE_REAL   |
+| _0.999900000                                       | 0.999900000                                        | 11         | CTE_REAL   |
 | _"@sdADaSjfla%dfg"                                 | "@sdADaSjfla%dfg"                                  | 17         | CTE_STRING |
 | _"asldk  fh sjf"                                   | "asldk  fh sjf"                                    | 15         | CTE_STRING |
 | _0                                                 | 0                                                  | 1          | CTE_INT    |
