@@ -16,14 +16,6 @@ void iniciar_tabla(Tabla *tabla) {
     tabla->nFilas = 0;
 }
 
-void normalizar_real(const char *entrada, char *salida, size_t tam_salida) {
-    // Convertimos la cadena a float (32 bits)
-    float numero = strtof(entrada, NULL);
-
-    // Escribimos en el buffer de salida con 6 decimales fijos
-    // snprintf evita desbordamientos de memoria
-    snprintf(salida, tam_salida, "%.6f", numero);
-}
 
 void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
 
@@ -36,7 +28,6 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
     }
     
     if(strcmp(tipo_token, "CTE_REAL") == 0){
-        //normalizar_real(nombre, salida, sizeof(salida));
         strcpy(salida, nombre);
     }
     
@@ -48,8 +39,8 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
     }
 
     if (strcmp(tipo_token, "CTE_INT") == 0) {
-        int numero = atoi(nombre); // convertir la cadena 'nombre' a entero
-        snprintf(salida, sizeof(salida), "%d", numero); // pasar el entero a 'salida'
+        int numero = atoi(nombre); 
+        snprintf(salida, sizeof(salida), "%d", numero); 
     }
 
     if(strcmp(tipo_token, "ID") == 0){
@@ -115,7 +106,7 @@ int existe_en_tabla(Tabla *tabla, char *valor, char* tipo_token) {
             char *nombre_tabla = tabla->filas[i].nombre;
 
             if (nombre_tabla[0] == '_') {
-                nombre_tabla++; // mover puntero al siguiente carácter
+                nombre_tabla++;
             }
 
             if (strcmp(nombre_tabla, valor) == 0) {
@@ -130,7 +121,7 @@ int existe_en_tabla(Tabla *tabla, char *valor, char* tipo_token) {
             char *nombre_tabla = tabla->filas[i].nombre;
 
             if (nombre_tabla[0] == '_') {
-                nombre_tabla++; // mover puntero al siguiente carácter
+                nombre_tabla++;
             }
 
             if (strcmp(nombre_tabla, valor) == 0) {

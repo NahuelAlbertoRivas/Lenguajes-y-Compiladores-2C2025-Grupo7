@@ -15,10 +15,10 @@ typedef struct {
     char *tipoDato;
 } InformacionToken;
 
-// Tabla de símbolos dinámica
+// Tabla de símbolos
 typedef struct {
-    InformacionToken filas[TAM_TABLA]; // arreglo dinámico de tokens
-    int nFilas;              // cantidad actual de filas
+    InformacionToken filas[TAM_TABLA];
+    int nFilas;         
 } Tabla;
 
 void iniciar_tabla(Tabla *tabla);

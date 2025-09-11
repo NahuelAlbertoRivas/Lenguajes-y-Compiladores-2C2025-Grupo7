@@ -24,7 +24,6 @@ FILE  *yyin;
 
 extern Tabla tabla;
 
-extern int yylval; // Tuve que declararlo como extern para que compile
 char *yyltext; 
 
 int yyerror(void);
@@ -206,19 +205,20 @@ int validar_entero(const char* lexema) {
         exit(1);
     }
     agregar_a_tabla(&tabla, lexema, "CTE_INT");
+    yylval.str = strdup(yytext);
     
     return CTE_INT;
 }
 
 void normalizar_real_lexico(const char *entrada, char *salida, size_t tam_salida) {
-    float numero = strtof(entrada, NULL);
+    double  numero = strtod(entrada, NULL);
 
     snprintf(salida, tam_salida, "%.9f", numero);
 }
 
 int validar_real(const char* lexema) {
     errno = 0;
-    float value = strtof(lexema, NULL);
+    double value = strtof(lexema, NULL);
 
     if (errno == ERANGE || value > FLT_MAX || value < -FLT_MAX) {
         fprintf(stderr, "ERROR: Constante real fuera de rango (maximo 32 bits): %s\n", lexema);
@@ -229,6 +229,7 @@ int validar_real(const char* lexema) {
     normalizar_real_lexico(lexema, normalizado, sizeof(normalizado));
     agregar_a_tabla(&tabla, normalizado, "CTE_REAL");
 
+    yylval.str = strdup(normalizado);
     return CTE_REAL;
 }
 
@@ -239,6 +240,8 @@ int validar_string(const char* lexema) {
         exit(1);
     }
     agregar_a_tabla(&tabla, lexema, "CTE_STRING");
+    
+    yylval.str = strdup(yytext);
     return CTE_STRING;
 }
 
@@ -249,5 +252,7 @@ int validar_id(const char* lexema) {
         exit(1);
     }
     agregar_a_tabla(&tabla, lexema, "ID");
+    
+    yylval.str = strdup(yytext);
     return ID;
 }
