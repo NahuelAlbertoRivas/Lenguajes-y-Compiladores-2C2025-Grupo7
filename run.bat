@@ -4,7 +4,7 @@ bison -dyv Sintactico.y
 
 gcc.exe lex.yy.c y.tab.c tabla.c -o lyc-compiler-1.0.0.exe
 
-lyc-compiler-1.0.0.exe prueba.txt
+lyc-compiler-1.0.0.exe test.txt
 
 pause
 

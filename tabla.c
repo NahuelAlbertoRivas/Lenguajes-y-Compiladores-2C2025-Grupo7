@@ -2,9 +2,13 @@
 #include <stdlib.h>
 #include "tabla.h"
 
-#include <float.h> /* Libreria para el manejo de floats, tiene el maximo de tamaño de reales de 32 bits*/
-#include <limits.h> /* Libreria para el manejo de enteros, tiene el maximo de tamaño de enteros de 16 bits*/
-#include <string.h> /* Libreria para el manejo de strings*/
+/* Libreria para el manejo de floats, tiene el maximo de tamaño de reales de 32 bits */
+#include <float.h>
+/* Libreria para el manejo de enteros, tiene el maximo de tamaño de enteros de 16 bits */
+#include <limits.h>
+/* Libreria para el manejo de strings */
+#include <string.h>
+/* Libreria para el manejo de conversión de caracteres (tolower()) */
 #include <ctype.h>
 
 #define TRUE 1
@@ -33,7 +37,7 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
     
     if(strcmp(tipo_token, "CTE_STRING") == 0){
         for (int i = 0; i < strlen(nombre); i++) {
-            salida[i]=tolower((unsigned char) nombre[i]);
+            salida[i] = tolower((unsigned char) nombre[i]);
         }
         salida[strlen(nombre)] = '\0';
     }
@@ -45,7 +49,7 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
 
     if(strcmp(tipo_token, "ID") == 0){
         for (int i = 0; i < strlen(nombre); i++) {
-            salida[i]=tolower((unsigned char) nombre[i]);
+            salida[i] = tolower((unsigned char) nombre[i]);
         }
         salida[strlen(nombre)] = '\0';
     }
@@ -53,15 +57,15 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
     
     if (existe_en_tabla(tabla, salida, tipo_token) == FALSE){
         int lexemas_ingresados = tabla->nFilas;
-            char* nombre1 = malloc(strlen(nombre) + 1); // +1 para "_" +1 para '\0'
+            char* nombre1 = malloc(strlen(nombre) + 1);
         if(strcmp(tipo_token, "ID") == 0){
             if (!nombre1) { perror("malloc"); return; }
-            // Asignar memoria
+            /* Asignar de memoria */
             tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 1);
             tabla->filas[lexemas_ingresados].valor = malloc(2);
             tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
             
-            //Rellenar valores
+            /* Rellenar valores */
             strcpy(nombre1, nombre);            
             strcpy(tabla->filas[lexemas_ingresados].nombre, nombre1);
             strcpy(tabla->filas[lexemas_ingresados].valor, "-");
@@ -70,13 +74,13 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
         } else {
             char* nombre1 = malloc(strlen(nombre) + 2); // +1 para "_" +1 para '\0'
             if (!nombre1) { perror("malloc"); return; }
-            // Asignación de memoria
+            /* Asignar de memoria */
             tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 1);
             tabla->filas[lexemas_ingresados].valor = malloc(strlen(nombre) + 1);
             tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
             tabla->filas[lexemas_ingresados].longitud = (int) strlen(nombre);
 
-            //Rellenar valores
+            /* Rellenar valores */
             strcpy(nombre1, "_");
             strcpy(nombre1 + 1, nombre);
             strcpy(tabla->filas[lexemas_ingresados].nombre, nombre1);
