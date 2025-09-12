@@ -7,6 +7,7 @@
 /* Includes */
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "y.tab.h"
 
 #include <float.h> /* Libreria para el manejo de floats, tiene el maximo de tamaño de reales de 32 bits*/
