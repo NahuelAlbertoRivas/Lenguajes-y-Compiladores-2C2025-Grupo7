@@ -7,6 +7,7 @@
 /* Includes */
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "y.tab.h"
 
 #include <float.h> /* Libreria para el manejo de floats, tiene el maximo de tamaño de reales de 32 bits*/
@@ -17,36 +18,23 @@
 
 /* Defines */
 #define TAM_MAX_STRING 50
+#define TAM_MAX_ID     100
 
 /* Variables Globales */
 FILE  *yyin;
 
 extern Tabla tabla;
 
-extern int yylval; // Tuve que declararlo como extern para que compile
 char *yyltext; 
 
 int yyerror(void);
 
-/*
-// Estructura para cada entrada en la tabla de símbolos
-typedef struct {
-    char *nombre;
-    char *valor; 
-    int longitud;   
-    char *tipoDato;
-} InformacionToken;
-
-// Tabla de símbolos dinámica
-typedef struct {
-    InformacionToken *filas; // arreglo dinámico de tokens
-    int nFilas;              // cantidad actual de filas
-} Tabla; */
 
 /* Funciones Auxiliares*/
 int validar_entero(const char* lexema);
 int validar_real(const char* lexema);
 int validar_string(const char* lexema);
+int validar_id(const char* lexema);
 
 %}
 
@@ -123,11 +111,13 @@ TD_BOOLEAN              "Boolean"
 WRITE                   "write"
 READ                    "read"
 INIT                    "init"
+TRUE                    "true"
+FALSE                   "false"
 
 FN_EQUALEXPRESSIONS     "equalExpressions"
 FN_ISZERO               "isZero"
 
-RET                 "return"
+RET                     "return"
 
 /* Regex: COMENTARIO*/
 COMMENT                 "#+".*"+#"
@@ -149,55 +139,58 @@ ID			            {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 /*---------------------------------------------*/
 
 %%
-{IF}			        {printf("\nPalabra Reservada: %s\n", yytext);return IF;}
-{WHILE}			        {printf("\nPalabra Reservada: %s\n", yytext);return WHILE;}
-{ELSE}			        {printf("\nPalabra Reservada: %s\n", yytext);return ELSE;}
-{WRITE}			        {printf("\nPalabra Reservada: %s\n", yytext);return WRITE;}
-{READ}			        {printf("\nPalabra Reservada: %s\n", yytext);return READ;}
-{INIT}			        {printf("\nPalabra Reservada: %s\n", yytext);return INIT;}
-{TD_INT}			    {printf("\nPalabra Reservada: %s\n", yytext);return TD_INT;}
-{TD_FLOAT}			    {printf("\nPalabra Reservada: %s\n", yytext);return TD_FLOAT;}
-{TD_STRING}			    {printf("\nPalabra Reservada: %s\n", yytext);return TD_STRING;}
-{TD_BOOLEAN}	        {printf("\nPalabra Reservada: %s\n", yytext);return TD_BOOLEAN;}
-{OP_AND}		        {printf("\nOperador: %s\n", yytext);return OP_AND;}
-{OP_OR}		            {printf("\nOperador: %s\n", yytext);return OP_OR;}
-{OP_NOT}		        {printf("\nOperador: %s\n", yytext);return OP_NOT;}
-{ID}			        {printf("\nIdentificador: %s\n", yytext); agregarATabla(&tabla, yytext, "CTE_STRING"); return ID;}
-{OP_SUM}		        {printf("\nSuma: %s\n", yytext);return OP_SUM;}
-{OP_ASIG}			    {printf("\nAsignacion: %s\n", yytext);return OP_ASIG;}
-{OP_MUL}		        {printf("\nMultiplicacion: %s\n", yytext);return OP_MUL;}
-{OP_RES}		        {printf("\nResta: %s\n", yytext);return OP_RES;}
-{OP_DIV}		        {printf("\nDivision: %s\n", yytext);return OP_DIV;}
-{PAR_ABR}			    {printf("\nParAbre: %s\n", yytext);return PAR_ABR;}
-{PAR_CIE}			    {printf("\nParCierra: %s\n", yytext);return PAR_CIE;}
-{PUNTO_COMA}            {printf("\nPunto y Coma: %s\n", yytext);return PUNTO_COMA;}
-{COR_ABR}               {printf("\nCorchete Abre: %s\n", yytext);return COR_ABR;}
-{COR_CIE}               {printf("\nCorchete Cierra: %s\n", yytext);return COR_CIE;}
-{LLA_ABR}               {printf("\nLLave abre: %s\n", yytext);return LLA_ABR;}
-{LLA_CIE}               {printf("\nLLave cierra: %s\n", yytext);return LLA_CIE;}
-{CMP_MAYOR}			    {printf("\nComparador: %s\n", yytext);return CMP_MAYOR;}
-{CMP_MENOR}			    {printf("\nComparador: %s\n", yytext);return CMP_MENOR;}
-{CMP_MAYOR_IGUAL}	    {printf("\nComparador: %s\n", yytext);return CMP_MAYOR_IGUAL;}
-{CMP_MENOR_IGUAL}	    {printf("\nComparador: %s\n", yytext);return CMP_MENOR_IGUAL;}
-{CMP_DISTINTO}		    {printf("\nComparador: %s\n", yytext);return CMP_DISTINTO;}
-{CMP_ES_IGUAL}		    {printf("\nComparador: %s\n", yytext);return CMP_ES_IGUAL;}
-{COMMENT}		        {printf("\nComentario ignorado: %s\n", yytext);}
-{COMA}		            {printf("\nComa: %s\n", yytext);return COMA;}
-{DOS_PUNTOS}            {printf("\nDos puntos: %s\n", yytext);return DOS_PUNTOS;}
-{OP_UN_INC}		    {printf("\nIncremento Unario: %s\n", yytext);return OP_UN_INC;}
-{OP_UN_DEC}		    {printf("\nDecremento Unario: %s\n", yytext);return OP_UN_DEC;}
+{IF}			        {return IF;}
+{WHILE}			        {return WHILE;}
+{ELSE}			        {return ELSE;}
+{WRITE}			        {return WRITE;}
+{READ}			        {return READ;}
+{INIT}			        {return INIT;}
+{TD_INT}			    {return TD_INT;}
+{TD_FLOAT}			    {return TD_FLOAT;}
+{TD_STRING}			    {return TD_STRING;}
+{TD_BOOLEAN}	        {return TD_BOOLEAN;}
+{OP_AND}		        {return OP_AND;}
+{OP_OR}		            {return OP_OR;}
+{OP_NOT}		        {return OP_NOT;}
+{FN_ISZERO}		        {return FN_ISZERO;}
+{FN_EQUALEXPRESSIONS}	{return FN_EQUALEXPRESSIONS;}
+{TRUE}	                {return TRUE;}
+{FALSE}	                {return FALSE;}
+{ID}			        {return validar_id(yytext);}
+{OP_SUM}		        {return OP_SUM;}
+{OP_ASIG}			    {return OP_ASIG;}
+{OP_MUL}		        {return OP_MUL;}
+{OP_RES}		        {return OP_RES;}
+{OP_DIV}		        {return OP_DIV;}
+{PAR_ABR}			    {return PAR_ABR;}
+{PAR_CIE}			    {return PAR_CIE;}
+{PUNTO_COMA}            {return PUNTO_COMA;}
+{COR_ABR}               {return COR_ABR;}
+{COR_CIE}               {return COR_CIE;}
+{LLA_ABR}               {return LLA_ABR;}
+{LLA_CIE}               {return LLA_CIE;}
+{CMP_MAYOR}			    {return CMP_MAYOR;}
+{CMP_MENOR}			    {return CMP_MENOR;}
+{CMP_MAYOR_IGUAL}	    {return CMP_MAYOR_IGUAL;}
+{CMP_MENOR_IGUAL}	    {return CMP_MENOR_IGUAL;}
+{CMP_DISTINTO}		    {return CMP_DISTINTO;}
+{CMP_ES_IGUAL}		    {return CMP_ES_IGUAL;}
+{COMMENT}		        {}
+{COMA}		            {return COMA;}
+{DOS_PUNTOS}            {return DOS_PUNTOS;}
+{OP_UN_INC}		        {return OP_UN_INC;}
+{OP_UN_DEC}		        {return OP_UN_DEC;}
 
 {CTE_INT}               { return validar_entero(yytext); }
 {CTE_REAL}              { return validar_real(yytext); }
 {CTE_STRING}            { return validar_string(yytext); }
 
-"\n"      		
-"\t"            
-"\n\t"          
-" "             		
-"\r\n"     
+"\n"
+"\t"
+"\n\t"
+" "
+"\r\n"
 .			            { printf( "ERROR LEXICO : Caracter no reconocido: %s\n", yytext ); exit (0);}
-
 %%
 
 /*---------------------------------------------*/
@@ -212,35 +205,33 @@ int validar_entero(const char* lexema) {
         fprintf(stderr, "ERROR: Constante entera fuera de rango (maximo 16 bits): %s\n", lexema);
         exit(1);
     }
+    agregar_a_tabla(&tabla, lexema, "CTE_INT");
+    yylval.str = strdup(yytext);
     
     return CTE_INT;
 }
 
-/*printf("\nConstante entera: %s\n", lexema);
-    
-    char nombre[100];
-    strcpy(nombre, "_");
-    strcat(nombre, lexema);
+void normalizar_real_lexico(const char *entrada, char *salida, size_t tam_salida) {
+    double  numero = strtod(entrada, NULL);
 
-    char longitud[100];
-    sprintf(longitud, "%d", (int)strlen(lexema));
-    
-    insertarEnTabla(&tabla, nombre, lexema, (int)strlen(lexema), "CTE_INT");
-    mostrarTabla(&tabla);**/
-
+    snprintf(salida, tam_salida, "%.9f", numero);
+}
 
 int validar_real(const char* lexema) {
     errno = 0;
-    float value = strtof(lexema, NULL);
+    double value = strtof(lexema, NULL);
 
     if (errno == ERANGE || value > FLT_MAX || value < -FLT_MAX) {
         fprintf(stderr, "ERROR: Constante real fuera de rango (maximo 32 bits): %s\n", lexema);
         exit(1);
     }
-    printf("\nConstante real: %s\n", lexema);
-    agregarATabla(&tabla, lexema, "CTE_REAL");
+
+    char normalizado[64];
+    normalizar_real_lexico(lexema, normalizado, sizeof(normalizado));
+    agregar_a_tabla(&tabla, normalizado, "CTE_REAL");
+
+    yylval.str = strdup(normalizado);
     return CTE_REAL;
-;
 }
 
 int validar_string(const char* lexema) {
@@ -249,28 +240,20 @@ int validar_string(const char* lexema) {
         fprintf(stderr, "ERROR: Constante string demasiado larga (maximo 50): %s\n", lexema);
         exit(1);
     }
-    printf("\nConstante string: %s\n", lexema);
-    agregarATabla(&tabla, lexema, "CTE_STRING");
+    agregar_a_tabla(&tabla, lexema, "CTE_STRING");
+    
+    yylval.str = strdup(yytext);
     return CTE_STRING;
 }
 
-
-/*
-{ID}            {
-    if(fa_validarLongitudID(yytext) == TRUE){
-        insertarEnLista(&listaSimbolos, yytext, tID);
-    }
-    strcpy(yylval.string_val, yytext); 
-    return ID;
-    }
-
-    int fa_validarLongitudID(char* ptr) {
-    long valor = strlen(ptr);
-
-    if ( valor < 1 || valor > ID_LARGO_MAX) {
-        printf ("[%d] Error, largo de ID fuera de rango\n", yylineno);
+int validar_id(const char* lexema) {
+    size_t len = strlen(lexema);
+    if (len < 0 || len > TAM_MAX_ID) {
+        fprintf(stderr, "ERROR: ID demasiado largao (maximo 100): %s\n", lexema);
         exit(1);
     }
-
+    agregar_a_tabla(&tabla, lexema, "ID");
+    
+    yylval.str = strdup(yytext);
     return ID;
-} */
+}

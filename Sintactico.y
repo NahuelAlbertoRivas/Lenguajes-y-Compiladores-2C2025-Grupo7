@@ -1,5 +1,6 @@
 // Usa Lexico_ClasePractica
 //Solo expresion_aritmeticaes sin ()
+
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,10 +15,20 @@ int yylex();
 
 %}
 
-%token CTE_INT
-%token CTE_REAL
-%token CTE_STRING
-%token ID
+%union {
+    char* str; 
+    int   num;
+}
+
+%token <str> ID
+%token <str> CTE_STRING
+%token <str> CTE_REAL
+%token <str> CTE_INT
+
+%token FN_EQUALEXPRESSIONS
+%token FN_ISZERO
+%token TRUE
+%token FALSE
 
 %right OP_ASIG
 %left OP_DIV OP_MUL OP_MOD
@@ -61,138 +72,129 @@ int yylex();
 
 %token NUMERAL
 
-
-%token FN_EQUALEXPRESSIONS
-%token FN_ISZERO  
-
-//y := equalExpressions(a + b, 5, b * 2, 3 + 2, a + b)
-//Y := isZero( s*7+1-h/2 )   
-
-//if(equalExpressions(a + b, 5, b * 2, 3 + 2, a + b) == TRUE)
-//while(isZero( s*7+1-h/2 )  == TRUE)
-
 %%
 
 programa:
-    lista_sentencias {printf("    Lista_Sentencias es Programa\n");}
+    lista_sentencias {printf("R1. Programa -> Lista_Sentencias\n");}
     ;
 
 lista_sentencias:
-    def_init {printf("    Def_Init es Lista_Sentencias\n");}
-    | sentencia {printf("    Sentencia es Lista_Sentencias\n");}
-    | lista_sentencias sentencia {printf("    Lista_Sentencias Sentencia es Lista_Sentencias\n");}
+    def_init {printf("\t\nR2. Lista_Sentencias -> Def_Init\n");}
+    | sentencia {printf("\t\nR3. Lista_Sentencias -> Sentencia\n");}
+    | lista_sentencias sentencia {printf("\t\nR4. Lista_Sentencias -> Lista_Sentencias Sentencia\n");}
     ;
 
 tipo_dato:
-    TD_BOOLEAN {printf("    TD_BOOLEAN es Tipo_Dato\n");}
-    | TD_INT {printf("    TD_INT es Tipo_Dato\n");}
-    | TD_FLOAT {printf("    TD_FLOAT es Tipo_Dato\n");}
-    | TD_STRING {printf("    TD_STRING es Tipo_Dato\n");}
+    TD_BOOLEAN {printf("\t\t\t\tR5. Tipo_Dato -> TD_BOOLEAN\n");}
+    | TD_INT {printf("\t\t\t\tR6. Tipo_Dato -> TD_INT\n");}
+    | TD_FLOAT {printf("\t\t\t\tR7. Tipo_Dato -> TD_FLOAT\n");}
+    | TD_STRING {printf("\t\t\t\tR8. Tipo_Dato -> TD_STRING\n");}
     ;
 
 lista_id:
-    ID {printf("    ID es lista_id\n");}
-    | lista_id COMA ID {printf("    {lista_id} COMA ID es Lista_Id\n");}
+    ID {printf("\t\t\t\tR9. lista_id -> [ID: '%s']\n", $1); free($1);} 
+    | lista_id COMA ID {printf("\t\t\t\tR10. Lista_Id -> lista_id COMA [ID: '%s']\n",$3); free($3);}
+    ;
 
 bloque_asig:
-    lista_id DOS_PUNTOS tipo_dato {printf("    lista_var es Bloque_Asig\n");}
-    | bloque_asig lista_id DOS_PUNTOS tipo_dato {printf("    Bloque_Asig { lista_var } es Bloque_Asig\n");}
+    lista_id DOS_PUNTOS tipo_dato {printf("\t\t\tR11. Bloque_Asig -> lista_id : tipo_dato\n");}
+    | bloque_asig lista_id DOS_PUNTOS tipo_dato {printf("\t\t\tR12. Bloque_Asig -> Bloque_Asig lista_id : tipo_dato\n");}
+    ;
 
 def_init:
-    INIT LLA_ABR bloque_asig LLA_CIE {printf("    INIT { bloque_asig } es Def_Init\n");}
+    INIT LLA_ABR bloque_asig LLA_CIE {printf("\t\tR13. Def_Init -> INIT { bloque_asig }\n");}
+    ;
 
 sentencia:  	   
-	asignacion {printf(" FIN ASIGNACION\n");} 
-    | condicional_si {printf(" FIN CONDICIONAL_SI\n");}
-    | bucle {printf(" FIN WHILE\n");}
-    | llamada_func {printf(" FIN LLAMADA_FUNC\n");}
-    | retornar {printf(" FIN RETORNAR\n");}
-    | entrada_salida {printf(" FIN RETORNAR\n");}
+	asignacion {printf("\t\tR14. sentencia -> Asignacion\n");} 
+    | condicional_si {printf("\t\tR15. sentencia -> Condicional_si\n");}
+    | bucle {printf("\t\tR16. sentencia -> While\n");}
+    | llamada_func {printf("\t\tR17. sentencia -> LLamada_func\n");}
+    | retornar {printf("\t\tR18. sentencia -> retornar\n");}
+    | entrada_salida {printf("\t\tR19. sentencia -> entrada_salida\n");}
     ;
 
 entrada_salida: 
-    WRITE PAR_ABR factor PAR_CIE {printf("    WRITE (elem)  es entrada_salida\n");}
-    |  READ PAR_ABR ID PAR_CIE {printf("    READ(ID) es entrada_salida\n");}
+    WRITE PAR_ABR factor PAR_CIE {printf("\t\t\tR20. entrada_salida -> WRITE (factor)\n");}
+    |  READ PAR_ABR ID PAR_CIE {printf("\t\t\tR21. entrada_salida -> READ([ID: '%s'])\n",$3);free($3);}
 	;
 
 asignacion: 
-    ID OP_ASIG expresion {printf("    ID := Expresion_Aritmetica es Asignacion\n");}
-    | ID OP_UN_INC {printf("    ID++ es Asignacion\n");}
-    | ID OP_UN_DEC {printf("    ID-- es Asignacion\n");}
+    ID OP_ASIG expresion {printf("\t\t\tR22. Asignacion -> [ID: '%s']:= Expresion_Aritmetica\n",$1);free($1);}
+    | ID OP_UN_INC {printf("\t\t\tR23. Asignacion -> [ID: '%s']++\n",$1);free($1);}
+    | ID OP_UN_DEC {printf("\t\t\tR24. Asignacion -> [ID: '%s']--\n",$1);free($1);}
+    | ID OP_ASIG FALSE {printf("\t\t\tR25. Asignacion -> [ID: '%s'] := Expresion_False\n", $1);free($1);}
+    | ID OP_ASIG TRUE {printf("\t\t\tR26. Asignacion -> [ID: '%s'] := Expresion_True\n", $1);free($1);}
 	;
 
 bloque_asociado:
-    sentencia {printf("    Sentencia es Bloque_Asociado\n");}
-    | LLA_ABR lista_sentencias LLA_CIE {printf("    { Lista_Sentencias } es Bloque_Asociado\n");}
+    sentencia {printf("\t\t\t\tR27. Bloque_Asociado -> Sentencia\n");}
+    | LLA_ABR lista_sentencias LLA_CIE {printf("\t\t\t\tR28. Bloque_Asociado -> { Lista_Sentencias }\n");}
     ;
 
 condicional_si:
-    IF PAR_ABR expresion PAR_CIE bloque_asociado %prec MENOS_QUE_ELSE {printf("    if(Expresion) Bloque_Asociado es Condicional_Si\n");}
-    | IF PAR_ABR expresion PAR_CIE bloque_asociado ELSE bloque_asociado  {printf("    if(Expresion) Bloque_Asociado else Bloque_Asociado es Condicional_Si\n");}
+    IF PAR_ABR expresion PAR_CIE bloque_asociado %prec MENOS_QUE_ELSE {printf("\t\t\tR29. Condicional_Si -> if(Expresion) Bloque_Asociado\n");}
+    | IF PAR_ABR expresion PAR_CIE bloque_asociado ELSE bloque_asociado  {printf("\t\t\tR30. Condicional_Si -> if(Expresion) Bloque_Asociado else Bloque_Asociado\n");}
     ;
 
 expresion: 
-    expresion_aritmetica {printf("    Expresion_Aritmetica es Expresion\n");}
-    | expresion_relacional {printf("    Expresion_Relacional es Expresion\n");}
-    | expresion_logica {printf("    Expresion_Logica es Expresion\n");}
+    expresion_aritmetica {printf("\t\t\t\tR31. Expresion -> Expresion_Aritmetica\n");}
+    | expresion_relacional {printf("\t\t\t\tR32. Expresion -> Expresion_Relacional\n");}
+    | expresion_logica {printf("\t\t\t\tR33. Expresion -> Expresion_Logica\n");}
 	;
 
 bucle:
-    WHILE PAR_ABR expresion PAR_CIE bloque_asociado {printf("    while(Expresion) Bloque_Asociado es Bucle\n");}
+    WHILE PAR_ABR expresion PAR_CIE bloque_asociado {printf("\t\t\tR34. Bucle -> while(Expresion) Bloque_Asociado\n");}
     ;
 
 expresion_logica:
-    expresion OP_AND expresion {printf("    Expresion AND Expresion es Expresion_Logica\n");}
-    | expresion OP_OR expresion {printf("    Expresion OR Expresion es Expresion_Logica\n");}
-    | OP_NOT expresion %prec NEGACION {printf("    NOT Expresion es Expresion_Logica\n");}
+    expresion OP_AND expresion {printf("\t\t\t\t\tR35. Expresion_Logica -> Expresion AND Expresion\n");}
+    | expresion OP_OR expresion {printf("\t\t\t\t\tR36. Expresion_Logica -> Expresion OR Expresion\n");}
+    | OP_NOT expresion %prec NEGACION {printf("\t\t\t\t\tR37. Expresion_Logica -> NOT Expresion\n");}
     ;
 
 expresion_relacional:
-    expresion_aritmetica CMP_MAYOR expresion_aritmetica {printf("    Expresion_aritmetica>Expresion_aritmetica es expresion_relacional\n");}
-    | expresion_aritmetica CMP_MENOR expresion_aritmetica {printf("    Expresion_aritmetica<Expresion_aritmetica es expresion_relacional\n");}
-    | expresion_aritmetica CMP_ES_IGUAL expresion_aritmetica {printf("    Expresion_aritmetica==Expresion_aritmetica es expresion_relacional\n");}
+    expresion_aritmetica CMP_MAYOR expresion_aritmetica {printf("\t\t\t\t\tR38. expresion_relacional -> Expresion_aritmetica > Expresion_aritmetica\n");}
+    | expresion_aritmetica CMP_MENOR expresion_aritmetica {printf("\t\t\t\t\tR39. expresion_relacional -> Expresion_aritmetica < Expresion_aritmetica\n");}
+    | expresion_aritmetica CMP_ES_IGUAL expresion_aritmetica {printf("\t\t\t\t\tR40. expresion_relacional -> Expresion_aritmetica == Expresion_aritmetica\n");}
     ;
     
 expresion_aritmetica:
-    termino {printf("    Termino es Expresion_Aritmetica\n");}
-    | OP_RES expresion_aritmetica %prec MENOS_UNARIO {printf("    - Expresion_Aritmetica es Expresion_aritmetica\n");}
-	| expresion_aritmetica OP_SUM termino {printf("    Expresion_aritmetica+Termino es Expresion_aritmetica\n");}
-	| expresion_aritmetica OP_RES termino {printf("    Expresion_aritmetica-Termino es Expresion_aritmetica\n");}
+    termino {printf("\t\t\t\t\tR41. Expresion_Aritmetica -> Termino\n");}
+    | OP_RES expresion_aritmetica %prec MENOS_UNARIO {printf("\t\t\t\t\tR42. Expresion_aritmetica -> - Expresion_Aritmetica\n");}
+	| expresion_aritmetica OP_SUM termino {printf("\t\t\t\t\tR43. Expresion_aritmetica -> Expresion_aritmetica + Termino\n");}
+	| expresion_aritmetica OP_RES termino {printf("\t\t\t\t\tR44. Expresion_aritmetica -> Expresion_aritmetica - Termino\n");}
     ;
 
-termino: 
-    factor {printf("    Factor es Termino\n");}
-    | termino OP_MUL factor {printf("     Termino*Factor es Termino\n");}
-    | termino OP_DIV factor {printf("     Termino/Factor es Termino\n");}
-    | termino OP_MOD factor {printf("     Termino%sFactor es Termino\n","%");}
+termino:
+    factor {printf("\t\t\t\t\t\tR45. Termino -> Factor\n");}
+    | termino OP_MUL factor {printf("\t\t\t\t\t\tR46. Termino -> Termino * Factor\n");}
+    | termino OP_DIV factor {printf("\t\t\t\t\t\tR47. Termino -> Termino / Factor\n");}
+    | termino OP_MOD factor {printf("\t\t\t\t\t\tR48. Termino -> Termino % Factor\n");}
     ;
 
 factor: 
-    ID {printf("    ID es Factor \n");}
-    | CTE_INT {printf("    CTE_INT es Factor\n");}
-    | PAR_ABR expresion PAR_CIE {printf("    Expresion entre parentesis es Factor\n");}
-    | CTE_STRING {printf("    CTE_INT es elemento\n");}
-    
-    | llamada_func {printf("    Llamada_Func es Factor\n");}
+    ID {printf("\t\t\t\t\t\t\tR49. Factor -> [ID: '%s']\n", $1); free($1);}
+    | CTE_INT {printf("\t\t\t\t\t\t\tR50. Factor -> [CTE_INT: '%s']\n",$1);free($1);}
+    | CTE_REAL {printf("\t\t\t\t\t\t\tR51. Factor -> [CTE_REAL: '%s']\n", $1); free($1);}
+    | PAR_ABR expresion PAR_CIE {printf("\t\t\t\t\t\t\tR52. Factor -> Expresion entre parentesis\n");}
+    | CTE_STRING {printf("\t\t\t\t\t\t\tR53. Factor -> [CTE_STRING: %s]\n", $1); free($1);} 
+    | llamada_func {printf("\t\t\t\t\t\t\tR54. Factor -> Llamada_Func\n");}
     ;
 
 lista_args:
-    expresion
-    | lista_args COMA expresion {printf("    Lista_Args , ID es Lista_Args \n");}
+    expresion {printf("\t\t\t\tR55. lista_args -> expresion\n");}
+    | lista_args COMA expresion {printf("\t\t\t\tR56. lista_args -> lista_args , expresion \n");}
     ;
 
 llamada_func:
-    funcion_especial PAR_ABR lista_args PAR_CIE {printf("    ID(Lista_Args) es Llamada_Func \n");}
-    | ID PAR_ABR PAR_CIE {printf("    ID() es Llamada_Func \n");} // Revisar esta regla!!
-    ;
-
-funcion_especial:
-    FN_EQUALEXPRESSIONS {printf("    FN_EQUALEXPRESSIONS es funcion especial isEqualExpressions\n");}
-    | FN_ISZERO {printf("    FN_ISZERO() es funcion especial isZero\n");}
+    FN_EQUALEXPRESSIONS PAR_ABR lista_args PAR_CIE {printf("\t\t\tR57. Llamada_Func -> funcion_especial(Lista_Args)\n");}
+    | FN_ISZERO PAR_ABR expresion PAR_CIE {printf("\t\t\tR58. Llamada_Func -> funcion_especial(Lista_Args)\n");}
+    | ID PAR_ABR PAR_CIE {printf("\t\t\tR59. Llamada_Func -> [ID: '%s']()\n", $1); free($1);}
     ;
 
 retornar:
-    RET expresion {printf("    RET Expresion es Retornar \n");}
+    RET expresion {printf("\t\t\tR60. Retornar -> RET Expresion\n");}
     ;
 
 %%
@@ -201,6 +203,10 @@ Tabla tabla;
 
 int main(int argc, char *argv[])
 {
+    printf("\n-----------------------------------------------------------------------------------------------------------------\n");
+    printf("                                        INICIO PROCESO ANALISIS SINTACTICO                                        ");
+    printf("\n-----------------------------------------------------------------------------------------------------------------\n");
+
     iniciar_tabla(&tabla); 
     if((yyin = fopen(argv[1], "rt"))==NULL)
     {
@@ -211,6 +217,10 @@ int main(int argc, char *argv[])
         yyparse();
     }
 	fclose(yyin);
+
+    printf("\n-----------------------------------------------------------------------------------------------------------------\n");
+    printf("                                     LA SINTAXIS DEL PROGRAMA ES CORRECTA                                            ");
+    printf("\n-----------------------------------------------------------------------------------------------------------------\n");
     
     return 0;
 }
