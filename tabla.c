@@ -88,7 +88,7 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
         tabla->nFilas++;
     }
 
-    guardar_tabla_en_archivo(tabla, "Salida.txt");
+    guardar_tabla_en_archivo(tabla, "Symbol-Table.txt");
 }
 
 int existe_en_tabla(Tabla *tabla, char *valor, char* tipo_token) {
@@ -136,16 +136,16 @@ int existe_en_tabla(Tabla *tabla, char *valor, char* tipo_token) {
 
 void mostrar_tabla(const Tabla *tabla) {
     printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
-    printf("| %-50s | %-50s | %-10s | %-10s |\n", 
-           "Nombre", "Valor", "Longitud", "TipoDato");
+    printf("| %-50s | %-10s | %-50s | %-10s |\n", 
+           "Nombre", "TipoDato", "Valor", "Longitud");
     printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
 
     for (int i = 0; i < tabla->nFilas; i++) {
-        printf("| %-50s | %-50s | %-10d | %-10s |\n",
+        printf("| %-50s | %-10s | %-50s | %-10d |\n",
                tabla->filas[i].nombre ? tabla->filas[i].nombre : "-",
+               tabla->filas[i].tipoDato ? tabla->filas[i].tipoDato : "-",
                tabla->filas[i].valor  ? tabla->filas[i].valor  : "-",
-               tabla->filas[i].longitud,
-               tabla->filas[i].tipoDato ? tabla->filas[i].tipoDato : "-");
+               tabla->filas[i].longitud);
     }
 
     printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
@@ -159,16 +159,16 @@ void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
     }
 
     fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
-    fprintf(f, "| %-50s | %-50s | %-10s | %-10s |\n", 
-            "Nombre", "Valor", "Longitud", "TipoDato");
+    fprintf(f, "| %-50s | %-10s | %-50s | %-10s |\n", 
+            "Nombre", "TipoDato", "Valor", "Longitud");
     fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
 
     for (int i = 0; i < tabla->nFilas; i++) {
-        fprintf(f, "| %-50s | %-50s | %-10d | %-10s |\n",
+        fprintf(f, "| %-50s | %-10s | %-50s | %-10d |\n",
                 tabla->filas[i].nombre ? tabla->filas[i].nombre : "-",
+                tabla->filas[i].tipoDato ? tabla->filas[i].tipoDato : "-",
                 tabla->filas[i].valor  ? tabla->filas[i].valor  : "-",
-                tabla->filas[i].longitud,
-                tabla->filas[i].tipoDato ? tabla->filas[i].tipoDato : "-");
+                tabla->filas[i].longitud);
     }
 
     fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
