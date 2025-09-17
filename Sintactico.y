@@ -70,8 +70,6 @@ int yylex();
 %nonassoc OP_OR
 %right OP_NOT
 
-%token NUMERAL
-
 %%
 
 programa:

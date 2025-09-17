@@ -30,12 +30,14 @@
 | _"asldk  fh sjf"                                   | "asldk  fh sjf"                                    | 15         | CTE_STRING |
 | _0                                                 | 0                                                  | 1          | CTE_INT    |
 | _5                                                 | 5                                                  | 1          | CTE_INT    |
-| _"a es mas grande que b"                           | "a es mas grande que b"                            | 23         | CTE_STRING |
-| _"a es mas chico o igual a b"                      | "a es mas chico o igual a b"                       | 28         | CTE_STRING |
-| _"a es mas grande que b y c es mas grande que b"   | "a es mas grande que b y c es mas grande que b"    | 47         | CTE_STRING |
-| _"a no es mas grande que b"                        | "a no es mas grande que b"                         | 26         | CTE_STRING |
-| _"a es mas grande que b y c"                       | "a es mas grande que b y c"                        | 27         | CTE_STRING |
+| _"a es más grande que b (a > b)"                  | "a es más grande que b (a > b)"                   | 32         | CTE_STRING |
+| _"a es más chico o igual a b (a <= b)"            | "a es más chico o igual a b (a <= b)"             | 38         | CTE_STRING |
+| _"a y c más grandes que b [a > b & c > b]"        | "a y c más grandes que b [a > b & c > b]"         | 42         | CTE_STRING |
+| _"a es más grande que b y c es más grande que b" | "a es más grande que b y c es más grande que b"  | 49         | CTE_STRING |
+| _"a no es más grande que b -> !(a > b)"           | "a no es más grande que b -> !(a > b)"            | 39         | CTE_STRING |
+| _"a es más grande que b y c"                      | "a es más grande que b y c"                       | 28         | CTE_STRING |
 | _3                                                 | 3                                                  | 1          | CTE_INT    |
+| _"a es más grande que b"                          | "a es más grande que b"                           | 24         | CTE_STRING |
 | x                                                  | -                                                  | 0          | ID         |
 | _27                                                | 27                                                 | 2          | CTE_INT    |
 | r                                                  | -                                                  | 0          | ID         |
@@ -47,7 +49,7 @@
 | _10                                                | 10                                                 | 2          | CTE_INT    |
 | _"El contador vale 10"                             | "El contador vale 10"                              | 21         | CTE_STRING |
 | _7                                                 | 7                                                  | 1          | CTE_INT    |
-| _"La expresion es igual a cero"                    | "La expresion es igual a cero"                     | 30         | CTE_STRING |
+| _"La expresión es igual a cero"                   | "La expresión es igual a cero"                    | 31         | CTE_STRING |
 | _0.500000000                                       | 0.500000000                                        | 11         | CTE_REAL   |
 | _5.500000000                                       | 5.500000000                                        | 11         | CTE_REAL   |
 | _"hola"                                            | "hola"                                             | 6          | CTE_STRING |
