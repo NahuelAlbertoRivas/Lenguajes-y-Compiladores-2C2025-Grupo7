@@ -73,11 +73,11 @@ int yylex();
 %%
 
 programa:
-    lista_sentencias {printf("R1. Programa -> Lista_Sentencias\n");}
+    def_init lista_sentencias {printf("R1. Programa -> Def_Init Lista_Sentencias\n");}
     ;
 
 lista_sentencias:
-    def_init {printf("\t\nR2. Lista_Sentencias -> Def_Init\n");}
+    //def_init {printf("\t\nR2. Lista_Sentencias -> Def_Init\n");}
     | sentencia {printf("\t\nR3. Lista_Sentencias -> Sentencia\n");}
     | lista_sentencias sentencia {printf("\t\nR4. Lista_Sentencias -> Lista_Sentencias Sentencia\n");}
     ;
@@ -108,7 +108,7 @@ sentencia:
     | condicional_si {printf("\t\tR15. sentencia -> Condicional_si\n");}
     | bucle {printf("\t\tR16. sentencia -> While\n");}
     | llamada_func {printf("\t\tR17. sentencia -> LLamada_func\n");}
-    | retornar {printf("\t\tR18. sentencia -> retornar\n");}
+    //| retornar {printf("\t\tR18. sentencia -> retornar\n");}
     | entrada_salida {printf("\t\tR19. sentencia -> entrada_salida\n");}
     ;
 
@@ -118,7 +118,8 @@ entrada_salida:
 	;
 
 asignacion: 
-    ID OP_ASIG expresion {printf("\t\t\tR22. Asignacion -> [ID: '%s']:= Expresion_Aritmetica\n",$1);free($1);}
+    ID OP_ASIG expresion_aritmetica {printf("\t\t\tR22. Asignacion -> [ID: '%s']:= Expresion_Aritmetica\n",$1);free($1);}
+    | ID OP_ASIG Valor_Booleano {printf("\t\t\tR22. Asignacion -> [ID: '%s']:= Valor_Booleano\n",$1);free($1);}
     | ID OP_UN_INC {printf("\t\t\tR23. Asignacion -> [ID: '%s']++\n",$1);free($1);}
     | ID OP_UN_DEC {printf("\t\t\tR24. Asignacion -> [ID: '%s']--\n",$1);free($1);}
     | ID OP_ASIG FALSE {printf("\t\t\tR25. Asignacion -> [ID: '%s'] := Expresion_False\n", $1);free($1);}
@@ -131,8 +132,8 @@ bloque_asociado:
     ;
 
 condicional_si:
-    IF PAR_ABR expresion PAR_CIE bloque_asociado %prec MENOS_QUE_ELSE {printf("\t\t\tR29. Condicional_Si -> if(Expresion) Bloque_Asociado\n");}
-    | IF PAR_ABR expresion PAR_CIE bloque_asociado ELSE bloque_asociado  {printf("\t\t\tR30. Condicional_Si -> if(Expresion) Bloque_Asociado else Bloque_Asociado\n");}
+    IF PAR_ABR expresion_logica PAR_CIE bloque_asociado %prec MENOS_QUE_ELSE {printf("\t\t\tR29. Condicional_Si -> if(Expresion) Bloque_Asociado\n");}
+    | IF PAR_ABR expresion_logica PAR_CIE bloque_asociado ELSE bloque_asociado  {printf("\t\t\tR30. Condicional_Si -> if(Expresion) Bloque_Asociado else Bloque_Asociado\n");}
     ;
 
 expresion: 
@@ -142,19 +143,31 @@ expresion:
 	;
 
 bucle:
-    WHILE PAR_ABR expresion PAR_CIE bloque_asociado {printf("\t\t\tR34. Bucle -> while(Expresion) Bloque_Asociado\n");}
+    WHILE PAR_ABR expresion_logica PAR_CIE bloque_asociado {printf("\t\t\tR34. Bucle -> while(Expresion) Bloque_Asociado\n");}
     ;
 
 expresion_logica:
-    expresion OP_AND expresion {printf("\t\t\t\t\tR35. Expresion_Logica -> Expresion AND Expresion\n");}
-    | expresion OP_OR expresion {printf("\t\t\t\t\tR36. Expresion_Logica -> Expresion OR Expresion\n");}
-    | OP_NOT expresion %prec NEGACION {printf("\t\t\t\t\tR37. Expresion_Logica -> NOT Expresion\n");}
+    expresion_para_condicion OP_AND expresion_para_condicion {printf("\t\t\t\t\tR35. Expresion_Logica -> Expresion AND Expresion\n");}
+    | expresion_para_condicion OP_OR expresion_para_condicion {printf("\t\t\t\t\tR36. Expresion_Logica -> Expresion OR Expresion\n");}
+    | OP_NOT expresion_para_condicion %prec NEGACION {printf("\t\t\t\t\tR37. Expresion_Logica -> NOT Expresion\n");}
+    | expresion_para_condicion {printf("\t\t\t\t\tR38. Expresion_Logica -> Valor_Booleano\n");}
     ;
+
+ Valor_Booleano:   
+    llamada_func {printf("\t\t\t\t\t\t\tR54. Factor -> Llamada_Func\n");}
+    | TRUE {printf("\t\t\t\t\tR34. Valor_Booleano -> TRUE\n");}
+    | FALSE {printf("\t\t\t\t\tR35. Valor_Booleano -> FALSE\n");}
+    ;
+
+expresion_para_condicion:
+    Valor_Booleano | expresion_relacional;
 
 expresion_relacional:
     expresion_aritmetica CMP_MAYOR expresion_aritmetica {printf("\t\t\t\t\tR38. expresion_relacional -> Expresion_aritmetica > Expresion_aritmetica\n");}
     | expresion_aritmetica CMP_MENOR expresion_aritmetica {printf("\t\t\t\t\tR39. expresion_relacional -> Expresion_aritmetica < Expresion_aritmetica\n");}
     | expresion_aritmetica CMP_ES_IGUAL expresion_aritmetica {printf("\t\t\t\t\tR40. expresion_relacional -> Expresion_aritmetica == Expresion_aritmetica\n");}
+    | expresion_aritmetica CMP_MAYOR_IGUAL expresion_aritmetica {printf("\t\t\t\t\tR40. expresion_relacional -> Expresion_aritmetica >= Expresion_aritmetica\n");}
+    | expresion_aritmetica CMP_MENOR_IGUAL expresion_aritmetica {printf("\t\t\t\t\tR40. expresion_relacional -> Expresion_aritmetica <= Expresion_aritmetica\n");}
     ;
     
 expresion_aritmetica:
@@ -175,9 +188,9 @@ factor:
     ID {printf("\t\t\t\t\t\t\tR49. Factor -> [ID: '%s']\n", $1); free($1);}
     | CTE_INT {printf("\t\t\t\t\t\t\tR50. Factor -> [CTE_INT: '%s']\n",$1);free($1);}
     | CTE_REAL {printf("\t\t\t\t\t\t\tR51. Factor -> [CTE_REAL: '%s']\n", $1); free($1);}
-    | PAR_ABR expresion PAR_CIE {printf("\t\t\t\t\t\t\tR52. Factor -> Expresion entre parentesis\n");}
+    | PAR_ABR expresion_aritmetica PAR_CIE {printf("\t\t\t\t\t\t\tR52. Factor -> Expresion entre parentesis\n");}
     | CTE_STRING {printf("\t\t\t\t\t\t\tR53. Factor -> [CTE_STRING: %s]\n", $1); free($1);} 
-    | llamada_func {printf("\t\t\t\t\t\t\tR54. Factor -> Llamada_Func\n");}
+    //| llamada_func {printf("\t\t\t\t\t\t\tR54. Factor -> Llamada_Func\n");}
     ;
 
 lista_args:
@@ -188,12 +201,12 @@ lista_args:
 llamada_func:
     FN_EQUALEXPRESSIONS PAR_ABR lista_args PAR_CIE {printf("\t\t\tR57. Llamada_Func -> funcion_especial(Lista_Args)\n");}
     | FN_ISZERO PAR_ABR expresion PAR_CIE {printf("\t\t\tR58. Llamada_Func -> funcion_especial(Lista_Args)\n");}
-    | ID PAR_ABR PAR_CIE {printf("\t\t\tR59. Llamada_Func -> [ID: '%s']()\n", $1); free($1);}
+    //| ID PAR_ABR PAR_CIE {printf("\t\t\tR59. Llamada_Func -> [ID: '%s']()\n", $1); free($1);}
     ;
 
-retornar:
-    RET expresion {printf("\t\t\tR60. Retornar -> RET Expresion\n");}
-    ;
+//retornar:
+    //RET expresion {printf("\t\t\tR60. Retornar -> RET Expresion\n");}
+//    ;
 
 %%
 
