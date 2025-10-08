@@ -52,6 +52,7 @@ DIGITO_POSITIVO         [1-9]
 LETRA			        [a-zA-Z]
 LETRA_MIN               [a-z]
 LETRA_MAY               [A-Z]
+LETRA_ESP               [áéíóúÁÉÍÓÚñÑÜü]
 
 HEXA                    [0-9a-fA-F]
 OCTAL                   [0-7]
@@ -93,10 +94,11 @@ PUNTO                   "."
 DOS_PUNTOS              ":"
 COMA                    ","
 PUNTO_COMA              ";"
-NUMERAL                 "#"
 COMILLA_DOBLE           "\""
 COMILLA_SIMPLE          "\'"
 UNDERSCORE              "_"
+COM_ABR                 "#+"
+COM_CIE                 "+#"
 
 /* Regex: Palabras Reservadas */
 WHILE                   "while"
@@ -119,9 +121,6 @@ FN_ISZERO               "isZero"
 
 RET                     "return"
 
-/* Regex: COMENTARIO*/
-COMMENT                 "#+".*"+#"
-
 /* Regex: TOKENS*/
 ESCAPE_SIMPLE           \\[\'\"\\\?abfnrtv]   
 ESCAPE_OCTAL            \\{OCTAL}{1,3}       
@@ -131,8 +130,15 @@ CARACTER                ({CARACTER_SIMPLE}|{ESCAPE})
 
 CTE_INT		            {DIGITO}+
 CTE_REAL                ({DIGITO}+{PUNTO}{DIGITO}+|{DIGITO}+{PUNTO}{DIGITO}*|{DIGITO}*{PUNTO}{DIGITO}+)
-CTE_STRING              {COMILLA_DOBLE}{CARACTER_SIMPLE}*{COMILLA_DOBLE}
+CTE_STRING              {COMILLA_DOBLE}({CARACTER_SIMPLE}|{LETRA_ESP}|{SIMBS_LIT}|{SIMBS_ESP})*{COMILLA_DOBLE}
 ID			            {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
+
+/* Regex: COMENTARIO*/
+OP_O_COMP               ({CMP_ES_IGUAL}|{CMP_DISTINTO}|{CMP_MAYOR}|{CMP_MAYOR_IGUAL}|{CMP_MENOR}|{CMP_MENOR_IGUAL}|{OP_ASIG}|{OP_DIV}|{OP_MOD}|{OP_MUL}|{OP_SUM}|{OP_RES})
+COMILLAS                ({COMILLA_DOBLE}|{COMILLA_SIMPLE})
+SIMBS_LIT               ({PUNTO}|"\t"|"?"|"¿"|"¡"|"!"|"&"|"@"|" ")
+SIMBS_ESP               ({DOS_PUNTOS}|{PUNTO_COMA}|{UNDERSCORE}|"-"|{PAR_ABR}|{PAR_CIE}|{COR_ABR}|{COR_CIE}|{LLA_ABR}|{LLA_CIE}|"/"|"|"|{COMA}|"="|"*"|"\\"|"#")
+COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMBS_ESP}|{SIMBS_LIT}|{COMILLAS}|{ESCAPE})*{COM_CIE}
 
 /*---------------------------------------------*/
 /* Seccion Definición de Reglas */
@@ -175,7 +181,6 @@ ID			            {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {CMP_MENOR_IGUAL}	    {return CMP_MENOR_IGUAL;}
 {CMP_DISTINTO}		    {return CMP_DISTINTO;}
 {CMP_ES_IGUAL}		    {return CMP_ES_IGUAL;}
-{COMMENT}		        {}
 {COMA}		            {return COMA;}
 {DOS_PUNTOS}            {return DOS_PUNTOS;}
 {OP_UN_INC}		        {return OP_UN_INC;}
@@ -184,6 +189,8 @@ ID			            {LETRA}({LETRA}|{DIGITO}|{UNDERSCORE})*
 {CTE_INT}               { return validar_entero(yytext); }
 {CTE_REAL}              { return validar_real(yytext); }
 {CTE_STRING}            { return validar_string(yytext); }
+
+{COMENTARIO}            { printf("%s\n", yytext); }
 
 "\n"
 "\t"
@@ -249,7 +256,7 @@ int validar_string(const char* lexema) {
 int validar_id(const char* lexema) {
     size_t len = strlen(lexema);
     if (len < 0 || len > TAM_MAX_ID) {
-        fprintf(stderr, "ERROR: ID demasiado largao (maximo 100): %s\n", lexema);
+        fprintf(stderr, "ERROR: ID demasiado largo (maximo 100): %s\n", lexema);
         exit(1);
     }
     agregar_a_tabla(&tabla, lexema, "ID");
