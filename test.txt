@@ -142,13 +142,14 @@ while(h<20)
 	else
 		c := 5
 }
+
 if(a==0 AND b<c){a:=5}
 else
 {
-	n_code := reportAndFix()
+	n_code := equalExpressions(0, -5, a + b)
 	if( 5 == 5)
 		broad++
-	if(NOT c)
+	if(NOT false)
 		c := 3
 	else
 			n_code--
