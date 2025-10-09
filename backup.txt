@@ -150,6 +150,8 @@ asignacion:
     | ID OP_ASIG valor_booleano {printf("\t\t\tR22. Asignacion -> [ID: '%s']:= valor_booleano\n",$1);free($1);}
     | ID OP_UN_INC {printf("\t\t\tR23. Asignacion -> [ID: '%s']++\n",$1);free($1);}
     | ID OP_UN_DEC {printf("\t\t\tR24. Asignacion -> [ID: '%s']--\n",$1);free($1);}
+    | ID OP_ASIG FALSE {printf("\t\t\tR25. Asignacion -> [ID: '%s'] := Expresion_False\n", $1);free($1);}
+    | ID OP_ASIG TRUE {printf("\t\t\tR26. Asignacion -> [ID: '%s'] := Expresion_True\n", $1);free($1);}
 	;
 
 condicional_si:
@@ -178,11 +180,12 @@ lista_args:
 
 entrada_salida: 
     WRITE PAR_ABR factor PAR_CIE {printf("\t\t\tR20. entrada_salida -> WRITE (factor)\n");}
-    | READ PAR_ABR ID PAR_CIE {printf("\t\t\tR21. entrada_salida -> READ([ID: '%s'])\n",$3);free($3);}
+    |  READ PAR_ABR ID PAR_CIE {printf("\t\t\tR21. entrada_salida -> READ([ID: '%s'])\n",$3);free($3);}
 	;
 
 expresion: 
     expresion_aritmetica {printf("\t\t\t\tR31. Expresion -> Expresion_Aritmetica\n");}
+    | expresion_relacional {printf("\t\t\t\tR32. Expresion -> Expresion_Relacional\n");}
     | expresion_logica {printf("\t\t\t\tR33. Expresion -> Expresion_Logica\n");}
 	;
 
