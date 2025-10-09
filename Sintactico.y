@@ -191,15 +191,15 @@ expresion_logica:
     | expresion_para_condicion {printf("\t\t\t\t\tR38. Expresion_Logica -> valor_booleano\n");}
     ;
 
- valor_booleano:   
-    llamada_func {printf("\t\t\t\t\t\t\tR54. Factor -> Llamada_Func\n");}
-    | TRUE {printf("\t\t\t\t\tR34. valor_booleano -> TRUE\n");}
-    | FALSE {printf("\t\t\t\t\tR35. valor_booleano -> FALSE\n");}
-    ;
-
 expresion_para_condicion:
     valor_booleano 
     | expresion_relacional
+    ;
+
+valor_booleano:   
+    llamada_func {printf("\t\t\t\t\t\t\tR54. Factor -> Llamada_Func\n");}
+    | TRUE {printf("\t\t\t\t\tR34. valor_booleano -> TRUE\n");}
+    | FALSE {printf("\t\t\t\t\tR35. valor_booleano -> FALSE\n");}
     ;
 
 expresion_relacional:
