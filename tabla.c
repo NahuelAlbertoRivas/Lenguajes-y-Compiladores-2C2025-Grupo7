@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tabla.h"
+#include "utilidades/pila.h"
+#include "utilidades/hashmap.h"
 
 /* Libreria para el manejo de floats, tiene el maximo de tamaño de reales de 32 bits */
 #include <float.h>
@@ -21,10 +23,11 @@ void iniciar_tabla(Tabla *tabla) {
 }
 
 
-void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
+int agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
 
     char salida[10000] = "";
     char nombre2[10000] = "";
+    int pos = NO_SE_AGREGA;
 
     if(bandera == 0){
         bandera = 1;
@@ -49,7 +52,7 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
 
     if(strcmp(tipo_token, "ID") == 0){
         for (int i = 0; i < strlen(nombre); i++) {
-            salida[i] = tolower((unsigned char) nombre[i]);
+            salida[i] = nombre[i];
         }
         salida[strlen(nombre)] = '\0';
     }
@@ -57,9 +60,10 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
     
     if (existe_en_tabla(tabla, salida, tipo_token) == FALSE){
         int lexemas_ingresados = tabla->nFilas;
-            char* nombre1 = malloc(strlen(nombre) + 1);
+        char* nombre1;
         if(strcmp(tipo_token, "ID") == 0 || strcmp(tipo_token, "CTE_INT") == 0 || strcmp(tipo_token, "CTE_REAL") == 0){
-            if (!nombre1) { perror("malloc"); return; }
+            nombre1 = malloc(strlen(nombre) + 1);
+            if (!nombre1) { perror("malloc"); return SIN_MEMORIA; }
 
             if(strcmp(tipo_token, "CTE_INT") == 0 || strcmp(tipo_token, "CTE_REAL") == 0){
                 tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
@@ -77,10 +81,10 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
             free(nombre1);
         } 
         else {
-            char* nombre1 = malloc(strlen(nombre) + 2); // +1 para "_" +1 para '\0'
-            if (!nombre1) { perror("malloc"); return; }
+            nombre1 = malloc(strlen(nombre) + 2); // +1 para "_" +1 para '\0'
+            if (!nombre1) { perror("malloc"); return SIN_MEMORIA; }
             /* Asignar de memoria */
-            tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 1);
+            tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 2);
             tabla->filas[lexemas_ingresados].valor = malloc(strlen(nombre) + 1);
             tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
             tabla->filas[lexemas_ingresados].longitud = (int) strlen(nombre);
@@ -93,11 +97,11 @@ void agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
             strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
             free(nombre1);
         }
-
+        pos = tabla->nFilas;
         tabla->nFilas++;
     }
 
-    guardar_tabla_en_archivo(tabla, "Symbol-Table.txt");
+    return pos;
 }
 
 int existe_en_tabla(Tabla *tabla, char *valor, char* tipo_token) {
@@ -141,6 +145,30 @@ int existe_en_tabla(Tabla *tabla, char *valor, char* tipo_token) {
 
      }
 
+}
+
+int actualizar_tipo_dato(Tabla *tabla, int pos, const char *tipoDato)
+{
+    if(bandera == 0)
+    {
+        return TABLA_NO_INICIALIZADA;
+    }
+
+    //tabla->filas[pos].tipoDato = malloc(strlen(tipoDato) + 1);
+    //strcpy(tabla->filas[pos].tipoDato, tipoDato);
+    tabla->filas[pos].tipoDato = strdup(tipoDato);
+
+    return ACTUALIZACION_CORRECTA;
+}
+
+const char *obtener_tipo_dato(Tabla *tabla, int pos)
+{
+    if(bandera == 0)
+    {
+        return NULL;
+    }
+
+    return tabla->filas[pos].tipoDato;
 }
 
 void mostrar_tabla(const Tabla *tabla) {
@@ -190,6 +218,20 @@ void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
                 tabla->filas[i].tipoDato ? tabla->filas[i].tipoDato : "-",
                 tabla->filas[i].valor  ? tabla->filas[i].valor  : "-",
                 longitudStr);
+        
+        if(tabla->filas[i].nombre)
+        {
+            free(tabla->filas[i].nombre);
+        }
+        if(tabla->filas[i].valor)
+        {
+            free(tabla->filas[i].valor);
+        }
+        if(tabla->filas[i].tipoDato)
+        {
+            free(tabla->filas[i].tipoDato);
+        }
+        
     }
 
     fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");

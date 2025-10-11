@@ -3,37 +3,45 @@
 terceto tercetos[MAX_TERCETOS];
 int indiceTerceto = 0;
 
-int crearTerceto(char* operador, char* op1, char* op2)
+int crearTerceto(char* operador, int op1, int op2)
 {
     /* operador es el operador */
     /* op1 es el operando izquierdo */
     /* op2 es el operando derecho */
 
-    strcpy(tercetos[indiceTerceto].operando, operador);
-    strcpy(tercetos[indiceTerceto].operadorIzq, op1);
-    strcpy(tercetos[indiceTerceto].operadorDer, op2);
+    tercetos[indiceTerceto].indice = indiceTerceto;
+    strcpy(tercetos[indiceTerceto].operador, operador);
+    itoa(op1, tercetos[indiceTerceto].operandoIzq, 10);
+    itoa(op2, tercetos[indiceTerceto].operandoDer, 10);
+    
+    return indiceTerceto++;
+}
+
+int crearTercetoUnitario(int valor)
+{
+    tercetos[indiceTerceto].indice = indiceTerceto;
+    itoa(valor,tercetos[indiceTerceto].operador, 10);
+    strcpy(tercetos[indiceTerceto].operandoIzq, "_");
+    strcpy(tercetos[indiceTerceto].operandoDer, "_");
 
     return indiceTerceto++;
 }
 
-/*
-void completarTerceto(int indice, char* op)
+int crearTercetoUnitarioStr(const char *op)
 {
-    /* Esto se usa para completar los saltos */
-    /* indice indica el terceto */
-    /* op es el único operando */
-/*
-    strcpy(tercetos[indice].operadorIzq, op);
+    tercetos[indiceTerceto].indice = indiceTerceto;
+    strcpy(tercetos[indiceTerceto].operador, op);
+    strcpy(tercetos[indiceTerceto].operandoIzq, "_");
+    strcpy(tercetos[indiceTerceto].operandoDer, "_");
 
-    return;
+    return indiceTerceto++;
 }
-*/
 
 char* verOperadorTerceto(int indice)
 {
     /* indice indica el terceto */
 
-    return tercetos[indice].operando;
+    return tercetos[indice].operador;
 }
 
 void modificarOperadorTerceto(int indice, char* op)
@@ -42,14 +50,67 @@ void modificarOperadorTerceto(int indice, char* op)
     /* indice indica el terceto */
     /* op es el salto */
 
-    strcpy(tercetos[indice].operando, op);
+    strcpy(tercetos[indice].operador, op);
+}
+
+void modificarOperandoDerechoConTerceto(int indice, int nroTerceto)
+{
+    /* Esto se usa para negar la condición de salto */
+    /* indice indica el terceto */
+    /* op es el salto */
+
+    itoa(nroTerceto, tercetos[indice].operandoDer, 10);
+}
+
+void modificarOperandoIzquierdoConTerceto(int indice, int nroTerceto)
+{
+    /* Esto se usa para negar la condición de salto */
+    /* indice indica el terceto */
+    /* op es el salto */
+
+    itoa(nroTerceto, tercetos[indice].operandoIzq, 10);
 }
 
 void imprimirTercetos()
 {
-    int i = 0;
-    for (i; i < indiceTerceto; i++)
-        fprintf(ptercetos, "[%d] (%s, %s, %s)\n", i, tercetos[i].operando, tercetos[i].operadorIzq, tercetos[i].operadorDer);
+    int i;
 
+    FILE *ptercetos = fopen("Tercetos.txt", "w");
+    if (!ptercetos) 
+    {
+        perror("Error al abrir el archivo");
+        return;
+    }
+
+    for (i = 0; i < indiceTerceto; i++) {
+        char MinValue[50];
+        itoa(SHRT_MIN, MinValue, 10);
+
+        char operandoIzq[50];
+        char operandoDer[50];
+
+        if(strcmp(tercetos[i].operandoIzq, "-32768") == 0)
+        {
+            strcpy(operandoIzq, "_");
+        }
+        else 
+        {
+            strcpy(operandoIzq, tercetos[i].operandoIzq);
+        }
+
+        if(strcmp(tercetos[i].operandoDer, "-32768") == 0)
+        {
+            strcpy(operandoDer, "_");
+        }
+        else 
+        {
+            strcpy(operandoDer, tercetos[i].operandoDer);
+        }
+        
+        fprintf(ptercetos, "[%d] (%s, %s, %s)\n", i, tercetos[i].operador, operandoIzq, operandoDer);
+    }
+        
+    fclose(ptercetos);
+        
     return;
 }

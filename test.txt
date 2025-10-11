@@ -3,10 +3,10 @@
 #+ /* Bloque de declaración de variables // +#
 init { #+|+#
 	a1, b1, a, b, ar0 : Float
-	var1, c, d, h, i, j, d, e, f: Int
-	s, h, contador : Int
+	var1, c, d, h, i, j, e, f: Int
+	s, contador, D : Int
 	p1, p2, p3 : String 
-	D, y, res : Boolean
+	y, res : Boolean
 }
 
 #+ ASignaciones +#
@@ -18,8 +18,10 @@ a := 99999.99
 a := 99.
 a := .9999
 
-b := "@sdADaSjfla%dfg"
-b := "asldk  fh sjf"
+b := 0.5
+b := 8
+
+p1 := p2
 
 #+ Condicional simple sin else +#
 if(a==0 AND b<c)
@@ -61,7 +63,7 @@ if(a==0 AND b<c)
 	a:=5
 } else 
 {
-	b := f
+	b := 5.1
 }
 
 #+ If anidado +#
@@ -84,14 +86,14 @@ while (a > b)
 }
 
 #+ Operaciones Aritméticas +#
-x := 27 - c
-x := r + 500
-x := 34 * 3
-x := z / f
+s := 27 - c
+s := a1 + 500
+s := 34 * 3
+s := b1 / a1
 
 #+ Entrada y Salida +#
-read(base)
-read(base) #+ base es una variable +#
+read(b1)
+read(c) #+ base es una variable +#
 write(var1)  #+ var1 es una variable numérica definida previamente +#
 
 #+ Llamada a funcion izZero() +#
@@ -129,15 +131,16 @@ a1 := 00005.500000000001 #+ Precisión 9 decimales, este número es considerado 
 p1 := "hola"
 p1 := "hola"
 p2 := "chau"
-D  := true
+y  := true
+p3 := "SI"
 ar0 := 1
 c:=d*(e-21)/4+j
 while(h<20)
 #+ Este es un comentario que se tiene que ignorar +#
 { #+ Este es otro comentario que se tiene que ignorar +#
-	if( (ar0 / rem) == est_com )
+	if( (ar0 / a1) == b )
 	{
-		sig := base * rend
+		a1 := a * ar0
 	}
 	else
 		c := 5
@@ -146,20 +149,20 @@ while(h<20)
 if(a==0 AND b<c){a:=5}
 else
 {
-	n_code := equalExpressions(0, -5, a + b)
+	res := equalExpressions(0, -5, a + b)
 	if( 5 == 5)
-		broad++
+		a++
 	if(NOT false)
 		c := 3
 	else
-			n_code--
+			b1--
 }
 
 write(var1)
 read(var1)
 write(5)
 
-res := "Sintaxis OK"
+p3 := "Sintaxis OK"
 
 
 #+ ---------------------- +#

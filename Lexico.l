@@ -15,6 +15,9 @@
 #include <string.h> /* Libreria para el manejo de strings*/
 
 #include "tabla.h" /* Archivo para la tabla de simbolos */
+#include "utilidades/pila.h"
+#include "utilidades/hashmap.h"
+#include "utilidades/acciones_semanticas.h"
 
 /* Defines */
 #define TAM_MAX_STRING 50
@@ -24,6 +27,8 @@
 FILE  *yyin;
 
 extern Tabla tabla;
+extern HashMap *hashmap;
+extern tPila pilaVars;
 
 char *yyltext; 
 
@@ -151,10 +156,10 @@ COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMB
 {WRITE}			        {return WRITE;}
 {READ}			        {return READ;}
 {INIT}			        {return INIT;}
-{TD_INT}			    {return TD_INT;}
-{TD_FLOAT}			    {return TD_FLOAT;}
-{TD_STRING}			    {return TD_STRING;}
-{TD_BOOLEAN}	        {return TD_BOOLEAN;}
+{TD_INT}			    {yylval.datosToken.str=strdup(yytext);return TD_INT;}
+{TD_FLOAT}			    {yylval.datosToken.str=strdup(yytext);return TD_FLOAT;}
+{TD_STRING}			    {yylval.datosToken.str=strdup(yytext);return TD_STRING;}
+{TD_BOOLEAN}	        {yylval.datosToken.str=strdup(yytext);return TD_BOOLEAN;}
 {OP_AND}		        {return OP_AND;}
 {OP_OR}		            {return OP_OR;}
 {OP_NOT}		        {return OP_NOT;}
@@ -210,10 +215,14 @@ int validar_entero(const char* lexema) {
 
     if (errno == ERANGE || value < SHRT_MIN || value > SHRT_MAX) {
         fprintf(stderr, "ERROR: Constante entera fuera de rango (maximo 16 bits): %s\n", lexema);
-        exit(1);
+        yylval.datosToken.codValidacion = ERR_VALIDACION;
     }
-    agregar_a_tabla(&tabla, lexema, "CTE_INT");
-    yylval.str = strdup(yytext);
+    else
+    {
+        agregar_a_tabla(&tabla, lexema, "CTE_INT");
+        yylval.datosToken.codValidacion = VALIDACION_OK;
+        yylval.datosToken.str = strdup(yytext);
+    }
     
     return CTE_INT;
 }
@@ -228,39 +237,56 @@ int validar_real(const char* lexema) {
     errno = 0;
     double value = strtof(lexema, NULL);
 
-    if (errno == ERANGE || value > FLT_MAX || value < -FLT_MAX) {
+    if (errno == ERANGE || value > FLT_MAX || value < -FLT_MAX)
+    {
         fprintf(stderr, "ERROR: Constante real fuera de rango (maximo 32 bits): %s\n", lexema);
-        exit(1);
+        yylval.datosToken.codValidacion = ERR_VALIDACION;
     }
-
-    char normalizado[64];
-    normalizar_real_lexico(lexema, normalizado, sizeof(normalizado));
-    agregar_a_tabla(&tabla, normalizado, "CTE_REAL");
-
-    yylval.str = strdup(normalizado);
+    else
+    {
+        char normalizado[64];
+        normalizar_real_lexico(lexema, normalizado, sizeof(normalizado));
+        agregar_a_tabla(&tabla, normalizado, "CTE_REAL");
+        yylval.datosToken.codValidacion = VALIDACION_OK;
+        yylval.datosToken.str = strdup(normalizado);
+    }
     return CTE_REAL;
 }
 
 int validar_string(const char* lexema) {
     size_t len = strlen(lexema);
-    if (len < 2 || len - 2 > TAM_MAX_STRING) {
+    if (len < 2 || len - 2 > TAM_MAX_STRING)
+    {
         fprintf(stderr, "ERROR: Constante string demasiado larga (maximo 50): %s\n", lexema);
-        exit(1);
+        yylval.datosToken.codValidacion = ERR_VALIDACION;
     }
-    agregar_a_tabla(&tabla, lexema, "CTE_STRING");
-    
-    yylval.str = strdup(yytext);
+    else
+    {
+        agregar_a_tabla(&tabla, lexema, "CTE_STRING");
+        yylval.datosToken.codValidacion = VALIDACION_OK;
+        yylval.datosToken.str = strdup(yytext);
+    }
     return CTE_STRING;
 }
 
 int validar_id(const char* lexema) {
     size_t len = strlen(lexema);
+    int pos;
+    tVar tmp;
+
     if (len < 0 || len > TAM_MAX_ID) {
         fprintf(stderr, "ERROR: ID demasiado largo (maximo 100): %s\n", lexema);
-        exit(1);
+        yylval.datosToken.codValidacion = ERR_VALIDACION;
     }
-    agregar_a_tabla(&tabla, lexema, "ID");
-    
-    yylval.str = strdup(yytext);
+    else
+    {
+        pos = agregar_a_tabla(&tabla, lexema, "ID");
+        strcpy(tmp.id, lexema);
+        tmp.pos_en_tabla = pos;
+        poner_en_pila(&pilaVars, &tmp, sizeof(tmp));
+
+        yylval.datosToken.codValidacion = VALIDACION_OK;
+        yylval.datosToken.str = strdup(yytext);
+    }
     return ID;
 }
