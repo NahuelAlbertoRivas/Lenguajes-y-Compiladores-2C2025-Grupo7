@@ -80,7 +80,7 @@ int verificar_compatibilidad_tipos_datos(const char *tipo1, const char *tipo2)
     return VERIFICACION_OK;
 }
 
-/***************************************/
+/************************************************TODAVÍA NO IMPLEMENTADO******************************************************/
 
 int establecer_tipo_dato_esperado(HashMap *hashmap, Tabla *tabla, const char *id, char *tipo_esperado)
 {
@@ -138,26 +138,3 @@ int _liberar_recursos_string(char *str)
 
     return ACCION_EXITOSA;
 }
-
-/*
-int asignar_tipo_validando(tPila *pilaVars, HashMap *hashmap, Tabla *tabla, const char *tipoDato)
-{
-    tVar tmp;
-    int pos_en_tabla;
-
-    while(sacar_de_pila(pilaVars, &tmp, sizeof(tVar)) != PILA_VACIA)
-    {
-        if((tmp.pos_en_tabla == NO_SE_AGREGA) || (add_HashMapEntry(hashmap, tmp.id, tmp.pos_en_tabla) == HM_DUPLICATE_KEY))
-        {
-            fprintf(stderr, "\nERROR: definicion de ID duplicada: %s\n", tmp.id);
-            return DEF_VARIABLES_DUPLICADAS;
-        }
-        else
-        {
-            //printf("\n\ntoken  -->  %s   ;    index -->  %d\n\n", tmp.id, tmp.pos_en_tabla);
-            actualizar_tipo_dato(tabla, tmp.pos_en_tabla, tipoDato);
-        }
-    }
-    return ACCION_EXITOSA;
-}
-*/

@@ -29,6 +29,9 @@ FILE  *yyin;
 extern Tabla tabla;
 extern HashMap *hashmap;
 extern tPila pilaVars;
+extern HashMap *hashmap;
+extern tPila pilaVars;
+extern FILE *ptercetos;
 
 char *yyltext; 
 
@@ -40,6 +43,7 @@ int validar_entero(const char* lexema);
 int validar_real(const char* lexema);
 int validar_string(const char* lexema);
 int validar_id(const char* lexema);
+void finalizar_recursos();
 
 %}
 
@@ -202,7 +206,7 @@ COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMB
 "\n\t"
 " "
 "\r\n"
-.			            { printf( "ERROR LEXICO : Caracter no reconocido: %s\n", yytext ); exit (0);}
+.			            { printf( "ERROR LEXICO : Caracter no reconocido: %s\n", yytext ); finalizar_recursos(); exit (0);}
 %%
 
 /*---------------------------------------------*/
@@ -289,4 +293,13 @@ int validar_id(const char* lexema) {
         yylval.datosToken.str = strdup(yytext);
     }
     return ID;
+}
+
+void finalizar_recursos()
+{
+    printf("\n\nFinalizando recursos y saliendo...\n\n");
+    guardar_tabla_en_archivo(&tabla, "Symbol-Table.txt");
+    fclose(yyin);
+    vaciar_pila(&pilaVars);
+    destroy_HashMap(hashmap);
 }

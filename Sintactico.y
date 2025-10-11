@@ -27,8 +27,6 @@ extern FILE  *yyin; // Tuve que declararlo como extern para que compile
 int yyerror();
 int yylex();
 
-int validar_existencia_id(const char *id);
-int verificar_tipo_resultado_asignado(const char *id, const char *tipo_esperado);
 int acciones_definicion_variable(const char *id, int codValidacion);
 int acciones_asignacion_tipo(const char *tipoDato);
 int acciones_asignacion_variable_general(const char *id, int codValidacion, const char *tipoResultado);
@@ -36,7 +34,6 @@ int acciones_asignacion_literal(const char *id, int codValidacionId, int codValC
 int acciones_definicion_tipo_retorno(const char *id, int codValidacion);
 int acciones_verificacion_compatibilidad_tipo(int codValidacion, const char *tipoCte);
 int acciones_parametro_read(const char *id, int codValidacion);
-void tercetos_expresion_condicion_AND();
 
 int ProgramaInd;
 int DefInitInd;
@@ -740,19 +737,13 @@ int main(int argc, char *argv[])
         printf("                                     LA SINTAXIS DEL PROGRAMA ES CORRECTA                                            ");
         printf("\n-----------------------------------------------------------------------------------------------------------------\n");
     }
-    mostrar_tabla(&tabla);
 
     guardar_tabla_en_archivo(&tabla, "Symbol-Table.txt");
-    printf("\n\nFinalizando recursos y saliendo...\n\n");
 	fclose(yyin);
     vaciar_pila(&pilaVars);
     destroy_HashMap(hashmap);
-    if(ver_tope(&pilaVars, &tmp, sizeof(tVar)) == TODO_OK)
-        printf("no se vacia correctamente");
 
     imprimirTercetos();
-
-    printf("\n\nPROCESO EXITOSO\n\n");
 
     return PROCESO_EXITOSO;
 }
@@ -924,12 +915,12 @@ int acciones_parametro_read(const char *id, int codValidacion)
     return ACCION_EXITOSA;
 }
 
+/************************************************TODAVÍA NO IMPLEMENTADO******************************************************/
+
 void tercetos_expresion_condicion_AND()
 {
     
 }
-
-/* ********************* */
 
 /*
 int acciones_expresion_aritm_simple()
