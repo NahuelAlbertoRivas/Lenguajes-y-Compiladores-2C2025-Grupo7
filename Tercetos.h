@@ -3,6 +3,11 @@
 
 #define MAX_TERCETOS 1000
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <limits.h>
+
 /*VARIABLES GLOBALES*/
 extern FILE *ptercetos;
 
@@ -23,7 +28,8 @@ typedef struct {
 extern terceto tercetos[MAX_TERCETOS];
 extern int indiceTerceto;
 
-int crearTerceto(char* operador, char* op1, char* op2);
+int crearTerceto(char* operador, int op1, int op2);
+int crearTercetoUnitario(int valor);
 void completarTerceto(int indice, char* op);
 char* verOperadorTerceto(int indice);
 void modificarOperadorTerceto(int indice, char* op);

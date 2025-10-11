@@ -6,9 +6,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h> /* Libreria para el manejo de enteros, tiene el maximo de tamaño de enteros de 16 bits*/
+
 #include "y.tab.h" 
 #include "tabla.h" /* Archivo para la tabla de simbolos */
 #include "Tercetos.h" /* Archivo para la tabla de simbolos */
+
+
+#define VERDADERO   1
+#define FALSO       0
+#define CAMPO_NULO SHRT_MIN
 
 int yystopparser=0;
 extern FILE  *yyin; // Tuve que declararlo como extern para que compile
@@ -34,10 +41,15 @@ int ValorBooleanoInd;
 int ExpresionparaCondicionInd;
 int ExpresionRelacionalInd;
 int ExpresionAritmeticaInd;
-int terminoInd;
+int TerminoInd;
 int FactorInd;
-int listaArgsInd;
-int llamadaFuncInd;
+int ListaArgsInd;
+int LlamadaFuncInd;
+
+// Indices Auxiliares (Para expresiones dobles)
+int ExpresionAritmeticaInd2;
+
+int ExpresionParaCondicionInd2;
 
 int Xind; //Auxiliar para los tipos de datos
 /*
@@ -46,6 +58,9 @@ char TTDind[MAX_LONG_TD]; //Tipo de Dato Término
 char FTDind[MAX_LONG_TD]; //Tipo de Dato Factor
 */
 
+// Variables Auxiliares (Para guardar resultados intermedios)
+int _resExpRelacional;
+int _resExpresionLogica;
 %}
 
 %union {
@@ -185,56 +200,199 @@ expresion:
 	;
 
 expresion_logica:
-    expresion_para_condicion OP_AND expresion_para_condicion {printf("\t\t\t\t\tR35. Expresion_Logica -> Expresion AND Expresion\n");}
-    | expresion_para_condicion OP_OR expresion_para_condicion {printf("\t\t\t\t\tR36. Expresion_Logica -> Expresion OR Expresion\n");}
-    | OP_NOT expresion_para_condicion %prec NEGACION {printf("\t\t\t\t\tR37. Expresion_Logica -> NOT Expresion\n");}
-    | expresion_para_condicion {printf("\t\t\t\t\tR38. Expresion_Logica -> valor_booleano\n");}
+    expresion_para_condicion OP_AND expresion_para_condicion {
+        printf("\t\t\t\t\tR35. Expresion_Logica -> Expresion AND Expresion\n");
+        
+        ExpresionLogicaInd = crearTerceto("AND", ExpresionParaCondicionInd2, ExpresionparaCondicionInd);
+        Xind = crearTerceto("+", ExpresionParaCondicionInd2, ExpresionparaCondicionInd);
+        crearTerceto(":=", _resExpresionLogica, Xind);
+        crearTerceto("CMP", _resExpresionLogica, 2);
+        crearTerceto("BNE", Xind + 6, CAMPO_NULO);
+        crearTerceto(":=", _resExpresionLogica, VERDADERO);
+        crearTerceto("BI", Xind + 7, CAMPO_NULO);
+        crearTerceto(":=", _resExpresionLogica, FALSO);
+        }
+    | expresion_para_condicion OP_OR expresion_para_condicion {
+        printf("\t\t\t\t\tR36. Expresion_Logica -> Expresion OR Expresion\n");
+
+        ExpresionLogicaInd = crearTerceto("OR", ExpresionParaCondicionInd2, ExpresionparaCondicionInd);
+        Xind = crearTerceto("+", ExpresionParaCondicionInd2, ExpresionparaCondicionInd);
+        crearTerceto(":=", _resExpresionLogica, Xind);
+        crearTerceto("CMP", _resExpresionLogica, 1);
+        crearTerceto("BLT", Xind + 6, CAMPO_NULO);
+        crearTerceto(":=", _resExpresionLogica, VERDADERO); 
+        crearTerceto("BI", Xind + 7, CAMPO_NULO);
+        crearTerceto(":=", _resExpresionLogica, FALSO);
+        }
+    | OP_NOT expresion_para_condicion %prec NEGACION {
+        printf("\t\t\t\\tR37. Expresion_Logica -> NOT Expresion\n");
+
+        ExpresionLogicaInd = crearTerceto("NOT", ExpresionparaCondicionInd, CAMPO_NULO);
+        Xind = crearTerceto(":=", _resExpresionLogica, ExpresionparaCondicionInd);
+        crearTerceto("CMP", _resExpresionLogica, 0);
+        crearTerceto("BNE", Xind + 5, CAMPO_NULO);
+        crearTerceto(":=", _resExpresionLogica, VERDADERO); 
+        crearTerceto("BI", Xind + 6, CAMPO_NULO);
+        crearTerceto(":=", _resExpresionLogica, FALSO);
+        }
+    | expresion_para_condicion {
+        printf("\t\t\t\t\tR38. Expresion_Logica -> expresion_para_condicion\n");
+
+        ExpresionLogicaInd = ExpresionparaCondicionInd;
+        
+        Xind = crearTerceto(":=", _resExpresionLogica, ExpresionparaCondicionInd);
+        crearTerceto("CMP", _resExpresionLogica, 1);
+        crearTerceto("BNE", Xind + 5, CAMPO_NULO);
+        crearTerceto(":=", _resExpresionLogica, VERDADERO); 
+        crearTerceto("BI", Xind + 6, CAMPO_NULO);
+        crearTerceto(":=", _resExpresionLogica, FALSO);
+        }
     ;
 
 expresion_para_condicion:
-    valor_booleano 
-    | expresion_relacional
+    valor_booleano{
+        ExpresionParaCondicionInd2 = ExpresionparaCondicionInd;
+        ExpresionparaCondicionInd = ValorBooleanoInd;
+    } 
+    | expresion_relacional {
+        ExpresionParaCondicionInd2 = ExpresionparaCondicionInd;
+        ExpresionparaCondicionInd = ExpresionRelacionalInd;
+    }
     ;
 
 valor_booleano:   
-    llamada_func {printf("\t\t\t\t\t\t\tR54. Factor -> Llamada_Func\n");}
-    | TRUE {printf("\t\t\t\t\tR34. valor_booleano -> TRUE\n");}
-    | FALSE {printf("\t\t\t\t\tR35. valor_booleano -> FALSE\n");}
+    llamada_func {
+        printf("\t\t\t\t\t\t\tR54. Factor -> Llamada_Func\n");
+        ValorBooleanoInd=LlamadaFuncInd;}
+    | TRUE {
+        printf("\t\t\t\t\tR34. valor_booleano -> TRUE\n");}
+    | FALSE {
+        printf("\t\t\t\t\tR35. valor_booleano -> FALSE\n");}
     ;
 
 expresion_relacional:
-    expresion_aritmetica CMP_MAYOR expresion_aritmetica {printf("\t\t\t\t\tR38. expresion_relacional -> Expresion_aritmetica > Expresion_aritmetica\n");}
-    | expresion_aritmetica CMP_MENOR expresion_aritmetica {printf("\t\t\t\t\tR39. expresion_relacional -> Expresion_aritmetica < Expresion_aritmetica\n");}
-    | expresion_aritmetica CMP_ES_IGUAL expresion_aritmetica {printf("\t\t\t\t\tR40. expresion_relacional -> Expresion_aritmetica == Expresion_aritmetica\n");}
-    | expresion_aritmetica CMP_MAYOR_IGUAL expresion_aritmetica {printf("\t\t\t\t\tR40. expresion_relacional -> Expresion_aritmetica >= Expresion_aritmetica\n");}
-    | expresion_aritmetica CMP_MENOR_IGUAL expresion_aritmetica {printf("\t\t\t\t\tR40. expresion_relacional -> Expresion_aritmetica <= Expresion_aritmetica\n");}
+    expresion_aritmetica CMP_MAYOR expresion_aritmetica {
+        printf("\t\t\t\t\tR38. expresion_relacional -> Expresion_aritmetica > Expresion_aritmetica\n");
+        
+        Xind = crearTerceto("CMP", ExpresionAritmeticaInd2, ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = Xind;
+        crearTerceto("BLE", Xind + 4, CAMPO_NULO);
+        crearTerceto(":=", _resExpRelacional, VERDADERO);
+        crearTerceto("BI", Xind + 5, CAMPO_NULO);
+        crearTerceto(":=", _resExpRelacional, FALSO);
+        }
+    | expresion_aritmetica CMP_MENOR expresion_aritmetica {
+        printf("\t\t\t\t\tR39. expresion_relacional -> Expresion_aritmetica < Expresion_aritmetica\n");
+
+        Xind = crearTerceto("CMP", ExpresionAritmeticaInd2, ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = Xind;
+        crearTerceto("BGE", Xind + 4, CAMPO_NULO);
+        crearTerceto(":=", _resExpRelacional, VERDADERO);
+        crearTerceto("BI", Xind + 5, CAMPO_NULO);
+        crearTerceto(":=", _resExpRelacional, FALSO);
+        }
+    | expresion_aritmetica CMP_ES_IGUAL expresion_aritmetica {
+        printf("\t\t\t\t\tR40. expresion_relacional -> Expresion_aritmetica == Expresion_aritmetica\n");
+
+        Xind = crearTerceto("CMP", ExpresionAritmeticaInd2, ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = Xind;
+        crearTerceto("BNE", Xind + 4, CAMPO_NULO);
+        crearTerceto(":=", _resExpRelacional, VERDADERO);
+        crearTerceto("BI", Xind + 5, CAMPO_NULO);
+        crearTerceto(":=", _resExpRelacional, FALSO);
+        }
+    | expresion_aritmetica CMP_MAYOR_IGUAL expresion_aritmetica {
+        printf("\t\t\t\t\tR40. expresion_relacional -> Expresion_aritmetica >= Expresion_aritmetica\n");
+        
+        Xind = crearTerceto("CMP", ExpresionAritmeticaInd2, ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = Xind;
+        crearTerceto("BLT", Xind + 4, CAMPO_NULO);
+        crearTerceto(":=", _resExpRelacional, VERDADERO);
+        crearTerceto("BI", Xind + 5, CAMPO_NULO);
+        crearTerceto(":=", _resExpRelacional, FALSO);
+        }
+    | expresion_aritmetica CMP_MENOR_IGUAL expresion_aritmetica {
+        printf("\t\t\t\t\tR40. expresion_relacional -> Expresion_aritmetica <= Expresion_aritmetica\n");
+        
+        Xind = crearTerceto("CMP", ExpresionAritmeticaInd2, ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = Xind;
+        crearTerceto("BGT", Xind + 4, CAMPO_NULO);
+        crearTerceto(":=", _resExpRelacional, VERDADERO);
+        crearTerceto("BI", Xind + 5, CAMPO_NULO);
+        crearTerceto(":=", _resExpRelacional, FALSO);
+        }
     ;
     
 expresion_aritmetica:
-    termino {printf("\t\t\t\t\tR41. Expresion_Aritmetica -> Termino\n");}
-    | OP_RES expresion_aritmetica %prec MENOS_UNARIO {printf("\t\t\t\t\tR42. Expresion_aritmetica -> - Expresion_Aritmetica\n");}
-	| expresion_aritmetica OP_SUM termino {printf("\t\t\t\t\tR43. Expresion_aritmetica -> Expresion_aritmetica + Termino\n");}
-	| expresion_aritmetica OP_RES termino {printf("\t\t\t\t\tR44. Expresion_aritmetica -> Expresion_aritmetica - Termino\n");}
+    termino {
+        printf("\t\t\t\t\tR41. Expresion_Aritmetica -> Termino\n");
+        ExpresionAritmeticaInd2 = ExpresionAritmeticaInd;
+        ExpresionAritmeticaInd = TerminoInd;
+        }
+    | OP_RES expresion_aritmetica %prec MENOS_UNARIO {
+        printf("\t\t\t\t\tR42. Expresion_aritmetica -> - Expresion_Aritmetica\n");
+        ExpresionAritmeticaInd2 = ExpresionAritmeticaInd;
+        ExpresionAritmeticaInd = crearTerceto("-",ExpresionAritmeticaInd,TerminoInd);
+        }
+	| expresion_aritmetica OP_SUM termino {
+        printf("\t\t\t\t\tR43. Expresion_aritmetica -> Expresion_aritmetica + Termino\n");
+        ExpresionAritmeticaInd2 = ExpresionAritmeticaInd;
+        ExpresionAritmeticaInd = crearTerceto("+", ExpresionAritmeticaInd, TerminoInd);
+        }
+	| expresion_aritmetica OP_RES termino {
+        printf("\t\t\t\t\tR44. Expresion_aritmetica -> Expresion_aritmetica - Termino\n");
+        ExpresionAritmeticaInd2 = ExpresionAritmeticaInd;
+        ExpresionAritmeticaInd = crearTerceto("-", ExpresionAritmeticaInd, TerminoInd);
+        }
     ;
 
 termino:
-    factor {printf("\t\t\t\t\t\tR45. Termino -> Factor\n");}
-    | termino OP_MUL factor {printf("\t\t\t\t\t\tR46. Termino -> Termino * Factor\n");}
-    | termino OP_DIV factor {printf("\t\t\t\t\t\tR47. Termino -> Termino / Factor\n");}
-    | termino OP_MOD factor {printf("\t\t\t\t\t\tR48. Termino -> Termino % Factor\n");}
+    factor {
+        printf("\t\t\t\t\t\tR45. Termino -> Factor\n");
+        TerminoInd = FactorInd;
+        }
+    | termino OP_MUL factor {
+        printf("\t\t\t\t\t\tR46. Termino -> Termino * Factor\n");
+        TerminoInd = crearTerceto("*", TerminoInd, FactorInd);
+        }
+    | termino OP_DIV factor {printf("\t\t\t\t\t\tR47. Termino -> Termino / Factor\n");
+        TerminoInd = crearTerceto("/", TerminoInd, FactorInd);
+    }
+    | termino OP_MOD factor {
+        printf("\t\t\t\t\t\tR48. Termino -> Termino % Factor\n");
+        TerminoInd = crearTerceto("%", TerminoInd, FactorInd);
+        }
     ;
 
 factor: 
-    ID {printf("\t\t\t\t\t\t\tR49. Factor -> [ID: '%s']\n", $1); free($1);}
-    | CTE_INT {printf("\t\t\t\t\t\t\tR50. Factor -> [CTE_INT: '%s']\n",$1);free($1);}
-    | CTE_REAL {printf("\t\t\t\t\t\t\tR51. Factor -> [CTE_REAL: '%s']\n", $1); free($1);}
-    | PAR_ABR expresion_aritmetica PAR_CIE {printf("\t\t\t\t\t\t\tR52. Factor -> Expresion entre parentesis\n");}
-    | CTE_STRING {printf("\t\t\t\t\t\t\tR53. Factor -> [CTE_STRING: %s]\n", $1); free($1);} 
+    ID {
+        printf("\t\t\t\t\t\t\tR49. Factor -> [ID: '%s']\n", $1);
+        FactorInd = crearTercetoUnitario(*($1)); 
+        free($1);
+        }
+    | CTE_INT {
+        printf("\t\t\t\t\t\t\tR50. Factor -> [CTE_INT: '%s']\n",$1); 
+        FactorInd = crearTercetoUnitario(*($1)); 
+        free($1);
+        }
+    | CTE_REAL {
+        printf("\t\t\t\t\t\t\tR51. Factor -> [CTE_REAL: '%s']\n", $1); 
+        FactorInd = crearTercetoUnitario(*($1)); 
+        free($1);}
+    | PAR_ABR expresion_aritmetica PAR_CIE {
+        printf("\t\t\t\t\t\t\tR52. Factor -> Expresion entre parentesis\n");
+        }
+    | CTE_STRING {
+        printf("\t\t\t\t\t\t\tR53. Factor -> [CTE_STRING: %s]\n", $1);
+        FactorInd = crearTercetoUnitario(*($1)); 
+        free($1);
+        } 
     ;
 
 %%
 
 Tabla tabla;
+FILE *ptercetos;
 
 int main(int argc, char *argv[])
 {
@@ -257,6 +415,8 @@ int main(int argc, char *argv[])
     printf("                                     LA SINTAXIS DEL PROGRAMA ES CORRECTA                                            ");
     printf("\n-----------------------------------------------------------------------------------------------------------------\n");
         
+    imprimirTercetos();
+
     return 0;
 }
 

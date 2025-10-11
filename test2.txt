@@ -1,0 +1,31 @@
+init { #+|+#
+	a1, b1, a, b, ar0 : Float
+	var1, c, d, h, i, j, d, e, f: Int
+	s, h, contador : Int
+	p1, p2, p3 : String 
+	D, y, res : Boolean
+}
+
+a := 99999.99
+a := 1+2
+
+#+ Condicional simple sin else +#
+if(a==0 AND b<c)
+{ #++#
+	a:=5
+}
+
+#+ Condicional compuesto con else +#
+if(a==0 AND b<c)
+{ 
+	a:=5
+} else 
+{
+	b := f
+}
+
+#+ Condicional compuesto NOT sin else +#
+if (NOT a > b)
+{
+    write("a no es más grande que b -> !(a > b)")
+}

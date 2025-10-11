@@ -3,15 +3,26 @@
 terceto tercetos[MAX_TERCETOS];
 int indiceTerceto = 0;
 
-int crearTerceto(char* operador, char* op1, char* op2)
+int crearTerceto(char* operador, int op1, int op2)
 {
     /* operador es el operador */
     /* op1 es el operando izquierdo */
     /* op2 es el operando derecho */
-
+    
+    tercetos[indiceTerceto].indice = indiceTerceto;
     strcpy(tercetos[indiceTerceto].operando, operador);
-    strcpy(tercetos[indiceTerceto].operadorIzq, op1);
-    strcpy(tercetos[indiceTerceto].operadorDer, op2);
+    itoa(op1, tercetos[indiceTerceto].operadorIzq, 10);
+    itoa(op2, tercetos[indiceTerceto].operadorDer, 10);
+
+    return indiceTerceto++;
+}
+
+int crearTercetoUnitario(int valor)
+{
+    tercetos[indiceTerceto].indice = indiceTerceto;
+    itoa(valor,tercetos[indiceTerceto].operando,10);
+    strcpy(tercetos[indiceTerceto].operadorIzq, "_");
+    strcpy(tercetos[indiceTerceto].operadorDer, "_");
 
     return indiceTerceto++;
 }
@@ -47,9 +58,37 @@ void modificarOperadorTerceto(int indice, char* op)
 
 void imprimirTercetos()
 {
-    int i = 0;
-    for (i; i < indiceTerceto; i++)
-        fprintf(ptercetos, "[%d] (%s, %s, %s)\n", i, tercetos[i].operando, tercetos[i].operadorIzq, tercetos[i].operadorDer);
+    FILE *ptercetos = fopen("Tercetos.txt", "w");
+    if (!ptercetos) {
+        perror("Error al abrir el archivo");
+        return;
+    }
 
+    int i = 0;
+    for (i; i < indiceTerceto; i++) {
+        char MinValue[50];
+        itoa(SHRT_MIN, MinValue, 10);
+
+        char* operadorIzq;
+        char* operadorDer;
+        if(strcmp(tercetos[i].operadorIzq, "-32768") == 0){
+            strcpy(operadorIzq, "_");
+        }
+        else {
+            strcpy(operadorIzq, tercetos[i].operadorIzq);
+        }
+        
+        if(strcmp(tercetos[i].operadorDer, "-32768") == 0){
+            strcpy(operadorDer, "_");
+        }
+        else {
+            strcpy(operadorDer, tercetos[i].operadorDer);
+        }
+        
+        fprintf(ptercetos, "[%d] (%s, %s, %s)\n", i, tercetos[i].operando, operadorIzq, operadorDer);
+    }
+        
+    fclose(ptercetos);
+        
     return;
 }
