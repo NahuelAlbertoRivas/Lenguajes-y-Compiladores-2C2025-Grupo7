@@ -3,7 +3,7 @@
 terceto tercetos[MAX_TERCETOS];
 int indiceTerceto = 0;
 
-int crearTerceto(char* operador, int op1, int op2)
+int crearTerceto(char* operador, char *op1, char *op2)
 {
     /* operador es el operador */
     /* op1 es el operando izquierdo */
@@ -11,8 +11,8 @@ int crearTerceto(char* operador, int op1, int op2)
 
     tercetos[indiceTerceto].indice = indiceTerceto;
     strcpy(tercetos[indiceTerceto].operador, operador);
-    itoa(op1, tercetos[indiceTerceto].operandoIzq, 10);
-    itoa(op2, tercetos[indiceTerceto].operandoDer, 10);
+    strcpy(tercetos[indiceTerceto].operandoIzq, op1);
+    strcpy(tercetos[indiceTerceto].operandoDer, op2);
     
     return indiceTerceto++;
 }
@@ -53,22 +53,22 @@ void modificarOperadorTerceto(int indice, char* op)
     strcpy(tercetos[indice].operador, op);
 }
 
-void modificarOperandoDerechoConTerceto(int indice, int nroTerceto)
+void modificarOperandoDerechoConTerceto(int indice, char *nroTerceto)
 {
     /* Esto se usa para negar la condición de salto */
     /* indice indica el terceto */
     /* op es el salto */
 
-    itoa(nroTerceto, tercetos[indice].operandoDer, 10);
+    strcpy(tercetos[indice].operandoDer, nroTerceto);
 }
 
-void modificarOperandoIzquierdoConTerceto(int indice, int nroTerceto)
+void modificarOperandoIzquierdoConTerceto(int indice, char *nroTerceto)
 {
     /* Esto se usa para negar la condición de salto */
     /* indice indica el terceto */
     /* op es el salto */
 
-    itoa(nroTerceto, tercetos[indice].operandoIzq, 10);
+    strcpy(tercetos[indice].operandoIzq, nroTerceto);
 }
 
 void imprimirTercetos()
