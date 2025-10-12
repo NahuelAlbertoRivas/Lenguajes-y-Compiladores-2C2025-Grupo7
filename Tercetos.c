@@ -3,48 +3,49 @@
 terceto tercetos[MAX_TERCETOS];
 int indiceTerceto = 0;
 
-int crearTerceto(char* operador, int op1, int op2)
+int crearTerceto(char* operador, char *op1, char *op2)
 {
     /* operador es el operador */
     /* op1 es el operando izquierdo */
     /* op2 es el operando derecho */
-    
-    tercetos[indiceTerceto].indice = indiceTerceto;
-    strcpy(tercetos[indiceTerceto].operando, operador);
-    itoa(op1, tercetos[indiceTerceto].operadorIzq, 10);
-    itoa(op2, tercetos[indiceTerceto].operadorDer, 10);
 
+    tercetos[indiceTerceto].indice = indiceTerceto;
+    strcpy(tercetos[indiceTerceto].operador, operador);
+    strcpy(tercetos[indiceTerceto].operandoIzq, op1);
+    strcpy(tercetos[indiceTerceto].operandoDer, op2);
+    
     return indiceTerceto++;
+}
+
+int getIndice(){
+    return indiceTerceto;
 }
 
 int crearTercetoUnitario(int valor)
 {
     tercetos[indiceTerceto].indice = indiceTerceto;
-    itoa(valor,tercetos[indiceTerceto].operando,10);
-    strcpy(tercetos[indiceTerceto].operadorIzq, "_");
-    strcpy(tercetos[indiceTerceto].operadorDer, "_");
+    itoa(valor,tercetos[indiceTerceto].operador, 10);
+    strcpy(tercetos[indiceTerceto].operandoIzq, "_");
+    strcpy(tercetos[indiceTerceto].operandoDer, "_");
 
     return indiceTerceto++;
 }
 
-/*
-void completarTerceto(int indice, char* op)
+int crearTercetoUnitarioStr(const char *op)
 {
-    /* Esto se usa para completar los saltos */
-    /* indice indica el terceto */
-    /* op es el único operando */
-/*
-    strcpy(tercetos[indice].operadorIzq, op);
+    tercetos[indiceTerceto].indice = indiceTerceto;
+    strcpy(tercetos[indiceTerceto].operador, op);
+    strcpy(tercetos[indiceTerceto].operandoIzq, "_");
+    strcpy(tercetos[indiceTerceto].operandoDer, "_");
 
-    return;
+    return indiceTerceto++;
 }
-*/
 
 char* verOperadorTerceto(int indice)
 {
     /* indice indica el terceto */
 
-    return tercetos[indice].operando;
+    return tercetos[indice].operador;
 }
 
 void modificarOperadorTerceto(int indice, char* op)
@@ -53,39 +54,64 @@ void modificarOperadorTerceto(int indice, char* op)
     /* indice indica el terceto */
     /* op es el salto */
 
-    strcpy(tercetos[indice].operando, op);
+    strcpy(tercetos[indice].operador, op);
+}
+
+void modificarOperandoDerechoConTerceto(int indice, char *nroTerceto)
+{
+    /* Esto se usa para negar la condición de salto */
+    /* indice indica el terceto */
+    /* op es el salto */
+
+    strcpy(tercetos[indice].operandoDer, nroTerceto);
+}
+
+void modificarOperandoIzquierdoConTerceto(int indice, char *nroTerceto)
+{
+    /* Esto se usa para negar la condición de salto */
+    /* indice indica el terceto */
+    /* op es el salto */
+
+    strcpy(tercetos[indice].operandoIzq, nroTerceto);
 }
 
 void imprimirTercetos()
 {
+    int i;
+
     FILE *ptercetos = fopen("Tercetos.txt", "w");
-    if (!ptercetos) {
+    if (!ptercetos) 
+    {
         perror("Error al abrir el archivo");
         return;
     }
 
-    int i = 0;
-    for (i; i < indiceTerceto; i++) {
+    for (i = 0; i < indiceTerceto; i++) {
         char MinValue[50];
         itoa(SHRT_MIN, MinValue, 10);
 
-        char* operadorIzq;
-        char* operadorDer;
-        if(strcmp(tercetos[i].operadorIzq, "-32768") == 0){
-            strcpy(operadorIzq, "_");
+        char operandoIzq[50];
+        char operandoDer[50];
+
+        if(strcmp(tercetos[i].operandoIzq, "-32768") == 0)
+        {
+            strcpy(operandoIzq, "_");
         }
-        else {
-            strcpy(operadorIzq, tercetos[i].operadorIzq);
+        else 
+        {
+            strcpy(operandoIzq, tercetos[i].operandoIzq);
+        }
+
+        if(strcmp(tercetos[i].operandoDer, "-32768") == 0)
+        {
+            strcpy(operandoDer, "_");
+        }
+        else 
+        {
+            strcpy(operandoDer, tercetos[i].operandoDer);
         }
         
-        if(strcmp(tercetos[i].operadorDer, "-32768") == 0){
-            strcpy(operadorDer, "_");
-        }
-        else {
-            strcpy(operadorDer, tercetos[i].operadorDer);
-        }
-        
-        fprintf(ptercetos, "[%d] (%s, %s, %s)\n", i, tercetos[i].operando, operadorIzq, operadorDer);
+        fprintf(ptercetos, "[%d] (%s, %s, %s)\n", i, tercetos[i].operador, operandoIzq, operandoDer);
     }
         
     fclose(ptercetos);
