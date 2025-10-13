@@ -18,6 +18,7 @@
 #include "utilidades/pila.h"
 #include "utilidades/hashmap.h"
 #include "utilidades/acciones_semanticas.h"
+#include "Tercetos.h"
 
 /* Defines */
 #define TAM_MAX_STRING 50
@@ -32,6 +33,7 @@ extern HashMap *hashmap;
 extern tPila pilaVars;
 extern tPila pilaSentencias;
 extern FILE *ptercetos;
+extern int _inicioExpresion;
 
 char *yyltext; 
 
@@ -154,7 +156,7 @@ COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMB
 /*---------------------------------------------*/
 
 %%
-{IF}			        {return IF;}
+{IF}			        {_inicioExpresion = getIndice();return IF;}
 {WHILE}			        {return WHILE;}
 {ELSE}			        {return ELSE;}
 {WRITE}			        {return WRITE;}
