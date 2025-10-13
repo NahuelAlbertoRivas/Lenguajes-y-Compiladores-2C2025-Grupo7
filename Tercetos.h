@@ -31,7 +31,7 @@ extern int indiceTerceto;
 int crearTerceto(char* operador, char *op1, char *op2);
 int crearTercetoUnitario(int valor);
 int crearTercetoUnitarioStr(const char *valor);
-void completarTerceto(int indice, char* op);
+int getIndice();
 char* verOperadorTerceto(int indice);
 void modificarOperadorTerceto(int indice, char* op);
 void modificarOperandoDerechoConTerceto(int indice, char *nroTerceto);

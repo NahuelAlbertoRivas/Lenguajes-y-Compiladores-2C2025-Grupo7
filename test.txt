@@ -23,6 +23,22 @@ b := 8
 
 p1 := p2
 
+while(43+342+324)
+{
+	c := 3
+}
+
+if(a > 5 AND c > 5 AND d < 3 OR (NOT res == false) AND 4 + 5 + 6 OR isZero(35 - f) AND equalExpressions(contador, D))
+{
+	if(true)
+		res := false
+	else
+	{
+		contador++
+		p1 := "un string"
+	}
+}
+
 #+ Condicional simple sin else +#
 if(a==0 AND b<c)
 { #++#

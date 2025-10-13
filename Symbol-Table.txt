@@ -29,8 +29,16 @@
 | 0.999900000                                        | CTE_REAL   | -                                                  | -          |
 | 0.500000000                                        | CTE_REAL   | -                                                  | -          |
 | 8                                                  | CTE_INT    | -                                                  | -          |
-| 0                                                  | CTE_INT    | -                                                  | -          |
+| 43                                                 | CTE_INT    | -                                                  | -          |
+| 342                                                | CTE_INT    | -                                                  | -          |
+| 324                                                | CTE_INT    | -                                                  | -          |
+| 3                                                  | CTE_INT    | -                                                  | -          |
 | 5                                                  | CTE_INT    | -                                                  | -          |
+| 4                                                  | CTE_INT    | -                                                  | -          |
+| 6                                                  | CTE_INT    | -                                                  | -          |
+| 35                                                 | CTE_INT    | -                                                  | -          |
+| _"un string"                                       | CTE_STRING | "un string"                                        | 11         |
+| 0                                                  | CTE_INT    | -                                                  | -          |
 | _"a es más grande que b (a > b)"                  | CTE_STRING | "a es más grande que b (a > b)"                   | 32         |
 | _"a es más chico o igual a b (a <= b)"            | CTE_STRING | "a es más chico o igual a b (a <= b)"             | 38         |
 | _"a y c más grandes que b [a > b & c > b]"        | CTE_STRING | "a y c más grandes que b [a > b & c > b]"         | 42         |
@@ -38,7 +46,6 @@
 | _"a no es más grande que b -> !(a > b)"           | CTE_STRING | "a no es más grande que b -> !(a > b)"            | 39         |
 | 5.100000000                                        | CTE_REAL   | -                                                  | -          |
 | _"a es más grande que b y c"                      | CTE_STRING | "a es más grande que b y c"                       | 28         |
-| 3                                                  | CTE_INT    | -                                                  | -          |
 | _"a es más grande que b"                          | CTE_STRING | "a es más grande que b"                           | 24         |
 | 27                                                 | CTE_INT    | -                                                  | -          |
 | 500                                                | CTE_INT    | -                                                  | -          |
@@ -53,7 +60,6 @@
 | _"chau"                                            | CTE_STRING | "chau"                                             | 6          |
 | _"SI"                                              | CTE_STRING | "SI"                                               | 4          |
 | 21                                                 | CTE_INT    | -                                                  | -          |
-| 4                                                  | CTE_INT    | -                                                  | -          |
 | 20                                                 | CTE_INT    | -                                                  | -          |
 | _"Sintaxis OK"                                     | CTE_STRING | "Sintaxis OK"                                      | 13         |
 -------------------------------------------------------------------------------------------------------------------------------------

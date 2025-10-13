@@ -37,6 +37,11 @@ int crearTercetoUnitarioStr(const char *op)
     return indiceTerceto++;
 }
 
+int getIndice()
+{
+    return indiceTerceto;
+}
+
 char* verOperadorTerceto(int indice)
 {
     /* indice indica el terceto */
