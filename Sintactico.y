@@ -34,6 +34,8 @@ int acciones_asignacion_literal(const char *id, int codValidacionId, int codValC
 int acciones_definicion_tipo_retorno(const char *id, int codValidacion);
 int acciones_verificacion_compatibilidad_tipo(int codValidacion, const char *tipoCte);
 int acciones_parametro_read(const char *id, int codValidacion);
+void recorrer_lista_argumentos_equalexpressions(tPila *pilaIndiceTercetosFuncionesEspeciales);
+void completar_bi_equalexpressions(tPila *pilaBI);
 
 int ProgramaInd;
 int DefInitInd;
@@ -97,8 +99,10 @@ tPila pilaExpresionesLogicas;
 tPila pilaIndiceTercetosFuncionesEspeciales;
 tPila pilaBI;
 
-int indice=0;
-int indiceActual=0;
+tPila pilaValoresBooleanos;
+
+int indice = 0;
+int indiceActual = 0;
 int indiceDesapilado = 0;
 
 bool _secuenciaAND = false;
@@ -358,8 +362,10 @@ asignacion:
             YYABORT;
         }
         sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
-        sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
-        AsignacionInd = crearTerceto("OP_ASIG", operandoIzqAux, operandoDerAux);
+        //sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
+        char valorBoleanoString[50];
+        sacar_de_pila(&pilaValoresBooleanos, valorBoleanoString, sizeof(valorBoleanoString));
+        AsignacionInd = crearTerceto("OP_ASIG", operandoIzqAux, valorBoleanoString);
         printf("\t\t\tR19. Asignacion -> [ID: '%s']:= valor_booleano\n", $1.str);
         free($1.str);
     }
@@ -514,20 +520,40 @@ bucle:
     ;
 
 llamada_func:
-    FN_EQUALEXPRESSIONS PAR_ABR lista_args PAR_CIE 
+    FN_EQUALEXPRESSIONS PAR_ABR 
     {
-        sprintf(operandoDerAux, "[%d]", ListaArgsInd);
-        LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_EQUALEXPRESSIONS", operandoDerAux);
+        crearTerceto("=", "@resEqualExpressions", "FALSO");
+    }
+    lista_args PAR_CIE 
+    {
+        recorrer_lista_argumentos_equalexpressions(&pilaIndiceTercetosFuncionesEspeciales);
+        //sprintf(operandoDerAux, "[%d]", ListaArgsInd);
+        //LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_EQUALEXPRESSIONS", operandoDerAux);
         printf("\t\t\tR27. Llamada_Func -> funcion_especial(Lista_Args)\n");
 
-        sacar_de_pila(&pilaBI, &indiceDesapilado, sizeof(indiceActual));
-        modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+        completar_bi_equalexpressions(&pilaBI);
+        //sacar_de_pila(&pilaBI, &indiceDesapilado, sizeof(indiceActual));
+        //modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+
+        char valoroBoolStr[50] = "@resEqualExpressions";
+        poner_en_pila(&pilaValoresBooleanos, valoroBoolStr, sizeof(valoroBoolStr));
     }
-    | FN_ISZERO PAR_ABR expresion PAR_CIE 
+    | FN_ISZERO PAR_ABR expresion_aritmetica PAR_CIE 
     {
-        sprintf(operandoDerAux, "[%d]", ExpresionInd);
-        LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_ISZERO", operandoDerAux);
+        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
+        //LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_ISZERO", operandoDerAux);
         printf("\t\t\tR28. Llamada_Func -> funcion_especial(Lista_Args)\n");
+
+        Xind = crearTerceto("CMP", operandoDerAux, "0");
+        sprintf(operandoIzqAux, "[%d]", Xind + 4);
+        crearTerceto("BNE", operandoIzqAux, "_"); // + 1
+        Xind = crearTerceto("=", "@resIsZero", "VERDADERO"); // + 2
+        sprintf(operandoIzqAux, "[%d]", Xind + 3);
+        crearTerceto("BI",operandoIzqAux, "_"); // + 3
+        crearTerceto("=", "@resIsZero", "FALSO"); // + 4
+
+        char valoroBoolStr[50] = "@resIsZero";
+        poner_en_pila(&pilaValoresBooleanos, valoroBoolStr, sizeof(valoroBoolStr));
     }
     ;
 
@@ -535,28 +561,29 @@ lista_args:
     expresion_aritmetica
     {
         sprintf(operandoDerAux, "[%d]", getIndice()-1);
-        ListaArgsInd = crearTerceto("=", "_pivote", operandoDerAux);
+        ListaArgsInd = crearTerceto("=", "@pivote", operandoDerAux);
         printf("\t\t\t\tR29. lista_args -> expresion\n");
         
     }
     | lista_args COMA expresion_aritmetica 
     {
         sprintf(operandoIzqAux, "[%d]", ListaArgsInd);
-        sprintf(operandoDerAux, "[%d]", ExpresionInd);
+        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
 
-        poner_en_pila(&pilaIndiceTercetosFuncionesEspeciales, &ExpresionInd, sizeof(ExpresionInd));
+        poner_en_pila(&pilaIndiceTercetosFuncionesEspeciales, &ExpresionAritmeticaInd, sizeof(ExpresionAritmeticaInd));
+        printf("Apile %d\n", ExpresionAritmeticaInd);
 
         sprintf(operandoDerAux, "[%d]", getIndice()-1);
-        ListaArgsInd = crearTerceto("=", "_Actual", operandoDerAux);
+        ListaArgsInd = crearTerceto("=", "@actual", operandoDerAux);
         printf("\t\t\t\tR30. lista_args -> lista_args , expresion \n");
 
-        crearTerceto("CMP", "_pivote", "_Actual");
+        crearTerceto("CMP", "@pivote", "@actual");
         sprintf(operandoIzqAux, "[%d]", ListaArgsInd+5);
         crearTerceto("BNE", operandoIzqAux, "_");
-        crearTerceto("=", "_res", "VERDADERO");
-        crearTerceto("BI","", "_");
-        
-        poner_en_pila(&pilaBI, &ExpresionInd, sizeof(ExpresionInd));
+        crearTerceto("=", "@resEqualExpressions", "VERDADERO");
+        int IndBI = crearTerceto("BI","", "_");
+
+        poner_en_pila(&pilaBI, &IndBI, sizeof(IndBI));
     }
     ;
 
@@ -822,12 +849,16 @@ valor_booleano:
     }
     | TRUE 
     {
-        ValorBooleanoInd = crearTercetoUnitarioStr("TRUE");
+        ValorBooleanoInd = crearTercetoUnitarioStr("VERDADERO");
+        char valoroBoolStr[50] = "VERDADERO";
+        poner_en_pila(&pilaValoresBooleanos, valoroBoolStr, sizeof(valoroBoolStr));
         printf("\t\t\t\t\tR42. Valor_Booleano -> TRUE\n");
     }
     | FALSE 
     {
-        ValorBooleanoInd = crearTercetoUnitarioStr("FALSE");
+        ValorBooleanoInd = crearTercetoUnitarioStr("FALSO");
+        char valoroBoolStr[50] = "FALSO";
+        poner_en_pila(&pilaValoresBooleanos, valoroBoolStr, sizeof(valoroBoolStr));
         printf("\t\t\t\t\tR43. Valor_Booleano -> FALSE\n");
     }
     ;
@@ -959,6 +990,7 @@ int main(int argc, char *argv[])
     crear_pila(&pilaExpresionesLogicas);
     crear_pila(&pilaIndiceTercetosFuncionesEspeciales);
     crear_pila(&pilaBI);
+    crear_pila(&pilaValoresBooleanos);
 
     printf("\n-----------------------------------------------------------------------------------------------------------------\n");
     printf("                                        INICIO PROCESO ANALISIS SINTACTICO                                        ");
@@ -985,6 +1017,9 @@ int main(int argc, char *argv[])
     vaciar_pila(&pilaSentencias);
     vaciar_pila(&pilaListaSentencias);
     vaciar_pila(&pilaExpresionesLogicas);
+    vaciar_pila(&pilaIndiceTercetosFuncionesEspeciales);
+    vaciar_pila(&pilaBI);
+    vaciar_pila(&pilaValoresBooleanos);
     destroy_HashMap(hashmap);
 
     imprimirTercetos();
@@ -1153,3 +1188,76 @@ int acciones_expresion_aritm_simple()
     return ACCION_EXITOSA;
 }
 */
+
+/******************************************************************
+                Implementacion Funciones Especiales 
+*******************************************************************/
+
+void recorrer_lista_argumentos_equalexpressions(tPila *pilaIndiceTercetosFuncionesEspeciales)
+{
+    if (pila_vacia(pilaIndiceTercetosFuncionesEspeciales))
+        return;
+
+    // Pasar la pila a un vector auxiliar
+    int *vec = NULL;
+    int tam = 0;
+    int aux;
+
+    // Desapilo todo y lo guardo en un vector
+    while (!pila_vacia(pilaIndiceTercetosFuncionesEspeciales))
+    {
+        sacar_de_pila(pilaIndiceTercetosFuncionesEspeciales, &aux, sizeof(int));
+        vec = realloc(vec, (tam + 1) * sizeof(int));
+        vec[tam++] = aux;
+    }
+
+    // Para preservar la pila original, vuelvo a apilar en orden inverso
+    for (int i = tam - 1; i >= 0; i--)
+        poner_en_pila(pilaIndiceTercetosFuncionesEspeciales, &vec[i], sizeof(int));
+
+    // Ahora 'vec' tiene los índices en orden de aparición
+    for (int i = 0; i < tam / 2; i++)
+    {
+        int tmp = vec[i];
+        vec[i] = vec[tam - 1 - i];
+        vec[tam - 1 - i] = tmp;
+    }
+
+    // Paso 2: Doble bucle de comparación
+    int indicePivote;
+    int IndBI;
+    for (int i = 0; i < tam - 1; i++)
+    {
+        int indicePivote = vec[i];
+        sprintf(operandoDerAux, "[%d]", indicePivote);
+        crearTerceto("=", "@pivote", operandoDerAux);
+
+        for (int j = i + 1; j < tam; j++)
+        {
+            indiceActual = vec[j];
+            sprintf(operandoDerAux, "[%d]", indiceActual);
+            ListaArgsInd = crearTerceto("=", "@actual", operandoDerAux); // ListaArgsInd = 0
+            
+            crearTerceto("CMP", "@pivote", "@actual"); // + 1
+            sprintf(operandoIzqAux, "[%d]", ListaArgsInd + 5);
+            crearTerceto("BNE", operandoIzqAux, "_"); // +2
+            crearTerceto("=", "@resEqualExpressions", "VERDADERO"); // + 3
+            IndBI = crearTerceto("BI","", "_"); // + 4
+
+            poner_en_pila(&pilaBI, &IndBI, sizeof(IndBI));
+        }
+    }
+
+    free(vec);
+}
+
+void completar_bi_equalexpressions(tPila *PilaBI)
+{
+    int indiceDesapilado;
+    while(sacar_de_pila(PilaBI, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+    {
+        sprintf(operandoIzqAux, "[%d]", getIndice());
+        modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+    }
+}
+
