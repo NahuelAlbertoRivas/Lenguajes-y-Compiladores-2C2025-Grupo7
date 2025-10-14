@@ -18,10 +18,12 @@
 #include "utilidades/pila.h"
 #include "utilidades/hashmap.h"
 #include "utilidades/acciones_semanticas.h"
+#include "Tercetos.h"
 
 /* Defines */
 #define TAM_MAX_STRING 50
 #define TAM_MAX_ID     100
+#define CARACTER_NO_RECONOCIDO -4322
 
 /* Variables Globales */
 FILE  *yyin;
@@ -29,9 +31,9 @@ FILE  *yyin;
 extern Tabla tabla;
 extern HashMap *hashmap;
 extern tPila pilaVars;
-extern HashMap *hashmap;
-extern tPila pilaVars;
+extern tPila pilaSentencias;
 extern FILE *ptercetos;
+extern int _inicioExpresion;
 
 char *yyltext; 
 
@@ -154,7 +156,7 @@ COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMB
 /*---------------------------------------------*/
 
 %%
-{IF}			        {return IF;}
+{IF}			        {_inicioExpresion = getIndice();return IF;}
 {WHILE}			        {return WHILE;}
 {ELSE}			        {return ELSE;}
 {WRITE}			        {return WRITE;}
@@ -206,7 +208,7 @@ COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMB
 "\n\t"
 " "
 "\r\n"
-.			            { printf( "ERROR LEXICO : Caracter no reconocido: %s\n", yytext ); finalizar_recursos(); exit (0);}
+.			            { printf( "ERROR LEXICO : Caracter no reconocido: %s\n", yytext ); finalizar_recursos(); exit(CARACTER_NO_RECONOCIDO);}
 %%
 
 /*---------------------------------------------*/
@@ -219,12 +221,12 @@ int validar_entero(const char* lexema) {
 
     if (errno == ERANGE || value < SHRT_MIN || value > SHRT_MAX) {
         fprintf(stderr, "ERROR: Constante entera fuera de rango (maximo 16 bits): %s\n", lexema);
-        yylval.datosToken.codValidacion = ERR_VALIDACION;
+        finalizar_recursos();
+        exit(ERR_VALIDACION);
     }
     else
     {
         agregar_a_tabla(&tabla, lexema, "CTE_INT");
-        yylval.datosToken.codValidacion = VALIDACION_OK;
         yylval.datosToken.str = strdup(yytext);
     }
     
@@ -244,14 +246,14 @@ int validar_real(const char* lexema) {
     if (errno == ERANGE || value > FLT_MAX || value < -FLT_MAX)
     {
         fprintf(stderr, "ERROR: Constante real fuera de rango (maximo 32 bits): %s\n", lexema);
-        yylval.datosToken.codValidacion = ERR_VALIDACION;
+        finalizar_recursos();
+        exit(ERR_VALIDACION);
     }
     else
     {
         char normalizado[64];
         normalizar_real_lexico(lexema, normalizado, sizeof(normalizado));
         agregar_a_tabla(&tabla, normalizado, "CTE_REAL");
-        yylval.datosToken.codValidacion = VALIDACION_OK;
         yylval.datosToken.str = strdup(normalizado);
     }
     return CTE_REAL;
@@ -262,7 +264,9 @@ int validar_string(const char* lexema) {
     if (len < 2 || len - 2 > TAM_MAX_STRING)
     {
         fprintf(stderr, "ERROR: Constante string demasiado larga (maximo 50): %s\n", lexema);
-        yylval.datosToken.codValidacion = ERR_VALIDACION;
+        finalizar_recursos();
+        exit(ERR_VALIDACION);
+
     }
     else
     {
@@ -280,7 +284,8 @@ int validar_id(const char* lexema) {
 
     if (len < 0 || len > TAM_MAX_ID) {
         fprintf(stderr, "ERROR: ID demasiado largo (maximo 100): %s\n", lexema);
-        yylval.datosToken.codValidacion = ERR_VALIDACION;
+        finalizar_recursos();
+        exit(ERR_VALIDACION);
     }
     else
     {
@@ -301,5 +306,6 @@ void finalizar_recursos()
     guardar_tabla_en_archivo(&tabla, "Symbol-Table.txt");
     fclose(yyin);
     vaciar_pila(&pilaVars);
+    vaciar_pila(&pilaSentencias);
     destroy_HashMap(hashmap);
 }
