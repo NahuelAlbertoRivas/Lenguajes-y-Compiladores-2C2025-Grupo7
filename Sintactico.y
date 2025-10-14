@@ -289,14 +289,12 @@ lista_sentencias:
     {
         ListaSentenciasInd2 = ListaSentenciasInd;
         ListaSentenciasInd = SentenciaInd;
-        indiceActual = ListaSentenciasInd;
         if(sacar_de_pila(&pilaListaSentencias, &Xind, sizeof(Xind)) == TODO_OK)
         {
             ListaSentenciasInd2 = Xind;
-            indiceActual--;
         }
         sprintf(operandoIzqAux, "[%d]", ListaSentenciasInd2);
-        sprintf(operandoDerAux, "[%d]", indiceActual);
+        sprintf(operandoDerAux, "[%d]", ListaSentenciasInd);
         ListaSentenciasInd = crearTerceto("LISTA_SENTENCIAS", operandoIzqAux, operandoDerAux);
         poner_en_pila(&pilaListaSentencias, &ListaSentenciasInd, sizeof(ListaSentenciasInd));
         printf("\t\nR12. Lista_Sentencias -> Lista_Sentencias Sentencia\n");
