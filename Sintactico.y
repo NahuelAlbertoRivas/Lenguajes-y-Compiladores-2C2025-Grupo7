@@ -65,13 +65,19 @@ int ExpresionParaCondicionInd2;
 
 int BloqueAsociadoInd2;
 
-int Xind; //Auxiliar para los tipos de datos
+int ListaSentenciasInd2;
 
-/*
-char ETDind[MAX_LONG_TD]; //Tipo de Dato Expresión
-char TTDind[MAX_LONG_TD]; //Tipo de Dato Término
-char FTDind[MAX_LONG_TD]; //Tipo de Dato Factor
-*/
+int ListaIdInd2;
+
+int BloqueAsigInd2;
+
+int ExpresionRelacionalInd2;
+
+int ExpresionLogicaInd2;
+
+int SentenciaInd2;
+
+int Xind; //Auxiliar para los tipos de datos
 
 char operandoDerAux[50];
 char operandoIzqAux[50];
@@ -81,13 +87,23 @@ int _resExpRelacional;
 int _resExpresionLogica;
 int _saltoCeldas;
 int _tercetoNoDefinido;
+int _inicioBucle;
+int _inicioExpresion;
 const char *_tipoDatoExpresionActual;
 
 tPila pilaSentencias;
+tPila pilaListaSentencias;
+tPila pilaExpresionesLogicas;
+tPila pilaIndiceTercetosFuncionesEspeciales;
+tPila pilaBI;
 
 int indice=0;
 int indiceActual=0;
 int indiceDesapilado = 0;
+
+bool _secuenciaAND = false;
+bool _soloAritmetica = true;
+bool _soloBooleana = true;
 
 %}
 
@@ -138,25 +154,23 @@ int indiceDesapilado = 0;
 %token <datosToken> TD_STRING         
 %token <datosToken> TD_BOOLEAN        
 
-%token CMP_MAYOR            
-%token CMP_MENOR            
-%token CMP_MAYOR_IGUAL      
-%token CMP_MENOR_IGUAL     
-%token CMP_DISTINTO         
-%token CMP_ES_IGUAL     
+%left CMP_MAYOR CMP_MENOR CMP_MAYOR_IGUAL CMP_MENOR_IGUAL CMP_DISTINTO CMP_ES_IGUAL
 
-%left OP_AND
+%nonassoc PREC_RELACIONAL
+
 %nonassoc OP_OR
+%left OP_AND
 %right OP_NOT
+%nonassoc PRIORIDAD_EXPRESION
 
 %%
 
 programa:
     def_init lista_sentencias
     {
-        sprintf(operandoIzqAux, "[%d]", DefInitInd);
-        sprintf(operandoDerAux, "[%d]", ListaSentenciasInd);
-        ProgramaInd = crearTerceto(" ", operandoIzqAux, operandoDerAux);
+        //sprintf(operandoIzqAux, "[%d]", DefInitInd);
+        //sprintf(operandoDerAux, "[%d]", ListaSentenciasInd);
+        //ProgramaInd = crearTerceto("PROGRAMA", operandoIzqAux, operandoDerAux);
         printf("R1. Programa -> Def_Init Lista_Sentencias\n");
     }
     ;
@@ -164,7 +178,7 @@ programa:
 def_init:
     INIT LLA_ABR bloque_asig LLA_CIE
     {
-        DefInitInd = BloqueAsigInd;
+        //DefInitInd = BloqueAsigInd;
         printf("\t\tR2. Def_Init -> init { Bloque_Asig }\n");
     }
     ;
@@ -172,16 +186,22 @@ def_init:
 bloque_asig:
     lista_id DOS_PUNTOS tipo_dato
     {
-        sprintf(operandoIzqAux, "[%d]", ListaIdInd);
-        sprintf(operandoDerAux, "[%d]", TipoDatoInd);
-        BloqueAsigInd = crearTerceto(":", operandoIzqAux, operandoDerAux);
+        //BloqueAsigInd2 = BloqueAsigInd;
+        //BloqueAsigInd = ListaIdInd;
+        //sprintf(operandoIzqAux, "[%d]", ListaIdInd);
+        //sprintf(operandoDerAux, "[%d]", TipoDatoInd);
+        //BloqueAsigInd = crearTerceto("DOS_PUNTOS", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR3. Bloque_Asig -> Lista_Id : Tipo_Dato\n");
     }
     | bloque_asig lista_id DOS_PUNTOS tipo_dato
     {
-        sprintf(operandoIzqAux, "[%d]", BloqueAsigInd);
-        sprintf(operandoDerAux, "[%d]", ListaIdInd);
-        BloqueAsigInd = crearTerceto(" ", operandoIzqAux, operandoDerAux);
+        //BloqueAsigInd2 = BloqueAsigInd;
+        //sprintf(operandoIzqAux, "[%d]", ListaIdInd);
+        //sprintf(operandoDerAux, "[%d]", TipoDatoInd);
+        //indiceActual = crearTerceto("DOS_PUNTOS", operandoIzqAux, operandoDerAux);
+        //sprintf(operandoIzqAux, "[%d]", BloqueAsigInd2);
+        //sprintf(operandoDerAux, "[%d]", indiceActual);
+        //BloqueAsigInd = crearTerceto("BLOQUE_ASIG", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR4. Bloque_Asig -> Bloque_Asig Lista_Id : Tipo_Dato\n");
     }
     ;
@@ -189,24 +209,26 @@ bloque_asig:
 lista_id:
     ID
     {
+        //ListaIdInd2 = ListaIdInd;
         if(acciones_definicion_variable($1.str, $1.codValidacion) != ACCION_EXITOSA)
         {
             free($1.str);
             YYABORT;
         }
-        ListaIdInd = crearTercetoUnitarioStr($1.str);
+        //ListaIdInd = crearTercetoUnitarioStr($1.str);
         printf("\t\t\t\tR5. Lista_Id -> [ID: '%s']\n", $1.str);
         free($1.str);
     } 
     | lista_id COMA ID 
-    {
+    {        
+        //ListaIdInd2 = ListaIdInd;
         if(acciones_definicion_variable($3.str, $3.codValidacion) != ACCION_EXITOSA)
         {
             YYABORT;
         } 
-        sprintf(operandoIzqAux, "[%d]", ListaIdInd);
-        sprintf(operandoDerAux, "[%d]", crearTercetoUnitarioStr($3.str));
-        ListaIdInd = crearTerceto(", ", operandoIzqAux, operandoDerAux);
+        //sprintf(operandoIzqAux, "[%d]", ListaIdInd);
+        //sprintf(operandoDerAux, "[%d]", crearTercetoUnitarioStr($3.str));
+        //ListaIdInd = crearTerceto("COMA", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\tR6. Lista_Id -> Lista_Id COMA [ID: '%s']\n",$3.str); 
         free($3.str);
     }
@@ -215,7 +237,7 @@ lista_id:
 tipo_dato:
     TD_BOOLEAN 
     {
-        TipoDatoInd = crearTercetoUnitarioStr(DBOOLEAN);
+        //TipoDatoInd = crearTercetoUnitarioStr(DBOOLEAN);
         printf("\t\t\t\tR7. Tipo_Dato -> %s\n", $1.str); 
         if(acciones_asignacion_tipo($1.str) != ACCION_EXITOSA)
         {
@@ -225,7 +247,7 @@ tipo_dato:
     }
     | TD_INT 
     {
-        TipoDatoInd = crearTercetoUnitarioStr(DINTEGER);
+        //TipoDatoInd = crearTercetoUnitarioStr(DINTEGER);
         if(acciones_asignacion_tipo($1.str) != ACCION_EXITOSA)
         {
             free($1.str);
@@ -236,7 +258,7 @@ tipo_dato:
     }
     | TD_FLOAT 
     {
-        TipoDatoInd = crearTercetoUnitarioStr(DFLOAT);
+        //TipoDatoInd = crearTercetoUnitarioStr(DFLOAT);
         printf("\t\t\t\tR9. Tipo_Dato -> %s\n", $1.str); 
         if(acciones_asignacion_tipo($1.str) != ACCION_EXITOSA)
         {
@@ -246,7 +268,7 @@ tipo_dato:
     }
     | TD_STRING 
     {
-        TipoDatoInd = crearTercetoUnitarioStr(DSTRING);
+        //TipoDatoInd = crearTercetoUnitarioStr(DSTRING);
         if(acciones_asignacion_tipo($1.str)!=ACCION_EXITOSA)
         {
             free($1.str);
@@ -260,16 +282,23 @@ tipo_dato:
 lista_sentencias:
     sentencia 
     {
+        ListaSentenciasInd2 = ListaSentenciasInd;
         ListaSentenciasInd = SentenciaInd;
-        _contadorSentencias = 1;
+        poner_en_pila(&pilaListaSentencias, &ListaSentenciasInd, sizeof(ListaSentenciasInd));
         printf("\t\nR11. Lista_Sentencias -> Sentencia\n");
     }
     | lista_sentencias sentencia 
     {
-        sprintf(operandoIzqAux, "[%d]", ListaSentenciasInd);
-        sprintf(operandoDerAux, "[%d]", SentenciaInd);
-        ListaSentenciasInd = crearTerceto(" ", operandoIzqAux, operandoDerAux);
-        _contadorSentencias++;
+        ListaSentenciasInd2 = ListaSentenciasInd;
+        ListaSentenciasInd = SentenciaInd;
+        if(sacar_de_pila(&pilaListaSentencias, &Xind, sizeof(Xind)) == TODO_OK)
+        {
+            ListaSentenciasInd2 = Xind;
+        }
+        //sprintf(operandoIzqAux, "[%d]", ListaSentenciasInd2);
+        //sprintf(operandoDerAux, "[%d]", ListaSentenciasInd);
+        //ListaSentenciasInd = crearTerceto("LISTA_SENTENCIAS", operandoIzqAux, operandoDerAux);
+        poner_en_pila(&pilaListaSentencias, &ListaSentenciasInd, sizeof(ListaSentenciasInd));
         printf("\t\nR12. Lista_Sentencias -> Lista_Sentencias Sentencia\n");
     }
     ;
@@ -277,26 +306,31 @@ lista_sentencias:
 sentencia:  	   
 	asignacion 
     {
+        SentenciaInd2 = SentenciaInd;
         SentenciaInd = AsignacionInd;
         printf("\t\tR13. Sentencia -> Asignacion\n");
     } 
     | condicional_si 
     {
+        SentenciaInd2 = SentenciaInd;
         SentenciaInd = CondicionalSiInd;
         printf("\t\tR14. Sentencia -> Condicional_Si\n");
     }
     | bucle 
     {
+        SentenciaInd2 = SentenciaInd;
         SentenciaInd = BucleInd;
         printf("\t\tR15. Sentencia -> While\n");
     }
     | llamada_func 
     {
+        SentenciaInd2 = SentenciaInd;
         SentenciaInd = LlamadaFuncInd;
         printf("\t\tR16. Sentencia -> LLamada_Func\n");
     }
     | entrada_salida 
     {
+        SentenciaInd2 = SentenciaInd;
         SentenciaInd = EntradaSalidaInd;
         printf("\t\tR17. sentencia -> entrada_salida\n");
     }
@@ -312,7 +346,7 @@ asignacion:
         }
         sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
-        AsignacionInd = crearTerceto(":=", operandoIzqAux, operandoDerAux);
+        AsignacionInd = crearTerceto("OP_ASIG", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR18. Asignacion -> [ID: '%s']:= Expresion_Aritmetica\n",$1.str);
         free($1.str);
     }
@@ -325,7 +359,7 @@ asignacion:
         }
         sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
         sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
-        AsignacionInd = crearTerceto(":=", operandoIzqAux, operandoDerAux);
+        AsignacionInd = crearTerceto("OP_ASIG", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR19. Asignacion -> [ID: '%s']:= valor_booleano\n", $1.str);
         free($1.str);
     }
@@ -337,7 +371,7 @@ asignacion:
             YYABORT;
         }
         sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
-        AsignacionInd = crearTerceto("++", operandoIzqAux, "_");
+        AsignacionInd = crearTerceto("OP_UN_INC", operandoIzqAux, "_");
         printf("\t\t\tR20. Asignacion -> [ID: '%s']++\n",$1.str);
         free($1.str);
     }
@@ -349,7 +383,7 @@ asignacion:
             YYABORT;
         }
         sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
-        AsignacionInd = crearTerceto("--", operandoIzqAux, "_");
+        AsignacionInd = crearTerceto("OP_UN_DEC", operandoIzqAux, "_");
         printf("\t\t\tR21. Asignacion -> [ID: '%s']--\n",$1.str);
         free($1.str);
     }
@@ -369,7 +403,7 @@ asignacion:
         }
         sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
         sprintf(operandoDerAux, "[%d]", crearTercetoUnitarioStr($3.str));
-        AsignacionInd = crearTerceto(":=", operandoIzqAux, operandoDerAux);
+        AsignacionInd = crearTerceto("OP_ASIG", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR22. Asignacion -> [ID: '%s']:= \"%s\"\n", $1.str, $3.str);
         free($1.str);
         free($3.str);
@@ -377,34 +411,59 @@ asignacion:
 	;
 
 condicional_si:
-    IF PAR_ABR expresion_logica PAR_CIE bloque_asociado %prec MENOS_QUE_ELSE
+    IF PAR_ABR expresion PAR_CIE bloque_asociado %prec MENOS_QUE_ELSE
     {
-        indiceDesapilado = sacar_de_pila(&pilaSentencias,&indiceDesapilado, sizeof(indiceDesapilado));
-        indiceActual = getIndice();
-        indiceActual = indiceActual + 1;
-        sprintf(operandoIzqAux, "%d", indiceActual);
-        modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+        indiceActual = getIndice(); // [como en crearTerceto() siempre hacemos ++, siempre tenemos el nro. de terceto siguiente al último creado]
+        sprintf(operandoIzqAux, "[%d]", indiceActual);
+        if(_secuenciaAND)
+        {
+            while(sacar_de_pila(&pilaSentencias, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+            {
+                modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+            }
+        }
+        else
+        {
+            sacar_de_pila(&pilaSentencias, &indiceDesapilado, sizeof(indiceActual));
+            modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+        }
         printf("\t\t\tR22. Condicional_Si -> if(Expresion) Bloque_Asociado\n");
+        _secuenciaAND = false;
+        _soloAritmetica = true;
+        _soloBooleana = true;
+        CondicionalSiInd = _inicioExpresion;
     }
-    | IF PAR_ABR expresion_logica PAR_CIE bloque_asociado ELSE{
-          
-        sprintf(operandoIzqAux, "%d", Xind + 2);
-        Xind = crearTerceto("BI", operandoIzqAux, "_");
-        indiceDesapilado = sacar_de_pila(&pilaSentencias,&indiceDesapilado, sizeof(indiceDesapilado));
-        indiceActual = getIndice();
-        sprintf(operandoIzqAux, "%d", indiceActual + 1);
-        modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
-        indiceActual = getIndice();
-        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
-    } bloque_asociado
+    | IF PAR_ABR expresion PAR_CIE bloque_asociado ELSE
     {
-        sprintf(operandoIzqAux, "%d", (indiceActual + 1));
-        modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+          
+        indiceActual = getIndice(); // (1) me guardo el nro. de terceto de BI para actualizarlo una vez que sepa donde termina la última instrucción del bloque ELSE
+        crearTerceto("BI", "_saltoCeldas", "_");
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 1); // indiceActual + 1 ya sería el nro. de terceto correspondiente a la primer instrucción del bloque ELSE
+        if(_secuenciaAND)
+        {
+            while(sacar_de_pila(&pilaSentencias,&indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK) // (2)
+            {
+                modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+            }
+        }
+        else
+        {
+            sacar_de_pila(&pilaSentencias, &indiceDesapilado, sizeof(indiceDesapilado));
+            modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux); // (3)
+        }
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual)); // (4)
+    }
+    bloque_asociado
+    {
+        indiceActual = getIndice(); // [como en crearTerceto() siempre hacemos ++, siempre tenemos el nro. de terceto siguiente al último creado]
+        sprintf(operandoIzqAux, "[%d]", indiceActual);
+        sacar_de_pila(&pilaSentencias, &indiceDesapilado, sizeof(indiceDesapilado)); // (1)
+        modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux); // (2)
         printf("\t\t\tR23. Condicional_Si -> if(Expresion) Bloque_Asociado else Bloque_Asociado\n");
-        sacar_de_pila(&pilaSentencias, &indiceDesapilado, sizeof(indiceDesapilado));
-        indiceActual = getIndice();
-        sprintf(operandoIzqAux, "[%d]", (indiceActual + 1));
-        modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+        _secuenciaAND = false;
+        _soloAritmetica = true;
+        _soloBooleana = true;
+        CondicionalSiInd = _inicioExpresion;
     }
     ;
 
@@ -413,64 +472,91 @@ bloque_asociado:
     {
         BloqueAsociadoInd2 = BloqueAsociadoInd;
         BloqueAsociadoInd = SentenciaInd;
-        _contadorSentencias = 1;
+        poner_en_pila(&pilaListaSentencias, &SentenciaInd, sizeof(SentenciaInd));
         printf("\t\t\t\tR24. Bloque_Asociado -> Sentencia\n");
     }
     | LLA_ABR lista_sentencias LLA_CIE 
     {
         BloqueAsociadoInd2 = BloqueAsociadoInd;
         BloqueAsociadoInd = ListaSentenciasInd;
-        _contadorSentencias++;
         printf("\t\t\t\tR25. Bloque_Asociado -> { Lista_Sentencias }\n");
     }
     ;
 
 bucle:
-    WHILE PAR_ABR expresion_logica 
+    WHILE
     {
-        sprintf(operandoDerAux, "[%d]", ExpresionLogicaInd);
-        crearTerceto(":=", "_resExpresionLogica", operandoDerAux);
-        Xind = crearTerceto("CMP", "_resExpresionLogica", "1");
-        crearTerceto("BNE", "_saltoCeldas", "_");
+        _inicioBucle = getIndice(); // me guardo el inicio de la expresión lógica
+        BucleInd = _inicioBucle;
     }
-    PAR_CIE bloque_asociado
+    PAR_ABR expresion PAR_CIE bloque_asociado
     {
-        sprintf(operandoIzqAux, "[%d]", ExpresionLogicaInd);
-        sprintf(operandoDerAux, "[%d]", BloqueAsociadoInd2);
-        crearTerceto("while", operandoIzqAux, operandoDerAux);
-        sprintf(operandoIzqAux, "%d", _contadorSentencias + 1);
-        modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
-        printf("\t\t\tR26. Bucle -> while(Expresion) Bloque_Asociado\n");
+        sprintf(operandoIzqAux, "[%d]", _inicioBucle);
+        indiceActual = crearTerceto("BI", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 1); // la siguiente instrucción después del BI al final del bucle
+        if(_secuenciaAND)
+        {
+            while(sacar_de_pila(&pilaSentencias, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+            {
+                modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+            }
+        }
+        else
+        {
+            sacar_de_pila(&pilaSentencias, &indiceDesapilado, sizeof(indiceActual));
+            modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+        }
+        _secuenciaAND = false;
+        _soloAritmetica = true;
+        _soloBooleana = true;
+        printf("\t\t\t\tRn°. Bucle -> while ( Expresion_Logica )\n");
     }
     ;
 
 llamada_func:
     FN_EQUALEXPRESSIONS PAR_ABR lista_args PAR_CIE 
     {
-        sprintf(operandoIzqAux, "[%d]", ListaArgsInd);
-        LlamadaFuncInd = crearTerceto("equalExpressions", operandoIzqAux, "_");
+        sprintf(operandoDerAux, "[%d]", ListaArgsInd);
+        LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_EQUALEXPRESSIONS", operandoDerAux);
         printf("\t\t\tR27. Llamada_Func -> funcion_especial(Lista_Args)\n");
+
+        sacar_de_pila(&pilaBI, &indiceDesapilado, sizeof(indiceActual));
+        modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
     }
     | FN_ISZERO PAR_ABR expresion PAR_CIE 
     {
-        sprintf(operandoIzqAux, "[%d]", ExpresionInd);
-        LlamadaFuncInd = crearTerceto("equalExpressions", operandoIzqAux, "_");
+        sprintf(operandoDerAux, "[%d]", ExpresionInd);
+        LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_ISZERO", operandoDerAux);
         printf("\t\t\tR28. Llamada_Func -> funcion_especial(Lista_Args)\n");
     }
     ;
 
 lista_args:
-    expresion 
+    expresion_aritmetica
     {
-        ListaArgsInd = ExpresionInd;
+        sprintf(operandoDerAux, "[%d]", getIndice()-1);
+        ListaArgsInd = crearTerceto("=", "_pivote", operandoDerAux);
         printf("\t\t\t\tR29. lista_args -> expresion\n");
+        
     }
-    | lista_args COMA expresion 
+    | lista_args COMA expresion_aritmetica 
     {
         sprintf(operandoIzqAux, "[%d]", ListaArgsInd);
         sprintf(operandoDerAux, "[%d]", ExpresionInd);
-        ListaArgsInd = crearTerceto(", ", operandoIzqAux, operandoDerAux);
+
+        poner_en_pila(&pilaIndiceTercetosFuncionesEspeciales, &ExpresionInd, sizeof(ExpresionInd));
+
+        sprintf(operandoDerAux, "[%d]", getIndice()-1);
+        ListaArgsInd = crearTerceto("=", "_Actual", operandoDerAux);
         printf("\t\t\t\tR30. lista_args -> lista_args , expresion \n");
+
+        crearTerceto("CMP", "_pivote", "_Actual");
+        sprintf(operandoIzqAux, "[%d]", ListaArgsInd+5);
+        crearTerceto("BNE", operandoIzqAux, "_");
+        crearTerceto("=", "_res", "VERDADERO");
+        crearTerceto("BI","", "_");
+        
+        poner_en_pila(&pilaBI, &ExpresionInd, sizeof(ExpresionInd));
     }
     ;
 
@@ -478,7 +564,7 @@ entrada_salida:
     WRITE PAR_ABR factor PAR_CIE 
     {
         sprintf(operandoDerAux, "[%d]", FactorInd);
-        crearTerceto("io", "write", operandoDerAux);
+        EntradaSalidaInd = crearTerceto("ENTRADA_SALIDA", "WRITE", operandoDerAux);
         printf("\t\t\tR31. entrada_salida -> WRITE (factor)\n");
     }
     | WRITE PAR_ABR CTE_STRING PAR_CIE 
@@ -488,7 +574,7 @@ entrada_salida:
             YYABORT;
         }
         sprintf(operandoDerAux, "[%d]", crearTercetoUnitarioStr($3.str));
-        crearTerceto("io", "write", operandoDerAux);
+        EntradaSalidaInd = crearTerceto("ENTRADA_SALIDA", "WRITE", operandoDerAux);
         printf("\t\t\tR31. entrada_salida -> WRITE (CTE_STRING)\n");
     }
     | READ PAR_ABR ID PAR_CIE 
@@ -502,113 +588,229 @@ entrada_salida:
             YYABORT;
         }
         sprintf(operandoDerAux, "[%d]", crearTercetoUnitarioStr($3.str));
-        crearTerceto("io", "read", operandoDerAux);
+        EntradaSalidaInd = crearTerceto("ENTRADA_SALIDA", "READ", operandoDerAux);
         printf("\t\t\tR32. entrada_salida -> READ([ID: '%s'])\n",$3.str);
         free($3.str);
     }
 	;
 
 expresion: 
-    expresion_aritmetica 
-    {
-        ExpresionInd = ExpresionAritmeticaInd;
-        printf("\t\t\t\tR33. Expresion -> Expresion_Aritmetica\n");
-    }
-    | expresion_logica 
+    expresion_logica 
     {
         ExpresionInd = ExpresionLogicaInd;
         printf("\t\t\t\tR34. Expresion -> Expresion_Logica\n");
-        sprintf(operandoDerAux, "[%d]", ExpresionLogicaInd);
-        crearTerceto(":=", "_resExpresionLogica", operandoDerAux);
-        Xind = crearTerceto("CMP", "_resExpresionLogica", "1");
-        crearTerceto("BNE", "_saltoCeldas", "_");
-        indice = getIndice();
-        poner_en_pila(&pilaSentencias, &indice, sizeof(indice));    
     }
 	;
 
 expresion_logica:
-    expresion_para_condicion OP_AND expresion_para_condicion 
+    expresion_logica OP_AND expresion_para_condicion 
     {
-        sprintf(operandoIzqAux, "[%d]", ExpresionParaCondicionInd2);
+        ExpresionLogicaInd2 = ExpresionLogicaInd;
+        sprintf(operandoIzqAux, "[%d]", ExpresionLogicaInd);
         sprintf(operandoDerAux, "[%d]", ExpresionparaCondicionInd);
-        ExpresionLogicaInd = crearTerceto("AND", operandoIzqAux, operandoDerAux);
-        sprintf(operandoIzqAux, "[%d]", ExpresionParaCondicionInd2);
-        sprintf(operandoDerAux, "[%d]", ExpresionparaCondicionInd);
-        Xind = crearTerceto("+", operandoIzqAux, operandoDerAux);
-        sprintf(operandoDerAux, "%d", Xind);
-        crearTerceto(":=", "_resExpresionLogica", operandoDerAux);
-        crearTerceto("CMP", "_resExpresionLogica", "2");
-        sprintf(operandoIzqAux, "%d", (Xind + 6));
-        crearTerceto("BNE", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpresionLogica", "VERDADERO");
-        sprintf(operandoIzqAux, "%d", (Xind + 7));
-        crearTerceto("BI", operandoDerAux, "_");
-        crearTerceto(":=", "_resExpresionLogica", "FALSO");
+        if(sacar_de_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind)) == TODO_OK)
+        {
+            sprintf(operandoIzqAux, "[%d]", Xind);
+        }
+        Xind = ExpresionLogicaInd = crearTerceto("AND", operandoIzqAux, operandoDerAux);
+        sprintf(operandoDerAux, "[%d]", ExpresionLogicaInd);
+        crearTerceto("OP_ASIG", "_resExpresionLogica", operandoDerAux);
+        crearTerceto("CMP", "_resExpresionLogica", "VERDADERO");
+        indiceActual = getIndice(); // obtengo el índice del terceto relativo al salto (BNE en este caso)
+        crearTerceto("BNE", "_saltoCeldas", "_");
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+        _secuenciaAND = true;
+        poner_en_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind));
         printf("\t\t\t\t\tR35. Expresion_Logica -> Expresion AND Expresion\n");
     }
-    | expresion_para_condicion OP_OR expresion_para_condicion 
+    | expresion_logica OP_OR expresion_para_condicion 
     {
-        sprintf(operandoIzqAux, "[%d]", ExpresionParaCondicionInd2);
+        ExpresionLogicaInd2 = ExpresionLogicaInd;
+        sprintf(operandoIzqAux, "[%d]", ExpresionLogicaInd);
         sprintf(operandoDerAux, "[%d]", ExpresionparaCondicionInd);
+        if(sacar_de_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind)) == TODO_OK)
+        {
+            sprintf(operandoIzqAux, "[%d]", Xind);
+        }
         ExpresionLogicaInd = crearTerceto("OR", operandoIzqAux, operandoDerAux);
-        sprintf(operandoIzqAux, "[%d]", ExpresionParaCondicionInd2);
-        sprintf(operandoDerAux, "[%d]", ExpresionparaCondicionInd);
-        Xind = crearTerceto("+", operandoIzqAux, operandoDerAux);
-        sprintf(operandoDerAux, "%d", Xind);
-        crearTerceto(":=", "_resExpresionLogica", operandoDerAux);
-        crearTerceto("CMP", "_resExpresionLogica", "1");
-        sprintf(operandoIzqAux, "%d", (Xind + 6));
-        crearTerceto("BLT", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpresionLogica", "VERDADERO"); 
-        sprintf(operandoIzqAux, "%d", (Xind + 7));
-        crearTerceto("BI", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpresionLogica", "FALSO");
+        sprintf(operandoDerAux, "[%d]", ExpresionLogicaInd);
+        crearTerceto("OP_ASIG", "_resExpresionLogica", operandoDerAux); // con fadd recupero 
+        crearTerceto("CMP", "_resExpresionLogica", "VERDADERO");
+        indiceActual = getIndice(); // obtengo el índice del terceto relativo al salto (BNE en este caso)
+        crearTerceto("BNE", "_saltoCeldas", "_");
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+        poner_en_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind));
         printf("\t\t\t\t\tR36. Expresion_Logica -> Expresion OR Expresion\n");
     }
-    | OP_NOT expresion_para_condicion %prec NEGACION 
+    | OP_NOT expresion_logica %prec NEGACION 
     {
-        sprintf(operandoIzqAux, "%d", ExpresionParaCondicionInd2);
+        ExpresionLogicaInd2 = ExpresionLogicaInd;
+        sprintf(operandoIzqAux, "[%d]", ExpresionLogicaInd);
         ExpresionLogicaInd = crearTerceto("NOT", operandoIzqAux, "_");
-        sprintf(operandoDerAux, "%d", ExpresionparaCondicionInd);
-        Xind = crearTerceto(":=", "_resExpresionLogica", operandoDerAux);
-        crearTerceto("CMP", "_resExpresionLogica", "0");
-        sprintf(operandoIzqAux, "%d", (Xind + 5));
-        crearTerceto("BNE", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpresionLogica", "VERDADERO"); 
-        sprintf(operandoIzqAux, "%d", (Xind + 6));
-        crearTerceto("BI", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpresionLogica", "FALSO");
+        sprintf(operandoDerAux, "[%d]", ExpresionLogicaInd);
+        crearTerceto("OP_ASIG", "_resExpresionLogica", operandoDerAux);
+        crearTerceto("CMP", "_resExpresionLogica", "FALSO");
+        indiceActual = getIndice(); // me guardo la referencia del nro. de terceto asociado al Branch (BNE en este caso)
+        crearTerceto("BNE", "_saltoCeldas", "_");
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+        poner_en_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind));
         printf("\t\t\t\t\tR37. Expresion_Logica -> NOT Expresion\n");
     }
-    | expresion_para_condicion 
+    | expresion_para_condicion %prec PRIORIDAD_EXPRESION
     {
+        // lo paso tal cual viene
+        ExpresionLogicaInd2 = ExpresionLogicaInd;
         ExpresionLogicaInd = ExpresionparaCondicionInd;
-        sprintf(operandoDerAux, "[%d]", ExpresionparaCondicionInd);
-        Xind = crearTerceto(":=", "_resExpresionLogica", operandoDerAux);
-        crearTerceto("CMP", "_resExpresionLogica", "1");
-        sprintf(operandoIzqAux, "%d", (Xind + 5));
-        crearTerceto("BNE", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpresionLogica", "VERDADERO"); 
-        sprintf(operandoIzqAux, "%d", (Xind + 6));
-        crearTerceto("BI", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpresionLogica", "FALSO");
-        printf("\t\t\t\t\tR38. Expresion_Logica -> valor_booleano\n");
+        printf("\t\t\t\t\tR38. Expresion_Logica -> Expresion_Para_Condicion\n");
     }
     ;
 
 expresion_para_condicion:
-    valor_booleano 
+    expresion_relacional
     {
-        ExpresionParaCondicionInd2 = ExpresionparaCondicionInd;
-        ExpresionparaCondicionInd = ValorBooleanoInd;
-        printf("\t\t\t\t\tR39. Expresion_Para_Condicion -> Valor_Booleano\n");
-    }
-    | expresion_relacional 
-    {
+        if(_soloAritmetica)
+        {    
+            sprintf(operandoDerAux, "[%d]", ExpresionRelacionalInd);
+            indiceActual = crearTerceto("OP_ASIG", "_resExpresionAritmetica", operandoDerAux);
+            sprintf(operandoIzqAux, "[%d]", indiceActual);
+            crearTerceto("CMP", operandoIzqAux, "VERDADERO");
+            indiceActual = getIndice(); // me guardo la referencia del branch
+            crearTerceto("BNE", "_saltoCeldasSiCorresponde", "_");
+            poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+        }
+        if(_soloBooleana)
+        {
+            sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
+            crearTerceto("CMP", operandoIzqAux, "VERDADERO");
+            indiceActual = getIndice(); // me guardo la referencia del nro. de terceto asociado al Branch (BNE en este caso)
+            crearTerceto("BNE", "_saltoCeldasSiCorresponde", "_");
+            poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+        }
         ExpresionParaCondicionInd2 = ExpresionparaCondicionInd;
         ExpresionparaCondicionInd = ExpresionRelacionalInd;
+        _tipoDatoExpresionActual = NULL;
         printf("\t\t\t\t\tR40. Expresion_Para_Condicion -> Expresion_Relacional\n");
+    }
+    ;
+
+expresion_relacional:
+    expresion_relacional CMP_MAYOR expresion_aritmetica %prec PREC_RELACIONAL
+    {
+        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
+        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
+        indiceActual = getIndice(); // me guardo la referencia del branch
+        crearTerceto("BLE", "_saltoCeldasSiCorresponde", "_");
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(Xind)); // está acá simbólicamente, ya que apilo el terceto del salto para luego actualizarlo
+        _soloAritmetica = false;
+        _soloBooleana = false;
+        printf("\t\t\t\t\tR44. Expresion_Relacional -> Expresion_Aritmetica > Expresion_Aritmetica\n");
+    }
+    | expresion_relacional CMP_MENOR expresion_aritmetica %prec PREC_RELACIONAL
+    {
+        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
+        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
+        indiceActual = getIndice(); // me guardo la referencia del branch
+        crearTerceto("BGE", "_saltoCeldasSiCorresponde", "_");
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(Xind));
+        _soloAritmetica = false;
+        _soloBooleana = false;
+        printf("\t\t\t\t\tR45. Expresion_Relacional -> Expresion_Aritmetica < Expresion_Aritmetica\n");
+    }
+    | expresion_relacional CMP_ES_IGUAL expresion_aritmetica %prec PREC_RELACIONAL
+    {
+        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
+        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
+        indiceActual = getIndice(); // me guardo la referencia del branch
+        crearTerceto("BNE", "_saltoCeldasSiCorresponde", "_");
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+        _soloAritmetica = false;
+        _soloBooleana = false;
+        printf("\t\t\t\t\tR46. Expresion_Relacional -> Expresion_Aritmetica == Expresion_Aritmetica\n");
+    }
+    | expresion_relacional CMP_DISTINTO expresion_aritmetica %prec PREC_RELACIONAL
+    {
+        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
+        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
+        indiceActual = getIndice(); // me guardo la referencia del branch
+        crearTerceto("BE", "_saltoCeldasSiCorresponde", "_");
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+        _soloAritmetica = false;
+        _soloBooleana = false;
+        printf("\t\t\t\t\tR46. Expresion_Relacional -> Expresion_Aritmetica == Expresion_Aritmetica\n");
+    }
+    | expresion_relacional CMP_MAYOR_IGUAL expresion_aritmetica %prec PREC_RELACIONAL
+    {
+        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
+        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
+        indiceActual = getIndice(); // me guardo la referencia del branch
+        crearTerceto("BLT", "_saltoCeldasSiCorresponde", "_");
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+        _soloAritmetica = false;
+        _soloBooleana = false;
+        printf("\t\t\t\t\tR47. Expresion_Relacional -> Expresion_Aritmetica >= Expresion_Aritmetica\n");
+    }
+    | expresion_relacional CMP_MENOR_IGUAL expresion_aritmetica %prec PREC_RELACIONAL
+    {
+        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
+        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
+        indiceActual = getIndice(); // me guardo la referencia del branch
+        crearTerceto("BGT", "_saltoCeldasSiCorresponde", "_");
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+        _soloAritmetica = false;
+        _soloBooleana = false;
+        printf("\t\t\t\t\tR48. Expresion_Relacional -> Expresion_Aritmetica <= Expresion_Aritmetica\n");
+    }
+    | expresion_relacional CMP_ES_IGUAL valor_booleano 
+    {
+        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
+        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
+        indiceActual = getIndice(); // me guardo la referencia del branch
+        crearTerceto("BE", "_saltoCeldasSiCorresponde", "_");
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+        _soloAritmetica = false;
+        _soloBooleana = false;
+        printf("\t\t\t\t\tR39. Expresion_Para_Condicion -> Valor_Booleano\n");
+    }
+    | expresion_relacional CMP_DISTINTO valor_booleano 
+    {
+        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
+        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
+        ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
+        indiceActual = getIndice(); // me guardo la referencia del branch
+        crearTerceto("BE", "_saltoCeldasSiCorresponde", "_");
+        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+        _soloAritmetica = false;
+        _soloBooleana = false;
+        printf("\t\t\t\t\tR39. Expresion_Para_Condicion -> Valor_Booleano\n");
+    }
+    | valor_booleano 
+    {
+        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
+        ExpresionRelacionalInd = ValorBooleanoInd;
+        _soloAritmetica = false;
+        printf("\t\t\t\t\tR39. Expresion_Para_Condicion -> Valor_Booleano\n");
+    }
+    | expresion_aritmetica 
+    {
+        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
+        ExpresionRelacionalInd = ExpresionAritmeticaInd;
+        _soloBooleana = false;
+        printf("\t\t\t\tR33. Expresion -> Expresion_Aritmetica\n");
     }
     ;
 
@@ -620,86 +822,13 @@ valor_booleano:
     }
     | TRUE 
     {
-        ValorBooleanoInd = crearTercetoUnitarioStr("true");
+        ValorBooleanoInd = crearTercetoUnitarioStr("TRUE");
         printf("\t\t\t\t\tR42. Valor_Booleano -> TRUE\n");
     }
     | FALSE 
     {
-        ValorBooleanoInd = crearTercetoUnitarioStr("false");
+        ValorBooleanoInd = crearTercetoUnitarioStr("FALSE");
         printf("\t\t\t\t\tR43. Valor_Booleano -> FALSE\n");
-    }
-    ;
-
-expresion_relacional:
-    expresion_aritmetica CMP_MAYOR expresion_aritmetica 
-    {
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
-        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
-        Xind = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
-        ExpresionRelacionalInd = Xind;
-        sprintf(operandoIzqAux, "%d", (Xind + 4));
-        crearTerceto("BLE", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpRelacional", "VERDADERO");
-        sprintf(operandoIzqAux, "%d", (Xind + 5));
-        crearTerceto("BI", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpRelacional", "FALSO");
-        printf("\t\t\t\t\tR44. Expresion_Relacional -> Expresion_Aritmetica > Expresion_Aritmetica\n");
-    }
-    | expresion_aritmetica CMP_MENOR expresion_aritmetica 
-    {
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
-        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
-        Xind = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
-        ExpresionRelacionalInd = Xind;
-        sprintf(operandoIzqAux, "%d", (Xind + 4));
-        crearTerceto("BGE", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpRelacional", "VERDADERO");
-        sprintf(operandoIzqAux, "%d", (Xind + 5));
-        crearTerceto("BI", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpRelacional", "FALSO");
-        printf("\t\t\t\t\tR45. Expresion_Relacional -> Expresion_Aritmetica < Expresion_Aritmetica\n");
-    }
-    | expresion_aritmetica CMP_ES_IGUAL expresion_aritmetica 
-    {
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
-        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
-        Xind = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
-        ExpresionRelacionalInd = Xind;
-        sprintf(operandoIzqAux, "%d", (Xind + 4));
-        crearTerceto("BNE", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpRelacional", "VERDADERO");
-        sprintf(operandoIzqAux, "%d", (Xind + 5));
-        crearTerceto("BI", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpRelacional", "FALSO");
-        printf("\t\t\t\t\tR46. Expresion_Relacional -> Expresion_Aritmetica == Expresion_Aritmetica\n");
-    }
-    | expresion_aritmetica CMP_MAYOR_IGUAL expresion_aritmetica 
-    {
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
-        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
-        Xind = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
-        ExpresionRelacionalInd = Xind;
-        sprintf(operandoIzqAux, "%d", (Xind + 4));
-        crearTerceto("BLT", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpRelacional", "VERDADERO");
-        sprintf(operandoIzqAux, "[%d]", (Xind + 5));
-        crearTerceto("BI", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpRelacional", "FALSO");
-        printf("\t\t\t\t\tR47. Expresion_Relacional -> Expresion_Aritmetica >= Expresion_Aritmetica\n");
-    }
-    | expresion_aritmetica CMP_MENOR_IGUAL expresion_aritmetica 
-    {
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
-        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
-        Xind = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
-        ExpresionRelacionalInd = Xind;
-        sprintf(operandoIzqAux, "%d", (Xind + 4));
-        crearTerceto("BGT", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpRelacional", "VERDADERO");
-        sprintf(operandoIzqAux, "%d", (Xind + 5));
-        crearTerceto("BI", operandoIzqAux, "_");
-        crearTerceto(":=", "_resExpRelacional", "FALSO");
-        printf("\t\t\t\t\tR48. Expresion_Relacional -> Expresion_Aritmetica <= Expresion_Aritmetica\n");
     }
     ;
     
@@ -713,9 +842,8 @@ expresion_aritmetica:
     | OP_RES expresion_aritmetica %prec MENOS_UNARIO 
     {
         ExpresionAritmeticaInd2 = ExpresionAritmeticaInd;
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd);
-        sprintf(operandoDerAux, "[%d]", TerminoInd);
-        ExpresionAritmeticaInd = crearTerceto("-", operandoIzqAux, operandoDerAux);
+        sprintf(operandoIzqAux, "[%d]", TerminoInd);
+        ExpresionAritmeticaInd = crearTerceto("OP_RES", operandoIzqAux, "_");
         printf("\t\t\t\t\tR50. Expresion_Aritmetica -> - Expresion_Aritmetica\n");
     }
 	| expresion_aritmetica OP_SUM termino 
@@ -723,7 +851,7 @@ expresion_aritmetica:
         ExpresionAritmeticaInd2 = ExpresionAritmeticaInd;
         sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd);
         sprintf(operandoDerAux, "[%d]", TerminoInd);
-        ExpresionAritmeticaInd = crearTerceto("+", operandoIzqAux, operandoDerAux);
+        ExpresionAritmeticaInd = crearTerceto("OP_SUM", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\t\tR51. Expresion_Aritmetica -> Expresion_Aritmetica + Termino\n");
     }
 	| expresion_aritmetica OP_RES termino 
@@ -731,7 +859,7 @@ expresion_aritmetica:
         ExpresionAritmeticaInd2 = ExpresionAritmeticaInd;
         sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd);
         sprintf(operandoDerAux, "[%d]", TerminoInd);
-        ExpresionAritmeticaInd = crearTerceto("-", operandoIzqAux, operandoDerAux);
+        ExpresionAritmeticaInd = crearTerceto("OP_RES", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\t\tR52. Expresion_Aritmetica -> Expresion_Aritmetica - Termino\n");
     }
     ;
@@ -746,21 +874,21 @@ termino:
     {
         sprintf(operandoIzqAux, "[%d]", TerminoInd);
         sprintf(operandoDerAux, "[%d]", FactorInd);
-        TerminoInd = crearTerceto("*", operandoIzqAux, operandoDerAux);
+        TerminoInd = crearTerceto("OP_MUL", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\t\t\tR54. Termino -> Termino * Factor\n");
     }
     | termino OP_DIV factor 
     {
         sprintf(operandoIzqAux, "[%d]", TerminoInd);
         sprintf(operandoDerAux, "[%d]", FactorInd);
-        TerminoInd = crearTerceto("/", operandoIzqAux, operandoDerAux);
+        TerminoInd = crearTerceto("OP_DIV", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\t\t\tR55. Termino -> Termino / Factor\n");
     }
     | termino OP_MOD factor 
     {
         sprintf(operandoIzqAux, "[%d]", TerminoInd);
         sprintf(operandoDerAux, "[%d]", FactorInd);
-        TerminoInd = crearTerceto("%", operandoIzqAux, operandoDerAux);
+        TerminoInd = crearTerceto("OP_MOD", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\t\t\tR56. Termino -> Termino % Factor\n");
     }
     ;
@@ -810,6 +938,7 @@ factor:
     }
     | PAR_ABR expresion PAR_CIE 
     {
+        FactorInd = ExpresionInd;
         printf("\t\t\t\t\t\t\tR60. Factor -> (Expresion)\n");
     }
     ;
@@ -824,9 +953,12 @@ FILE *ptercetos;
 int main(int argc, char *argv[])
 {
     hashmap = create_HashMap(HASHMAP_SIZE);
-    crear_pila(&pilaVars);
     crear_pila(&pilaSentencias);
-    tVar tmp;
+    crear_pila(&pilaVars);
+    crear_pila(&pilaListaSentencias);
+    crear_pila(&pilaExpresionesLogicas);
+    crear_pila(&pilaIndiceTercetosFuncionesEspeciales);
+    crear_pila(&pilaBI);
 
     printf("\n-----------------------------------------------------------------------------------------------------------------\n");
     printf("                                        INICIO PROCESO ANALISIS SINTACTICO                                        ");
@@ -850,6 +982,9 @@ int main(int argc, char *argv[])
     guardar_tabla_en_archivo(&tabla, "Symbol-Table.txt");
 	fclose(yyin);
     vaciar_pila(&pilaVars);
+    vaciar_pila(&pilaSentencias);
+    vaciar_pila(&pilaListaSentencias);
+    vaciar_pila(&pilaExpresionesLogicas);
     destroy_HashMap(hashmap);
 
     imprimirTercetos();
@@ -862,15 +997,13 @@ int yyerror(void)
     printf("Error Sintactico\n");
 }
 
+/*----------------------------------------------------------------------------
+                Funciones de Validacion Semantica
+----------------------------------------------------------------------------*/
 int acciones_definicion_variable(const char *id, int codValidacion)
 {
     tVar tmp;
     int res;
-
-    if(codValidacion != VALIDACION_OK)
-    {
-        return ID_NO_VALIDO;
-    }
 
     if(ver_tope(&pilaVars, &tmp, sizeof(tVar)) != TODO_OK)
     {
@@ -911,13 +1044,7 @@ int acciones_asignacion_tipo(const char *tipoDato)
 
 int acciones_asignacion_variable_general(const char *id, int codValidacion, const char *tipoResultado)
 {
-
     int res;
-
-    if(codValidacion != VALIDACION_OK)
-    {
-        return ID_NO_VALIDO;
-    }
 
     res = verificar_existencia_variable(hashmap, id);
     if(res == VARIABLE_NO_DEFINIDA)
@@ -939,18 +1066,6 @@ int acciones_asignacion_variable_general(const char *id, int codValidacion, cons
 
 int acciones_asignacion_literal(const char *id, int codValidacion, int codValCadenaAsignada)
 {
-    if(codValidacion != VALIDACION_OK)
-    {
-        return ID_NO_VALIDO;
-    }
-
-    if(codValCadenaAsignada != VALIDACION_OK)
-    {
-        return CTE_NO_VALIDA;
-    }
-
-    vaciar_pila(&pilaVars);
-
     return acciones_asignacion_variable_general(id, codValidacion, DCTESTRING);
 }
 
@@ -959,11 +1074,6 @@ int acciones_verificacion_compatibilidad_tipo(int codValidacion, const char *tip
     const char *tipoDatoLeido;
     tVar tmp;
     int indice;
-
-    if(codValidacion != VALIDACION_OK)
-    {
-        return ID_NO_VALIDO;
-    }
 
     if(tipoCte != NULL)
     {
@@ -1010,11 +1120,6 @@ int acciones_verificacion_compatibilidad_tipo(int codValidacion, const char *tip
 
 int acciones_parametro_read(const char *id, int codValidacion)
 {
-    if(codValidacion != VALIDACION_OK)
-    {
-        return ID_NO_VALIDO;
-    }
-
     if(verificar_existencia_variable(hashmap, id) != VERIFICACION_OK)
     {
         fprintf(stderr, "\nERROR: variable no definida (ID: %s)\n", id);
@@ -1037,11 +1142,6 @@ int acciones_expresion_aritm_simple()
     tVar tmp;
     int res;
     const char *tipo_dato_termino;
-
-    if(codValidacion != VALIDACION_OK)
-    {
-        return ID_NO_VALIDO;
-    }
 
     if(ver_tope(&pilaVars, &tmp, sizeof(tVar)) != TODO_OK)
     {

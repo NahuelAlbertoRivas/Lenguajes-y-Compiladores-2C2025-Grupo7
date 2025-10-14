@@ -17,10 +17,6 @@ int crearTerceto(char* operador, char *op1, char *op2)
     return indiceTerceto++;
 }
 
-int getIndice(){
-    return indiceTerceto;
-}
-
 int crearTercetoUnitario(int valor)
 {
     tercetos[indiceTerceto].indice = indiceTerceto;
@@ -39,6 +35,11 @@ int crearTercetoUnitarioStr(const char *op)
     strcpy(tercetos[indiceTerceto].operandoDer, "_");
 
     return indiceTerceto++;
+}
+
+int getIndice()
+{
+    return indiceTerceto;
 }
 
 char* verOperadorTerceto(int indice)

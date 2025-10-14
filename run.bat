@@ -4,12 +4,12 @@ bison -dyv Sintactico.y
 
 gcc.exe lex.yy.c y.tab.c tabla.c utilidades/hashmap.c utilidades/pila.c utilidades/acciones_semanticas.c Tercetos.c -o lyc-compiler-1.0.0.exe
 
-lyc-compiler-1.0.0.exe test2.txt
+lyc-compiler-2.0.0.exe test.txt
 
 pause
 
 @echo off
-del lyc-compiler-1.0.0.exe
+del lyc-compiler-2.0.0.exe
 del lex.yy.c
 del y.tab.c
 del y.tab.h
