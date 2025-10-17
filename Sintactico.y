@@ -369,8 +369,16 @@ asignacion:
             free($1.str); 
             YYABORT;
         }
-        sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
-        AsignacionInd = crearTerceto("OP_UN_INC", operandoIzqAux, "_");
+
+        int IDind = crearTercetoUnitarioStr($1.str);
+
+        sprintf(operandoIzqAux, "[%d]", IDind);
+        sprintf(operandoDerAux, "%d", 1);
+        Xind = crearTerceto("+", operandoIzqAux, operandoDerAux);
+        sprintf(operandoIzqAux, "[%d]", IDind);
+        sprintf(operandoDerAux, "[%d]", Xind);
+        AsignacionInd = crearTerceto(":=", operandoIzqAux, operandoDerAux);
+
         printf("\t\t\tR20. Asignacion -> [ID: '%s']++\n",$1.str);
         free($1.str);
     }
@@ -381,8 +389,16 @@ asignacion:
             free($1.str); 
             YYABORT;
         }
-        sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
-        AsignacionInd = crearTerceto("OP_UN_DEC", operandoIzqAux, "_");
+
+        int IDind = crearTercetoUnitarioStr($1.str);
+
+        sprintf(operandoIzqAux, "[%d]", IDind);
+        sprintf(operandoDerAux, "%d", 1);
+        Xind = crearTerceto("-", operandoIzqAux, operandoDerAux);
+        sprintf(operandoIzqAux, "[%d]", IDind);
+        sprintf(operandoDerAux, "[%d]", Xind);
+        AsignacionInd = crearTerceto(":=", operandoIzqAux, operandoDerAux);
+
         printf("\t\t\tR21. Asignacion -> [ID: '%s']--\n",$1.str);
         free($1.str);
     }
