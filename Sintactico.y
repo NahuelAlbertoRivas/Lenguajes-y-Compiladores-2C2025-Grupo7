@@ -84,11 +84,11 @@ int Xind; //Auxiliar para los tipos de datos
 char operandoDerAux[50];
 char operandoIzqAux[50];
 
-int _contadorSentencias;
-int _resExpRelacional;
-int _resExpresionLogica;
-int _saltoCeldas;
-int _tercetoNoDefinido;
+//int _contadorSentencias;
+//int _resExpRelacional;
+// int @resExpresionLogica;
+// int _saltoCeldas;
+// int _tercetoNoDefinido;
 int _inicioBucle;
 int _inicioExpresion;
 const char *_tipoDatoExpresionActual;
@@ -641,8 +641,8 @@ expresion_logica:
         }
         Xind = ExpresionLogicaInd = crearTerceto("AND", operandoIzqAux, operandoDerAux);
         sprintf(operandoDerAux, "[%d]", ExpresionLogicaInd);
-        crearTerceto("OP_ASIG", "_resExpresionLogica", operandoDerAux);
-        crearTerceto("CMP", "_resExpresionLogica", "VERDADERO");
+        crearTerceto("OP_ASIG", "@resExpresionLogica", operandoDerAux);
+        crearTerceto("CMP", "@resExpresionLogica", "VERDADERO");
         indiceActual = getIndice(); // obtengo el índice del terceto relativo al salto (BNE en este caso)
         crearTerceto("BNE", "_saltoCeldas", "_");
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
@@ -661,8 +661,8 @@ expresion_logica:
         }
         ExpresionLogicaInd = crearTerceto("OR", operandoIzqAux, operandoDerAux);
         sprintf(operandoDerAux, "[%d]", ExpresionLogicaInd);
-        crearTerceto("OP_ASIG", "_resExpresionLogica", operandoDerAux); // con fadd recupero 
-        crearTerceto("CMP", "_resExpresionLogica", "VERDADERO");
+        crearTerceto("OP_ASIG", "@resExpresionLogica", operandoDerAux); // con fadd recupero 
+        crearTerceto("CMP", "@resExpresionLogica", "VERDADERO");
         indiceActual = getIndice(); // obtengo el índice del terceto relativo al salto (BNE en este caso)
         crearTerceto("BNE", "_saltoCeldas", "_");
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
@@ -675,8 +675,8 @@ expresion_logica:
         sprintf(operandoIzqAux, "[%d]", ExpresionLogicaInd);
         ExpresionLogicaInd = crearTerceto("NOT", operandoIzqAux, "_");
         sprintf(operandoDerAux, "[%d]", ExpresionLogicaInd);
-        crearTerceto("OP_ASIG", "_resExpresionLogica", operandoDerAux);
-        crearTerceto("CMP", "_resExpresionLogica", "FALSO");
+        crearTerceto("OP_ASIG", "@resExpresionLogica", operandoDerAux);
+        crearTerceto("CMP", "@resExpresionLogica", "FALSO");
         indiceActual = getIndice(); // me guardo la referencia del nro. de terceto asociado al Branch (BNE en este caso)
         crearTerceto("BNE", "_saltoCeldas", "_");
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
@@ -698,7 +698,7 @@ expresion_para_condicion:
         if(_soloAritmetica)
         {    
             sprintf(operandoDerAux, "[%d]", ExpresionRelacionalInd);
-            indiceActual = crearTerceto("OP_ASIG", "_resExpresionAritmetica", operandoDerAux);
+            indiceActual = crearTerceto("OP_ASIG", "@resExpresionAritmetica", operandoDerAux);
             sprintf(operandoIzqAux, "[%d]", indiceActual);
             crearTerceto("CMP", operandoIzqAux, "VERDADERO");
             indiceActual = getIndice(); // me guardo la referencia del branch
