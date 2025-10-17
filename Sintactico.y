@@ -526,7 +526,7 @@ llamada_func:
         recorrer_lista_argumentos_equalexpressions(&pilaIndiceTercetosFuncionesEspeciales);
         //sprintf(operandoDerAux, "[%d]", ListaArgsInd);
         //LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_EQUALEXPRESSIONS", operandoDerAux);
-        printf("\t\t\tR28. Llamada_Func -> funcion_especial(Lista_Args)\n");
+        printf("\t\t\tR28. Llamada_Func -> equalExpressions(Lista_Args)\n");
 
         completar_bi_equalexpressions(&pilaBI);
         //sacar_de_pila(&pilaBI, &indiceDesapilado, sizeof(indiceActual));
@@ -539,7 +539,7 @@ llamada_func:
     {
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         //LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_ISZERO", operandoDerAux);
-        printf("\t\t\tR29. Llamada_Func -> funcion_especial(Lista_Args)\n");
+        printf("\t\t\tR29. Llamada_Func -> isZero(Lista_Args)\n");
 
         Xind = crearTerceto("CMP", operandoDerAux, "0");
         sprintf(operandoIzqAux, "[%d]", Xind + 4);
@@ -571,7 +571,7 @@ lista_args:
             add_HashMapEntry(hashmap, "@pivote", 0);
             agregar_a_tabla_variables_internas(&tabla, "@pivote", "Int");
         }
-        printf("\t\t\t\tR30. lista_args -> expresion\n");
+        printf("\t\t\t\tR30. lista_args -> expresion_aritmetica\n");
         
     }
     | lista_args COMA expresion_aritmetica 
@@ -589,7 +589,7 @@ lista_args:
             agregar_a_tabla_variables_internas(&tabla, "@actual", "Int");
         }
         
-        printf("\t\t\t\tR31. lista_args -> lista_args , expresion \n");
+        printf("\t\t\t\tR31. lista_args -> lista_args , expresion_aritmetica \n");
 
         crearTerceto("CMP", "@pivote", "@actual");
         sprintf(operandoIzqAux, "[%d]", ListaArgsInd+5);
@@ -805,7 +805,7 @@ expresion_relacional:
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         _soloAritmetica = false;
         _soloBooleana = false;
-        printf("\t\t\t\t\tR44. Expresion_Relacional -> Expresion_Aritmetica == Expresion_Aritmetica\n");
+        printf("\t\t\t\t\tR44. Expresion_Relacional -> Expresion_Aritmetica != Expresion_Aritmetica\n");
     }
     | expresion_relacional CMP_MAYOR_IGUAL expresion_aritmetica %prec PREC_RELACIONAL
     {
@@ -844,7 +844,7 @@ expresion_relacional:
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         _soloAritmetica = false;
         _soloBooleana = false;
-        printf("\t\t\t\t\tR47. Expresion_Para_Condicion -> Valor_Booleano\n");
+        printf("\t\t\t\t\tR47. Expresion_Relacional -> Expresion_Relacional == Valor_Booleano\n");
     }
     | expresion_relacional CMP_DISTINTO valor_booleano 
     {
@@ -857,21 +857,21 @@ expresion_relacional:
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         _soloAritmetica = false;
         _soloBooleana = false;
-        printf("\t\t\t\t\tR48. Expresion_Para_Condicion -> Valor_Booleano\n");
+        printf("\t\t\t\t\tR48. Expresion_Relacional -> Expresion_Relacional != Valor_Booleano\n");
     }
     | valor_booleano 
     {
         ExpresionRelacionalInd2 = ExpresionRelacionalInd;
         ExpresionRelacionalInd = ValorBooleanoInd;
         _soloAritmetica = false;
-        printf("\t\t\t\t\tR49. Expresion_Para_Condicion -> Valor_Booleano\n");
+        printf("\t\t\t\t\tR49. Expresion_Relacional -> Valor_Booleano\n");
     }
     | expresion_aritmetica 
     {
         ExpresionRelacionalInd2 = ExpresionRelacionalInd;
         ExpresionRelacionalInd = ExpresionAritmeticaInd;
         _soloBooleana = false;
-        printf("\t\t\t\tR50. Expresion -> Expresion_Aritmetica\n");
+        printf("\t\t\t\tR50. Expresion_Relacional -> Expresion_Aritmetica\n");
     }
     ;
 
