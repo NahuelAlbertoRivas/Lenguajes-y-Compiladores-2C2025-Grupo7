@@ -61,7 +61,7 @@ int agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
     if (existe_en_tabla(tabla, salida, tipo_token) == FALSE){
         int lexemas_ingresados = tabla->nFilas;
         char* nombre1;
-        if(strcmp(tipo_token, "ID") == 0 || strcmp(tipo_token, "CTE_INT") == 0 || strcmp(tipo_token, "CTE_REAL") == 0){
+        if(strcmp(tipo_token, "ID") == 0){
             nombre1 = malloc(strlen(nombre) + 1);
             if (!nombre1) { perror("malloc"); return SIN_MEMORIA; }
 
@@ -79,7 +79,22 @@ int agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
             strcpy(tabla->filas[lexemas_ingresados].nombre, nombre1);
             strcpy(tabla->filas[lexemas_ingresados].valor, "-");
             free(nombre1);
-        } 
+        } else if(strcmp(tipo_token, "CTE_INT") == 0 || strcmp(tipo_token, "CTE_REAL") == 0) { 
+            nombre1 = malloc(strlen(nombre) + 1);
+            if (!nombre1) { perror("malloc"); return SIN_MEMORIA; }
+
+            tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 1);
+            tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
+            tabla->filas[lexemas_ingresados].valor = malloc(strlen(nombre) + 1);
+            tabla->filas[lexemas_ingresados].longitud = 0;
+
+            strcpy(nombre1, nombre);            
+            strcpy(tabla->filas[lexemas_ingresados].nombre, nombre1);
+            strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+            strcpy(tabla->filas[lexemas_ingresados].valor, nombre);
+            
+            free(nombre1);
+        }
         else {
             nombre1 = malloc(strlen(nombre) + 2); // +1 para "_" +1 para '\0'
             if (!nombre1) { perror("malloc"); return SIN_MEMORIA; }
