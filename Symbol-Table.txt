@@ -32,11 +32,17 @@
 | 43                                                 | CTE_INT    | -                                                  | -          |
 | 342                                                | CTE_INT    | -                                                  | -          |
 | 324                                                | CTE_INT    | -                                                  | -          |
+| @resExpresionAritmetica                            | Int        | -                                                  | -          |
 | 3                                                  | CTE_INT    | -                                                  | -          |
 | 5                                                  | CTE_INT    | -                                                  | -          |
+| @resExpresionLogica                                | Boolean    | -                                                  | -          |
 | 4                                                  | CTE_INT    | -                                                  | -          |
 | 6                                                  | CTE_INT    | -                                                  | -          |
 | 35                                                 | CTE_INT    | -                                                  | -          |
+| @resIsZero                                         | Boolean    | -                                                  | -          |
+| @resEqualExpressions                               | Boolean    | -                                                  | -          |
+| @pivote                                            | Int        | -                                                  | -          |
+| @actual                                            | Int        | -                                                  | -          |
 | _"un string"                                       | CTE_STRING | "un string"                                        | 11         |
 | 0                                                  | CTE_INT    | -                                                  | -          |
 | _"a es más grande que b (a > b)"                  | CTE_STRING | "a es más grande que b (a > b)"                   | 32         |

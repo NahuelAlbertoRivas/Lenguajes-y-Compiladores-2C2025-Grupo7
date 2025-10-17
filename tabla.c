@@ -171,21 +171,25 @@ const char *obtener_tipo_dato(Tabla *tabla, int pos)
     return tabla->filas[pos].tipoDato;
 }
 
-void mostrar_tabla(const Tabla *tabla) {
-    printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
-    printf("| %-50s | %-10s | %-50s | %-10s |\n", 
-           "Nombre", "TipoDato", "Valor", "Longitud");
-    printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
+void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_token){
+    /*char varibales[6][50] = {
+        "@resEqualExpressions", // booleano
+        "@resIsZero", // booleano
+        "@resExpresionLogica", // booleano
+        "@pivote", // entero
+        "@actual", // entero
+        "@resExpresionAritmetica" // entero
+    };*/
 
-    for (int i = 0; i < tabla->nFilas; i++) {
-        printf("| %-50s | %-10s | %-50s | %-10d |\n",
-               tabla->filas[i].nombre ? tabla->filas[i].nombre : "-",
-               tabla->filas[i].tipoDato ? tabla->filas[i].tipoDato : "-",
-               tabla->filas[i].valor  ? tabla->filas[i].valor  : "-",
-               tabla->filas[i].longitud);
-    }
+    int lexemas_ingresados = tabla->nFilas;
+    
+    tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 2);
+    tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
 
-    printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
+    strcpy(tabla->filas[lexemas_ingresados].nombre, nombre);
+    strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+
+    tabla->nFilas++;
 }
 
 void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
