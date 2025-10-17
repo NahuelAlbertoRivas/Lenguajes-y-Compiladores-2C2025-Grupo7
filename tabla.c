@@ -61,8 +61,8 @@ int agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
     if (existe_en_tabla(tabla, salida, tipo_token) == FALSE){
         int lexemas_ingresados = tabla->nFilas;
         char* nombre1;
-        if(strcmp(tipo_token, "ID") == 0 || strcmp(tipo_token, "CTE_INT") == 0 || strcmp(tipo_token, "CTE_REAL") == 0){
-            nombre1 = malloc(strlen(nombre) + 1);
+        if(strcmp(tipo_token, "ID") == 0){
+            nombre1 = malloc(strlen(salida) + 1);
             if (!nombre1) { perror("malloc"); return SIN_MEMORIA; }
 
             if(strcmp(tipo_token, "CTE_INT") == 0 || strcmp(tipo_token, "CTE_REAL") == 0){
@@ -75,25 +75,40 @@ int agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
             tabla->filas[lexemas_ingresados].longitud = 0;
             
             /* Rellenar valores */
-            strcpy(nombre1, nombre);            
+            strcpy(nombre1, salida);            
             strcpy(tabla->filas[lexemas_ingresados].nombre, nombre1);
             strcpy(tabla->filas[lexemas_ingresados].valor, "-");
             free(nombre1);
-        } 
+        } else if(strcmp(tipo_token, "CTE_INT") == 0 || strcmp(tipo_token, "CTE_REAL") == 0) { 
+            nombre1 = malloc(strlen(salida) + 1);
+            if (!nombre1) { perror("malloc"); return SIN_MEMORIA; }
+
+            tabla->filas[lexemas_ingresados].nombre = malloc(strlen(salida) + 1);
+            tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
+            tabla->filas[lexemas_ingresados].valor = malloc(strlen(salida) + 1);
+            tabla->filas[lexemas_ingresados].longitud = 0;
+
+            strcpy(nombre1, salida);            
+            strcpy(tabla->filas[lexemas_ingresados].nombre, nombre1);
+            strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+            strcpy(tabla->filas[lexemas_ingresados].valor, salida);
+
+            free(nombre1);
+        }
         else {
-            nombre1 = malloc(strlen(nombre) + 2); // +1 para "_" +1 para '\0'
+            nombre1 = malloc(strlen(salida) + 2); // +1 para "_" +1 para '\0'
             if (!nombre1) { perror("malloc"); return SIN_MEMORIA; }
             /* Asignar de memoria */
-            tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 2);
-            tabla->filas[lexemas_ingresados].valor = malloc(strlen(nombre) + 1);
+            tabla->filas[lexemas_ingresados].nombre = malloc(strlen(salida) + 2);
+            tabla->filas[lexemas_ingresados].valor = malloc(strlen(salida) + 1);
             tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
-            tabla->filas[lexemas_ingresados].longitud = (int) strlen(nombre);
+            tabla->filas[lexemas_ingresados].longitud = (int) strlen(salida);
 
             /* Rellenar valores */
             strcpy(nombre1, "_");
-            strcpy(nombre1 + 1, nombre);
+            strcpy(nombre1 + 1, salida);
             strcpy(tabla->filas[lexemas_ingresados].nombre, nombre1);
-            strcpy(tabla->filas[lexemas_ingresados].valor, nombre);
+            strcpy(tabla->filas[lexemas_ingresados].valor, salida);
             strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
             free(nombre1);
         }
@@ -142,7 +157,6 @@ int existe_en_tabla(Tabla *tabla, char *valor, char* tipo_token) {
             }
         }
         return FALSE; 
-
      }
 
 }
@@ -171,21 +185,16 @@ const char *obtener_tipo_dato(Tabla *tabla, int pos)
     return tabla->filas[pos].tipoDato;
 }
 
-void mostrar_tabla(const Tabla *tabla) {
-    printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
-    printf("| %-50s | %-10s | %-50s | %-10s |\n", 
-           "Nombre", "TipoDato", "Valor", "Longitud");
-    printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
+void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_token){
+    int lexemas_ingresados = tabla->nFilas;
+    
+    tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 2);
+    tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
 
-    for (int i = 0; i < tabla->nFilas; i++) {
-        printf("| %-50s | %-10s | %-50s | %-10d |\n",
-               tabla->filas[i].nombre ? tabla->filas[i].nombre : "-",
-               tabla->filas[i].tipoDato ? tabla->filas[i].tipoDato : "-",
-               tabla->filas[i].valor  ? tabla->filas[i].valor  : "-",
-               tabla->filas[i].longitud);
-    }
+    strcpy(tabla->filas[lexemas_ingresados].nombre, nombre);
+    strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
 
-    printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
+    tabla->nFilas++;
 }
 
 void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
@@ -201,7 +210,7 @@ void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
     
 
     fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
-    fprintf(f, "| %-50s | %-10s | %-50s | %-10s |\n", 
+    fprintf(f, "| %-52s | %-10s | %-50s | %-10s |\n", 
             "Nombre", "TipoDato", "Valor", "Longitud");
     fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
 
@@ -213,7 +222,7 @@ void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
             longitudStr = buffer;
         }
 
-        fprintf(f, "| %-50s | %-10s | %-50s | %-10s |\n",
+        fprintf(f, "| %-52s | %-10s | %-50s | %-10s |\n",
                 tabla->filas[i].nombre ? tabla->filas[i].nombre : "-",
                 tabla->filas[i].tipoDato ? tabla->filas[i].tipoDato : "-",
                 tabla->filas[i].valor  ? tabla->filas[i].valor  : "-",
