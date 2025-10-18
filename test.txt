@@ -9,14 +9,6 @@ init { #+|+#
 	y, res : Boolean
 }
 
-if(a > b OR b < a) {
-	a := 5
-}
-
-if(a > b AND b < a) {
-	a := 5
-}
-
 #+ ASignaciones +#
 a := 1
 b := 1
