@@ -73,7 +73,10 @@ void modificarOperandoIzquierdoConTerceto(int indice, char *nroTerceto)
     /* indice indica el terceto */
     /* op es el salto */
 
-    strcpy(tercetos[indice].operandoIzq, nroTerceto);
+    if(strcmp(tercetos[indice].operandoIzq, "_") == 0) {
+        strcpy(tercetos[indice].operandoIzq, nroTerceto);
+        return;
+    }
 }
 
 void imprimirTercetos()

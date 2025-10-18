@@ -93,6 +93,8 @@ int indice = 0;
 int indiceActual = 0;
 int indiceDesapilado = 0;
 
+int indiceExpresiones = 0;
+
 bool _secuenciaAND = false;
 bool _soloAritmetica = true;
 bool _soloBooleana = true;
@@ -615,7 +617,7 @@ lista_args:
             add_HashMapEntry(hashmap, "@resEqualExpressions", 0);
             agregar_a_tabla_variables_internas(&tabla, "@resEqualExpressions", "Boolean");
         }
-        int IndBI = crearTerceto("BI","", "_");
+        int IndBI = crearTerceto("BI","_", "_");
 
         poner_en_pila(&pilaBI, &IndBI, sizeof(IndBI));
     }
@@ -706,50 +708,29 @@ expresion_logica:
         if(get_HashMapEntry_value(hashmap, "@resExpresionLogica") == HM_KEY_NOT_FOUND){
             add_HashMapEntry(hashmap, "@resExpresionLogica", 0);
             agregar_a_tabla_variables_internas(&tabla, "@resExpresionLogica", "Boolean");
-        } 
+        }
+        crearTerceto("BI", "_", "_");
         
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
+
         poner_en_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind));
-        
-        /*
-        ExpresionLogicaInd2 = ExpresionLogicaInd;
-        sprintf(operandoIzqAux, "[%d]", ExpresionLogicaInd);
-        sprintf(operandoDerAux, "[%d]", ExpresionparaCondicionInd);
-        if(sacar_de_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind)) == TODO_OK)
-        {
-            sprintf(operandoIzqAux, "[%d]", Xind);
-        }
-        Xind = ExpresionLogicaInd = crearTerceto("AND", operandoIzqAux, operandoDerAux);
-        sprintf(operandoDerAux, "[%d]", ExpresionLogicaInd);
-        crearTerceto(":=", "@resExpresionLogica", operandoDerAux);
-        if(get_HashMapEntry_value(hashmap, "@resExpresionLogica") == HM_KEY_NOT_FOUND){
-            add_HashMapEntry(hashmap, "@resExpresionLogica", 0);
-            agregar_a_tabla_variables_internas(&tabla, "@resExpresionLogica", "Boolean");
-        }
-        crearTerceto("CMP", "@resExpresionLogica", "VERDADERO");
-        indiceActual = getIndice(); // obtengo el índice del terceto relativo al salto (BNE en este caso)
-        crearTerceto("BNE", "_saltoCeldas", "_");
-        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
-        _secuenciaAND = true;
-        poner_en_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind));*/
+
         printf("\t\t\t\t\tR36. Expresion_Logica -> Expresion AND Expresion\n");
     }
     | expresion_logica OP_OR expresion_para_condicion 
     {
-        ExpresionLogicaInd2 = ExpresionLogicaInd;
-        sprintf(operandoIzqAux, "[%d]", ExpresionLogicaInd);
-        sprintf(operandoDerAux, "[%d]", ExpresionparaCondicionInd);
-        if(sacar_de_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind)) == TODO_OK) {
-            sprintf(operandoIzqAux, "[%d]", Xind);
-        }
-        
-        int izqInd = crearTerceto(":=", "@resOrIzq", operandoIzqAux);
+        char resDer[50];
+        sacar_de_pila(&pilaValoresBooleanos, resDer, sizeof(resDer));
+        char resIzq[50];
+        sacar_de_pila(&pilaValoresBooleanos, resIzq, sizeof(resIzq));
+
+        int izqInd = crearTerceto(":=", "@resOrIzq", resIzq);
         if(get_HashMapEntry_value(hashmap, "@resOrIzq") == HM_KEY_NOT_FOUND){
             add_HashMapEntry(hashmap, "@resOrIzq", 0);
             agregar_a_tabla_variables_internas(&tabla, "@resOrIzq", "Boolean");
         }
 
-        int derInd = crearTerceto(":=", "@resOrDer", operandoDerAux);
+        int derInd = crearTerceto(":=", "@resOrDer", resDer);
         if(get_HashMapEntry_value(hashmap, "@resOrDer") == HM_KEY_NOT_FOUND){
             add_HashMapEntry(hashmap, "@resOrDer", 0);
             agregar_a_tabla_variables_internas(&tabla, "@resOrDer", "Boolean");
@@ -777,44 +758,55 @@ expresion_logica:
             add_HashMapEntry(hashmap, "@resExpresionLogica", 0);
             agregar_a_tabla_variables_internas(&tabla, "@resExpresionLogica", "Boolean");
         } 
+        int indElse = crearTerceto("BI", "_", "_");
         
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         poner_en_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind));
 
         printf("\t\t\t\t\tR37. Expresion_Logica -> Expresion OR Expresion\n");
-
-        
-        //ExpresionLogicaInd = crearTerceto("OR", operandoIzqAux, operandoDerAux);
-        /*sprintf(operandoDerAux, "[%d]", ExpresionLogicaInd);
-        crearTerceto(":=", "@resExpresionLogica", operandoDerAux); // con fadd recupero 
-        if(get_HashMapEntry_value(hashmap, "@resExpresionLogica") == HM_KEY_NOT_FOUND){
-            add_HashMapEntry(hashmap, "@resExpresionLogica", 0);
-            agregar_a_tabla_variables_internas(&tabla, "@resExpresionLogica", "Boolean");
-        }
-
-        crearTerceto("CMP", "@resExpresionLogica", "VERDADERO");
-        indiceActual = getIndice(); // obtengo el índice del terceto relativo al salto (BNE en este caso)
-        crearTerceto("BNE", "_saltoCeldas", "_");
-        poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
-        poner_en_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind));
-        printf("\t\t\t\t\tR37. Expresion_Logica -> Expresion OR Expresion\n");*/
     }
     | OP_NOT expresion_logica %prec NEGACION 
     {
         ExpresionLogicaInd2 = ExpresionLogicaInd;
         sprintf(operandoIzqAux, "[%d]", ExpresionLogicaInd);
-        ExpresionLogicaInd = crearTerceto("NOT", operandoIzqAux, "_");
-        sprintf(operandoDerAux, "[%d]", ExpresionLogicaInd);
-        crearTerceto(":=", "@resExpresionLogica", operandoDerAux);
+        //sprintf(operandoDerAux, "[%d]", ExpresionparaCondicionInd);
+        //if(sacar_de_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind)) == TODO_OK) {
+            //sprintf(operandoIzqAux, "[%d]", Xind);
+        //}
+        
+        int izqInd = crearTerceto(":=", "@resOrIzq", operandoIzqAux);
+        if(get_HashMapEntry_value(hashmap, "@resOrIzq") == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, "@resOrIzq", 0);
+            agregar_a_tabla_variables_internas(&tabla, "@resOrIzq", "Boolean");
+        }
+
+        sprintf(operandoIzqAux, "[%d]", izqInd);
+        //sprintf(operandoDerAux, "[%d]", derInd);
+        //int resOrInd = crearTerceto("+", operandoIzqAux, operandoDerAux);
+        //sprintf(operandoIzqAux, "[%d]", resOrInd);
+
+        crearTerceto("CMP", operandoIzqAux, "1");
+        indiceActual = getIndice();
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 3);
+        crearTerceto("BNE", operandoIzqAux, "_");
+        ExpresionLogicaInd = crearTerceto(":=", "@resExpresionLogica", "VERDADERO");
         if(get_HashMapEntry_value(hashmap, "@resExpresionLogica") == HM_KEY_NOT_FOUND){
             add_HashMapEntry(hashmap, "@resExpresionLogica", 0);
             agregar_a_tabla_variables_internas(&tabla, "@resExpresionLogica", "Boolean");
         }
-        crearTerceto("CMP", "@resExpresionLogica", "FALSO");
-        indiceActual = getIndice(); // me guardo la referencia del nro. de terceto asociado al Branch (BNE en este caso)
-        crearTerceto("BNE", "_saltoCeldas", "_");
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 4);
+        crearTerceto("BI", operandoIzqAux, "_");
+
+        ExpresionLogicaInd = crearTerceto(":=", "@resExpresionLogica", "FALSO");
+        if(get_HashMapEntry_value(hashmap, "@resExpresionLogica") == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, "@resExpresionLogica", 0);
+            agregar_a_tabla_variables_internas(&tabla, "@resExpresionLogica", "Boolean");
+        } 
+        crearTerceto("BI", "_", "_");
+        
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         poner_en_pila(&pilaExpresionesLogicas, &Xind, sizeof(Xind));
+
         printf("\t\t\t\t\tR38. Expresion_Logica -> NOT Expresion\n");
     }
     | expresion_para_condicion %prec PRIORIDAD_EXPRESION
@@ -840,7 +832,32 @@ expresion_para_condicion:
             sprintf(operandoIzqAux, "[%d]", indiceActual);
             crearTerceto("CMP", operandoIzqAux, "VERDADERO");
             indiceActual = getIndice(); // me guardo la referencia del branch
-            crearTerceto("BNE", "_saltoCeldasSiCorresponde", "_");
+            //crearTerceto("BNE", "_saltoCeldasSiCorresponde", "_");
+
+            char variableInterna[50] = "@resExpresion";
+            char indice[5];
+            sprintf(indice, "_%d", indiceExpresiones);
+
+            strcat(variableInterna, indice);
+
+            sprintf(operandoIzqAux, "[%d]", indiceActual + 3);
+            crearTerceto("BNE", operandoIzqAux, "_");
+            crearTerceto(":=", variableInterna, "VERDADERO");
+            if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+                add_HashMapEntry(hashmap, variableInterna, 0);
+                agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+            }
+            sprintf(operandoIzqAux, "[%d]", indiceActual + 4);
+            crearTerceto("BI", operandoIzqAux, "_");
+            crearTerceto(":=", variableInterna, "FALSO");
+            if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+                add_HashMapEntry(hashmap, variableInterna, 0);
+                agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+            }
+
+            poner_en_pila(&pilaValoresBooleanos, &variableInterna, sizeof(variableInterna));
+            indiceExpresiones++;
+
             poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         }
         if(_soloBooleana)
@@ -848,7 +865,32 @@ expresion_para_condicion:
             sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
             crearTerceto("CMP", operandoIzqAux, "VERDADERO");
             indiceActual = getIndice(); // me guardo la referencia del nro. de terceto asociado al Branch (BNE en este caso)
-            crearTerceto("BNE", "_saltoCeldasSiCorresponde", "_");
+            //crearTerceto("BNE", "_saltoCeldasSiCorresponde", "_");
+
+            char variableInterna[50] = "@resExpresion";
+            char indice[5];
+            sprintf(indice, "_%d", indiceExpresiones);
+
+            strcat(variableInterna, indice);
+
+            sprintf(operandoIzqAux, "[%d]", indiceActual + 3);
+            crearTerceto("BNE", operandoIzqAux, "_");
+            crearTerceto(":=", variableInterna, "VERDADERO");
+            if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+                add_HashMapEntry(hashmap, variableInterna, 0);
+                agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+            }
+            sprintf(operandoIzqAux, "[%d]", indiceActual + 4);
+            crearTerceto("BI", operandoIzqAux, "_");
+            crearTerceto(":=", variableInterna, "FALSO");
+            if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+                add_HashMapEntry(hashmap, variableInterna, 0);
+                agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+            }
+
+            poner_en_pila(&pilaValoresBooleanos, &variableInterna, sizeof(variableInterna));
+            indiceExpresiones++;
+
             poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         }
         ExpresionParaCondicionInd2 = ExpresionparaCondicionInd;
@@ -866,7 +908,30 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         indiceActual = getIndice(); // me guardo la referencia del branch
-        crearTerceto("BLE", "_saltoCeldasSiCorresponde", "_");
+        //crearTerceto("BLE", "_saltoCeldasSiCorresponde", "_");
+        char variableInterna[50] = "@resExpresion";
+        char indice[5];
+        sprintf(indice, "_%d", indiceExpresiones);
+
+        strcat(variableInterna, indice);
+
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 3);
+        crearTerceto("BLE", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "VERDADERO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 4);
+        crearTerceto("BI", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "FALSO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+
+        poner_en_pila(&pilaValoresBooleanos, &variableInterna, sizeof(variableInterna));
+        indiceExpresiones++; 
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(Xind)); // está acá simbólicamente, ya que apilo el terceto del salto para luego actualizarlo
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -879,7 +944,31 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         indiceActual = getIndice(); // me guardo la referencia del branch
-        crearTerceto("BGE", "_saltoCeldasSiCorresponde", "_");
+        //crearTerceto("BGE", "_saltoCeldasSiCorresponde", "_");
+        char variableInterna[50] = "@resExpresion";
+        char indice[5];
+        sprintf(indice, "_%d", indiceExpresiones);
+
+        strcat(variableInterna, indice);
+
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 3);
+        crearTerceto("BGE", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "VERDADERO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 4);
+        crearTerceto("BI", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "FALSO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+
+        poner_en_pila(&pilaValoresBooleanos, &variableInterna, sizeof(variableInterna));
+        indiceExpresiones++; 
+
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(Xind));
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -892,7 +981,31 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         indiceActual = getIndice(); // me guardo la referencia del branch
-        crearTerceto("BNE", "_saltoCeldasSiCorresponde", "_");
+        //crearTerceto("BNE", "_saltoCeldasSiCorresponde", "_");
+        char variableInterna[50] = "@resExpresion";
+        char indice[5];
+        sprintf(indice, "_%d", indiceExpresiones);
+
+        strcat(variableInterna, indice);
+
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 3);
+        crearTerceto("BNE", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "VERDADERO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 4);
+        crearTerceto("BI", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "FALSO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+
+        poner_en_pila(&pilaValoresBooleanos, &variableInterna, sizeof(variableInterna));
+        indiceExpresiones++;  
+
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -905,7 +1018,31 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         indiceActual = getIndice(); // me guardo la referencia del branch
-        crearTerceto("BE", "_saltoCeldasSiCorresponde", "_");
+        //crearTerceto("BE", "_saltoCeldasSiCorresponde", "_");
+        char variableInterna[50] = "@resExpresion";
+        char indice[5];
+        sprintf(indice, "_%d", indiceExpresiones);
+
+        strcat(variableInterna, indice);
+
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 3);
+        crearTerceto("BE", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "VERDADERO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 4);
+        crearTerceto("BI", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "FALSO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+
+        poner_en_pila(&pilaValoresBooleanos, &variableInterna, sizeof(variableInterna));
+        indiceExpresiones++; 
+
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -918,7 +1055,32 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         indiceActual = getIndice(); // me guardo la referencia del branch
-        crearTerceto("BLT", "_saltoCeldasSiCorresponde", "_");
+        //crearTerceto("BLT", "_saltoCeldasSiCorresponde", "_");
+
+        char variableInterna[50] = "@resExpresion";
+        char indice[5];
+        sprintf(indice, "_%d", indiceExpresiones);
+
+        strcat(variableInterna, indice);
+
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 3);
+        crearTerceto("BLT", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "VERDADERO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 4);
+        crearTerceto("BI", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "FALSO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+
+        poner_en_pila(&pilaValoresBooleanos, &variableInterna, sizeof(variableInterna));
+        indiceExpresiones++;
+
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -931,7 +1093,32 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         indiceActual = getIndice(); // me guardo la referencia del branch
-        crearTerceto("BGT", "_saltoCeldasSiCorresponde", "_");
+        //crearTerceto("BGT", "_saltoCeldasSiCorresponde", "_");
+
+        char variableInterna[50] = "@resExpresion";
+        char indice[5];
+        sprintf(indice, "_%d", indiceExpresiones);
+
+        strcat(variableInterna, indice);
+
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 3);
+        crearTerceto("BGT", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "VERDADERO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 4);
+        crearTerceto("BI", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "FALSO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+
+        poner_en_pila(&pilaValoresBooleanos, &variableInterna, sizeof(variableInterna));
+        indiceExpresiones++;
+
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -944,7 +1131,32 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         indiceActual = getIndice(); // me guardo la referencia del branch
-        crearTerceto("BE", "_saltoCeldasSiCorresponde", "_");
+        //crearTerceto("BE", "_saltoCeldasSiCorresponde", "_");
+
+        char variableInterna[50] = "@resExpresion";
+        char indice[5];
+        sprintf(indice, "_%d", indiceExpresiones);
+
+        strcat(variableInterna, indice);
+
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 3);
+        crearTerceto("BNE", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "VERDADERO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 4);
+        crearTerceto("BI", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "FALSO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+
+        poner_en_pila(&pilaValoresBooleanos, &variableInterna, sizeof(variableInterna));
+        indiceExpresiones++;
+
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -957,7 +1169,32 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         indiceActual = getIndice(); // me guardo la referencia del branch
-        crearTerceto("BE", "_saltoCeldasSiCorresponde", "_");
+        //rearTerceto("BE", "_saltoCeldasSiCorresponde", "_");
+
+        char variableInterna[50] = "@resExpresion";
+        char indice[5];
+        sprintf(indice, "_%d", indiceExpresiones);
+
+        strcat(variableInterna, indice);
+
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 3);
+        crearTerceto("BE", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "VERDADERO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+        sprintf(operandoIzqAux, "[%d]", indiceActual + 4);
+        crearTerceto("BI", operandoIzqAux, "_");
+        crearTerceto(":=", variableInterna, "FALSO");
+        if(get_HashMapEntry_value(hashmap, variableInterna) == HM_KEY_NOT_FOUND){
+            add_HashMapEntry(hashmap, variableInterna, 0);
+            agregar_a_tabla_variables_internas(&tabla, variableInterna, "Boolean");
+        }
+
+        poner_en_pila(&pilaValoresBooleanos, &variableInterna, sizeof(variableInterna));
+        indiceExpresiones++;
+
         poner_en_pila(&pilaSentencias, &indiceActual, sizeof(indiceActual));
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -967,6 +1204,7 @@ expresion_relacional:
     {
         ExpresionRelacionalInd2 = ExpresionRelacionalInd;
         ExpresionRelacionalInd = ValorBooleanoInd;
+
         _soloAritmetica = false;
         printf("\t\t\t\t\tR49. Expresion_Relacional -> Valor_Booleano\n");
     }
@@ -1353,7 +1591,7 @@ void recorrer_lista_argumentos_equalexpressions(tPila *pilaIndiceTercetosFuncion
             sprintf(operandoIzqAux, "[%d]", ListaArgsInd + 5);
             crearTerceto("BNE", operandoIzqAux, "_"); // +2
             crearTerceto(":=", "@resEqualExpressions", "VERDADERO"); // + 3
-            IndBI = crearTerceto("BI","", "_"); // + 4
+            IndBI = crearTerceto("BI","_", "_"); // + 4
 
             poner_en_pila(&pilaBI, &IndBI, sizeof(IndBI));
         }
