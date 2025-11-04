@@ -80,7 +80,7 @@ void imprimirTercetos()
 {
     int i;
 
-    FILE *ptercetos = fopen("Tercetos.txt", "w");
+    FILE *ptercetos = fopen("intermediate-code.txt", "w");
     if (!ptercetos) 
     {
         perror("Error al abrir el archivo");
