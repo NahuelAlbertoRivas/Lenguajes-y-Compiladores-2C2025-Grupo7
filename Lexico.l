@@ -185,7 +185,7 @@ COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMB
 {PUNTO_COMA}            {return PUNTO_COMA;}
 {COR_ABR}               {return COR_ABR;}
 {COR_CIE}               {return COR_CIE;}
-{LLA_ABR}               {return LLA_ABR;}
+{LLA_ABR}               {_inicioBloqueAsociado = getIndice();return LLA_ABR;}
 {LLA_CIE}               {return LLA_CIE;}
 {CMP_MAYOR}			    {return CMP_MAYOR;}
 {CMP_MENOR}			    {return CMP_MENOR;}
