@@ -33,50 +33,53 @@
 | @resExpresionRelacional_5                          | Boolean    | -                                                  | -          |
 | @resExpresion_6                                    | Boolean    | -                                                  | -          |
 | @resExpresionRelacional_7                          | Boolean    | -                                                  | -          |
-| @resExpresion_8                                    | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_8                          | Boolean    | -                                                  | -          |
+| @resExpresion_9                                    | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_10                         | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_11                         | Boolean    | -                                                  | -          |
 | 43                                                 | CTE_INT    | -                                                  | -          |
 | 342                                                | CTE_INT    | -                                                  | -          |
 | 324                                                | CTE_INT    | -                                                  | -          |
-| @resExpresionRelacional_9                          | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_12                         | Boolean    | -                                                  | -          |
 | 3                                                  | CTE_INT    | -                                                  | -          |
-| @resExpresionRelacional_10                         | Boolean    | -                                                  | -          |
-| @resExpresionRelacional_11                         | Boolean    | -                                                  | -          |
-| @resExpresion_12                                   | Boolean    | -                                                  | -          |
-| @resExpresion_13                                   | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_13                         | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_14                         | Boolean    | -                                                  | -          |
+| @resExpresion_15                                   | Boolean    | -                                                  | -          |
+| @resExpresion_16                                   | Boolean    | -                                                  | -          |
 | 4                                                  | CTE_INT    | -                                                  | -          |
 | 6                                                  | CTE_INT    | -                                                  | -          |
-| @resExpresionRelacional_14                         | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_17                         | Boolean    | -                                                  | -          |
 | 35                                                 | CTE_INT    | -                                                  | -          |
 | @resIsZero                                         | Boolean    | -                                                  | -          |
-| @resExpresionRelacional_15                         | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_18                         | Boolean    | -                                                  | -          |
 | @resEqualExpressions                               | Boolean    | -                                                  | -          |
 | @pivote                                            | Int        | -                                                  | -          |
 | @actual                                            | Int        | -                                                  | -          |
-| @resExpresionRelacional_16                         | Boolean    | -                                                  | -          |
-| @resExpresionRelacional_17                         | Boolean    | -                                                  | -          |
-| @resExpresion_18                                   | Boolean    | -                                                  | -          |
-| _"un string"                                       | CTE_STRING | "un string"                                        | 11         |
-| @resExpresion_19                                   | Boolean    | -                                                  | -          |
-| @resExpresion_20                                   | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_19                         | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_20                         | Boolean    | -                                                  | -          |
 | @resExpresion_21                                   | Boolean    | -                                                  | -          |
-| @resExpresionRelacional_22                         | Boolean    | -                                                  | -          |
+| _"un string"                                       | CTE_STRING | "un string"                                        | 11         |
+| @resExpresion_22                                   | Boolean    | -                                                  | -          |
+| @resExpresion_23                                   | Boolean    | -                                                  | -          |
+| @resExpresion_24                                   | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_25                         | Boolean    | -                                                  | -          |
 | _"a es mas grande que b (a > b)"                   | CTE_STRING | "a es mas grande que b (a > b)"                    | 31         |
 | _"a es mas chico o igual a b (a <= b)"             | CTE_STRING | "a es mas chico o igual a b (a <= b)"              | 37         |
-| @resExpresionRelacional_23                         | Boolean    | -                                                  | -          |
-| @resExpresionRelacional_24                         | Boolean    | -                                                  | -          |
-| _"a y c mas grandes que b [a > b & c > b]"         | CTE_STRING | "a y c mas grandes que b [a > b & c > b]"          | 41         |
-| @resExpresionRelacional_25                         | Boolean    | -                                                  | -          |
 | @resExpresionRelacional_26                         | Boolean    | -                                                  | -          |
-| _"a es mas grande que b y c es mas grande que b"   | CTE_STRING | "a es mas grande que b y c es mas grande que b"    | 47         |
 | @resExpresionRelacional_27                         | Boolean    | -                                                  | -          |
-| _"a no es mas grande que b -> !(a > b)"            | CTE_STRING | "a no es mas grande que b -> !(a > b)"             | 38         |
-| @resExpresion_28                                   | Boolean    | -                                                  | -          |
-| @resExpresion_29                                   | Boolean    | -                                                  | -          |
-| 5.100000000                                        | CTE_REAL   | -                                                  | -          |
+| _"a y c mas grandes que b [a > b & c > b]"         | CTE_STRING | "a y c mas grandes que b [a > b & c > b]"          | 41         |
+| @resExpresionRelacional_28                         | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_29                         | Boolean    | -                                                  | -          |
+| _"a es mas grande que b y c es mas grande que b"   | CTE_STRING | "a es mas grande que b y c es mas grande que b"    | 47         |
 | @resExpresionRelacional_30                         | Boolean    | -                                                  | -          |
-| @resExpresionRelacional_31                         | Boolean    | -                                                  | -          |
+| _"a no es mas grande que b -> !(a > b)"            | CTE_STRING | "a no es mas grande que b -> !(a > b)"             | 38         |
+| @resExpresion_31                                   | Boolean    | -                                                  | -          |
+| @resExpresion_32                                   | Boolean    | -                                                  | -          |
+| 5.100000000                                        | CTE_REAL   | -                                                  | -          |
+| @resExpresionRelacional_33                         | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_34                         | Boolean    | -                                                  | -          |
 | _"a es mas grande que b y c"                       | CTE_STRING | "a es mas grande que b y c"                        | 27         |
 | 1                                                  | CTE_INT    | -                                                  | -          |
-| @resExpresionRelacional_32                         | Boolean    | -                                                  | -          |
+| @resExpresionRelacional_35                         | Boolean    | -                                                  | -          |
 | _"a es mas grande que b"                           | CTE_STRING | "a es mas grande que b"                            | 23         |
 -------------------------------------------------------------------------------------------------------------------------------------

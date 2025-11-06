@@ -110,13 +110,14 @@ int indiceBranchElse;
 
 int indiceExpresiones = 0;
 
-int _anidamientoExpresion = 0;
+int _contadorExpresionesAnidadas = 0;
 
 bool _secuenciaAND = false;
 bool _secuenciaNOT = false;
 bool _soloAritmetica = true;
 bool _soloBooleana = true;
 bool _expresionNueva = true;
+bool _expresionAnidada = false;
 
 char _resExpresionRelacional[MAX_RES_EXP];
 char _resExpresionLogica[MAX_RES_EXP];
@@ -658,6 +659,7 @@ expresion:
         _soloAritmetica = true;
         _soloBooleana = true;
         _expresionNueva = true;
+        _contadorExpresionesAnidadas=0;
 
         _contadorExpresionesLogicas = 0;
         printf("\t\t\t\tR35. Expresion -> Expresion_Logica\n");
@@ -679,6 +681,10 @@ expresion_logica:
             ponerAlComienzo(&listaAuxiliar, &Xind, sizeof(Xind));
         }
 
+        _expresionNueva = true;
+        _soloAritmetica = true;
+        _soloBooleana = true;
+
         _secuenciaAND = true;
     }
     expresion_para_condicion 
@@ -686,67 +692,67 @@ expresion_logica:
         ExpresionLogicaInd2 = ExpresionLogicaInd;
         ExpresionLogicaInd = ExpresionparaCondicionInd;
 
-        sacar_de_pila(&pilaValoresBooleanos, _resExpresionRelacional, MAX_RES_EXP);
-
-        crearTerceto("CMP", _resExpresionRelacional, "VERDADERO");
-
-        // branch a else
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-        indiceBranchElse = crearTerceto("BNE", operandoIzqAux, "_");
-        if(_secuenciaNOT == false)
+        if(_expresionNueva)
         {
-            poner_en_pila(&pilaBranchElse, &indiceBranchElse, sizeof(indiceBranchElse));
-        }
-        else
-        {
-            ponerAlComienzo(&listaAuxiliar, &indiceBranchElse, sizeof(indiceBranchElse));
-        }
+            sacar_de_pila(&pilaValoresBooleanos, _resExpresionRelacional, MAX_RES_EXP);
 
-        // branch incondicional then
-        // necesito sí o sí tener uno para cada resultado de expresion relacional ya que
-        // en casos de negación cambian los comportamientos
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
-        indiceActual = crearTerceto("BI", operandoIzqAux, "_");
-        poner_en_pila(&pilaBranchThen, &indiceActual, sizeof(indiceActual));
-        
-        _contadorSecuenciaAnd++;
+            crearTerceto("CMP", _resExpresionRelacional, "VERDADERO");
 
-        // si estamos en una SECUENCIA AND NEGADA
-        if(_secuenciaNOT && _secuenciaAND)
-        {
-            int i = _contadorSecuenciaAnd;
-            
-            // los branchs else deben ir al inicio de la próxima instancia
-            // todos los else se comportan como then
-
-            sprintf(operandoIzqAux, "[%d]", indiceBranchElse + 2);
-            mapLista(&listaAuxiliar, establecer_nuevo_operando_izquierdo, operandoIzqAux);
-
-            if(_contadorSecuenciaAnd > 2)
+            // branch a else
+            sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
+            indiceBranchElse = crearTerceto("BNE", operandoIzqAux, "_");
+            if(_secuenciaNOT == false)
             {
-                // el último then se comporta como else, entonces desestimo el anterior
-                sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
-                // obtengo el más reciente
-                ver_tope(&pilaBranchThen, &indiceBranchThen, sizeof(indiceBranchThen));
-                sprintf(operandoIzqAux, "[%d]", indiceBranchThen);
-                modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
+                poner_en_pila(&pilaBranchElse, &indiceBranchElse, sizeof(indiceBranchElse));
+            }
+            else
+            {
+                ponerAlComienzo(&listaAuxiliar, &indiceBranchElse, sizeof(indiceBranchElse));
             }
 
-            sacar_de_pila(&pilaBranchThen, &indiceBranchThen, sizeof(indiceBranchThen));
-            // dejo que una instancia superior establezca el fin de cuerpo true
-            poner_en_pila(&pilaBranchElse, &indiceBranchThen, sizeof(indiceBranchThen));
+            // branch incondicional then
+            // necesito sí o sí tener uno para cada resultado de expresion relacional ya que
+            // en casos de negación cambian los comportamientos
+            sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+            indiceActual = crearTerceto("BI", operandoIzqAux, "_");
+            poner_en_pila(&pilaBranchThen, &indiceActual, sizeof(indiceActual));
+            
+            _contadorSecuenciaAnd++;
+
+            // si estamos en una SECUENCIA AND NEGADA
+            if(_secuenciaNOT && _secuenciaAND)
+            {
+                int i = _contadorSecuenciaAnd;
+                
+                // los branchs else deben ir al inicio de la próxima instancia
+                // todos los else se comportan como then
+
+                sprintf(operandoIzqAux, "[%d]", indiceBranchElse + 2);
+                mapLista(&listaAuxiliar, establecer_nuevo_operando_izquierdo, operandoIzqAux);
+
+                if(_contadorSecuenciaAnd > 2)
+                {
+                    // el último then se comporta como else, entonces desestimo el anterior
+                    sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
+                    // obtengo el más reciente
+                    ver_tope(&pilaBranchThen, &indiceBranchThen, sizeof(indiceBranchThen));
+                    sprintf(operandoIzqAux, "[%d]", indiceBranchThen);
+                    modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
+                }
+
+                sacar_de_pila(&pilaBranchThen, &indiceBranchThen, sizeof(indiceBranchThen));
+                // dejo que una instancia superior establezca el fin de cuerpo true
+                poner_en_pila(&pilaBranchElse, &indiceBranchThen, sizeof(indiceBranchThen));
+            }
+            
+            // si NO ES NEGADA, ** en una instancia superior **, recupero los else y then involucrados y actualizo 
+            // según corresponda
+
+            _contadorExpresionesLogicas++;
+            _contadorExpresionesAnidadas++;
+
+            printf("\t\t\t\t\tR36. Expresion_Logica -> Expresion AND Expresion\n");
         }
-        
-        // si NO ES NEGADA, ** en una instancia superior **, recupero los else y then involucrados y actualizo 
-        // según corresponda
-
-        _contadorExpresionesLogicas++;
-
-        _expresionNueva = true;
-        _soloAritmetica = true;
-        _soloBooleana = true;
-
-        printf("\t\t\t\t\tR36. Expresion_Logica -> Expresion AND Expresion\n");
     }
     | expresion_logica OP_OR
     {
@@ -769,14 +775,7 @@ expresion_logica:
         else if(_contadorSecuenciaAnd) // si TENEMOS SECUENCIA AND
         {
             // sea negada o no,
-            // los branchs else deben ir al inicio de la próxima instancia
-            sprintf(operandoIzqAux, "[%d]", getIndice());
-            while(_contadorSecuenciaAnd > 0)
-            {
-                sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));     
-                modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
-                _contadorSecuenciaAnd--;
-            }
+            // los branchs else los maneja una instancia superior
 
             // si además ES NEGADA,
             if(_secuenciaNOT)
@@ -786,66 +785,71 @@ expresion_logica:
                 poner_en_pila(&pilaBranchElse, &Xind, sizeof(Xind));
             }
             
+            _contadorSecuenciaAnd = 0;
             _secuenciaAND = false;
         }
+
+        _expresionNueva = true;
+        _soloAritmetica = true;
+        _soloBooleana = true;
     }
     expresion_para_condicion 
     {
         ExpresionLogicaInd2 = ExpresionLogicaInd;
         ExpresionLogicaInd = ExpresionparaCondicionInd;
 
-        sacar_de_pila(&pilaValoresBooleanos, _resExpresionRelacional, MAX_RES_EXP);
-
-        crearTerceto("CMP", _resExpresionRelacional, "VERDADERO");
-
-        // branch a else
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-        indiceActual = crearTerceto("BNE", operandoIzqAux, "_");
-        poner_en_pila(&pilaBranchElse, &indiceActual, sizeof(indiceActual));
-
-        // branch incondicional then
-        // necesito sí o sí tener uno para cada resultado de expresion relacional ya que
-        // en casos de negación cambian los comportamientos
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
-        indiceActual = crearTerceto("BI", operandoIzqAux, "_");
-        poner_en_pila(&pilaBranchThen, &indiceActual, sizeof(indiceActual));
-
-        // si estamos en una SECUENCIA NEGADA
-        if(_secuenciaNOT)
+        if(_expresionNueva)
         {
-            // todos los else se comportan como una secuencia then de AND
-            // y el último va hacia la parte true de instancia superior
-            sacar_de_pila(&pilaBranchElse, &indiceBranchElse, sizeof(indiceBranchElse));
+            sacar_de_pila(&pilaValoresBooleanos, _resExpresionRelacional, MAX_RES_EXP);
 
-            // todos los then se comportan como un else
-            while(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+            crearTerceto("CMP", _resExpresionRelacional, "VERDADERO");
+
+            // branch a else
+            sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
+            indiceActual = crearTerceto("BNE", operandoIzqAux, "_");
+            poner_en_pila(&pilaBranchElse, &indiceActual, sizeof(indiceActual));
+
+            // branch incondicional then
+            // necesito sí o sí tener uno para cada resultado de expresion relacional ya que
+            // en casos de negación cambian los comportamientos
+            sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+            indiceActual = crearTerceto("BI", operandoIzqAux, "_");
+            poner_en_pila(&pilaBranchThen, &indiceActual, sizeof(indiceActual));
+
+            // si estamos en una SECUENCIA NEGADA
+            if(_secuenciaNOT)
             {
-                poner_en_pila(&pilaBranchElse, &indiceDesapilado, sizeof(indiceDesapilado));
+                // todos los else se comportan como una secuencia then de AND
+                // y el último va hacia la parte true de instancia superior
+                sacar_de_pila(&pilaBranchElse, &indiceBranchElse, sizeof(indiceBranchElse));
+
+                // todos los then se comportan como un else
+                while(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+                {
+                    poner_en_pila(&pilaBranchElse, &indiceDesapilado, sizeof(indiceDesapilado));
+                }
+
+                poner_en_pila(&pilaBranchThen, &indiceBranchElse, sizeof(indiceBranchElse));
+            }
+            else // si NO ES UNA SECUENCIA NEGADA
+            {
+                // los then de cada miembro del OR deben ir a la siguiente instrucción de la parte true superior
+                /*
+                sprintf(operandoDerAux, "[%d]", getIndice());
+                while(sacar_de_pila(&pilaBranchThen, &Xind, sizeof(Xind)) == TODO_OK)
+                {
+                    modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
+                }
+                */
             }
 
-            poner_en_pila(&pilaBranchThen, &indiceBranchElse, sizeof(indiceBranchElse));
+            // tengo que tener en cuenta tantos branchs else como operandos izquierdos hayan habido
+
+            _contadorExpresionesLogicas++;
+            _contadorExpresionesAnidadas++;
+
+            printf("\t\t\t\t\tR37. Expresion_Logica -> Expresion OR Expresion\n");
         }
-        else // si NO ES UNA SECUENCIA NEGADA
-        {
-            // los then de cada miembro del OR deben ir a la siguiente instrucción de la parte true superior
-            /* 
-            sprintf(operandoDerAux, "[%d]", getIndice());
-            while(sacar_de_pila(&pilaBranchThen, &Xind, sizeof(Xind)) == TODO_OK)
-            {
-                modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
-            }
-            */
-        }
-
-        // tengo que tener en cuenta tantos branchs else como operandos izquierdos hayan habido
-
-        _contadorExpresionesLogicas++;
-
-        _expresionNueva = true;
-        _soloAritmetica = true;
-        _soloBooleana = true;
-
-        printf("\t\t\t\t\tR37. Expresion_Logica -> Expresion OR Expresion\n");
     }
     | OP_NOT 
     {
@@ -893,6 +897,7 @@ expresion_logica:
 
             _contadorSecuenciaAnd++;
             _contadorExpresionesLogicas++;
+            _contadorExpresionesAnidadas++;
         }
 
         printf("\t\t\t\t\tR39. Expresion_Logica -> Expresion_Para_Condicion\n");
@@ -1375,7 +1380,13 @@ factor:
         printf("\t\t\t\t\t\t\tR59. Factor -> [CTE_REAL: '%s']\n", $1.str); 
         free($1.str);
     }
-    | PAR_ABR expresion PAR_CIE 
+    | PAR_ABR 
+    {
+        _soloAritmetica = true;
+        _soloBooleana = true;
+        _expresionAnidada = true;
+    }
+    expresion PAR_CIE 
     {
         FactorInd = ExpresionInd;
         
