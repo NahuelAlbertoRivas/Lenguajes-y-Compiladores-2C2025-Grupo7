@@ -1264,7 +1264,7 @@ expresion_aritmetica:
     {
         ExpresionAritmeticaInd2 = ExpresionAritmeticaInd;
         sprintf(operandoIzqAux, "[%d]", TerminoInd);
-        ExpresionAritmeticaInd = crearTerceto("OP_RES", operandoIzqAux, "_");
+        ExpresionAritmeticaInd = crearTerceto("-", operandoIzqAux, "_");
         printf("\t\t\t\t\tR50. Expresion_Aritmetica -> - Expresion_Aritmetica\n");
     }
 	| expresion_aritmetica OP_SUM termino 
@@ -1272,7 +1272,7 @@ expresion_aritmetica:
         ExpresionAritmeticaInd2 = ExpresionAritmeticaInd;
         sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd);
         sprintf(operandoDerAux, "[%d]", TerminoInd);
-        ExpresionAritmeticaInd = crearTerceto("OP_SUM", operandoIzqAux, operandoDerAux);
+        ExpresionAritmeticaInd = crearTerceto("+", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\t\tR51. Expresion_Aritmetica -> Expresion_Aritmetica + Termino\n");
     }
 	| expresion_aritmetica OP_RES termino 
@@ -1280,7 +1280,7 @@ expresion_aritmetica:
         ExpresionAritmeticaInd2 = ExpresionAritmeticaInd;
         sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd);
         sprintf(operandoDerAux, "[%d]", TerminoInd);
-        ExpresionAritmeticaInd = crearTerceto("OP_RES", operandoIzqAux, operandoDerAux);
+        ExpresionAritmeticaInd = crearTerceto("-", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\t\tR52. Expresion_Aritmetica -> Expresion_Aritmetica - Termino\n");
     }
     ;
@@ -1295,21 +1295,21 @@ termino:
     {
         sprintf(operandoIzqAux, "[%d]", TerminoInd);
         sprintf(operandoDerAux, "[%d]", FactorInd);
-        TerminoInd = crearTerceto("OP_MUL", operandoIzqAux, operandoDerAux);
+        TerminoInd = crearTerceto("*", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\t\t\tR54. Termino -> Termino * Factor\n");
     }
     | termino OP_DIV factor 
     {
         sprintf(operandoIzqAux, "[%d]", TerminoInd);
         sprintf(operandoDerAux, "[%d]", FactorInd);
-        TerminoInd = crearTerceto("OP_DIV", operandoIzqAux, operandoDerAux);
+        TerminoInd = crearTerceto("/", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\t\t\tR55. Termino -> Termino / Factor\n");
     }
     | termino OP_MOD factor 
     {
         sprintf(operandoIzqAux, "[%d]", TerminoInd);
         sprintf(operandoDerAux, "[%d]", FactorInd);
-        TerminoInd = crearTerceto("OP_MOD", operandoIzqAux, operandoDerAux);
+        TerminoInd = crearTerceto("%", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\t\t\tR56. Termino -> Termino % Factor\n");
     }
     ;
