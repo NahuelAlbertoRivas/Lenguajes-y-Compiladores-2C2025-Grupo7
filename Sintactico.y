@@ -856,14 +856,16 @@ expresion_logica:
 
             _contadorExpresionesLogicas++;
             _contadorExpresionesAnidadas++;
+            
+            _expresionAnidada = false;
 
             printf("\t\t\t\t\tR36. Expresion_Logica -> Expresion AND Expresion\n");
         }
     }
     | expresion_logica OP_OR
     {
-        // si previamente NO TENEMOS una SECUENCIA AND
-        if(_secuenciaAND == false)
+        // si previamente NO TENEMOS una SECUENCIA AND o comienza una expresión anidada
+        if((_secuenciaAND == false) || _expresionAnidada)
         {
             // desestimo los else
             sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
@@ -903,13 +905,18 @@ expresion_logica:
             }
             else
             {
-                sprintf(operandoIzqAux, "[%d]", getIndice());
-                // si no es negada, desestimo los else van hacia la prox eval
-                while(_contadorSecuenciaAnd > 0)
+                // si no es negada,
+                // y no hay anidamiento
+                if(!_expresionAnidada)
                 {
-                    sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
-                    modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
-                    _contadorSecuenciaAnd--;
+                    sprintf(operandoIzqAux, "[%d]", getIndice());
+                    // desestimo los else van hacia la prox eval
+                    while(_contadorSecuenciaAnd > 0)
+                    {
+                        sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
+                        modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
+                        _contadorSecuenciaAnd--;
+                    }
                 }
             }
 
@@ -976,6 +983,7 @@ expresion_logica:
 
             _contadorExpresionesLogicas++;
             _contadorExpresionesAnidadas++;
+            _expresionAnidada = false;
 
             printf("\t\t\t\t\tR37. Expresion_Logica -> Expresion OR Expresion\n");
         }
