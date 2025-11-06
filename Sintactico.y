@@ -352,7 +352,7 @@ asignacion:
         }
         sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
-        AsignacionInd = crearTerceto("OP_ASIG", operandoIzqAux, operandoDerAux);
+        AsignacionInd = crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR18. Asignacion -> [ID: '%s']:= Expresion_Aritmetica\n",$1.str);
         free($1.str);
     }
@@ -365,7 +365,7 @@ asignacion:
         }
         sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
         sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
-        AsignacionInd = crearTerceto("OP_ASIG", operandoIzqAux, operandoDerAux);
+        AsignacionInd = crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR19. Asignacion -> [ID: '%s']:= valor_booleano\n", $1.str);
         free($1.str);
     }
@@ -409,7 +409,7 @@ asignacion:
         }
         sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
         sprintf(operandoDerAux, "[%d]", crearTercetoUnitarioStr($3.str));
-        AsignacionInd = crearTerceto("OP_ASIG", operandoIzqAux, operandoDerAux);
+        AsignacionInd = crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR22. Asignacion -> [ID: '%s']:= \"%s\"\n", $1.str, $3.str);
         free($1.str);
         free($3.str);
