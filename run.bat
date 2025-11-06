@@ -2,18 +2,14 @@
 flex Lexico.l
 bison -dyv Sintactico.y
 
-<<<<<<< Updated upstream
-gcc.exe lex.yy.c y.tab.c tabla.c utilidades/hashmap.c utilidades/pila.c utilidades/acciones_semanticas.c Tercetos.c -o lyc-compiler-1.0.0.exe
-=======
 gcc.exe lex.yy.c y.tab.c tabla.c utilidades/hashmap.c utilidades/pila.c  utilidades/lista.c utilidades/acciones_semanticas.c Tercetos.c -o lyc-compiler-2.0.0.exe
->>>>>>> Stashed changes
 
-lyc-compiler-1.0.0.exe test.txt
+lyc-compiler-2.0.0.exe test.txt
 
 pause
 
 @echo off
-del lyc-compiler-1.0.0.exe
+del lyc-compiler-2.0.0.exe
 del lex.yy.c
 del y.tab.c
 del y.tab.h

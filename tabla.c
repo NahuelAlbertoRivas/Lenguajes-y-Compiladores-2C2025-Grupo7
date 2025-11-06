@@ -161,6 +161,18 @@ int actualizar_tipo_dato(Tabla *tabla, int pos, const char *tipoDato)
     return ACTUALIZACION_CORRECTA;
 }
 
+void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_token){
+    int lexemas_ingresados = tabla->nFilas;
+    
+    tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 2);
+    tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
+
+    strcpy(tabla->filas[lexemas_ingresados].nombre, nombre);
+    strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+
+    tabla->nFilas++;
+}
+
 const char *obtener_tipo_dato(Tabla *tabla, int pos)
 {
     if(bandera == 0)
