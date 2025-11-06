@@ -1,6 +1,7 @@
 -------------------------------------------------------------------------------------------------------------------------------------
 | Nombre                                             | TipoDato   | Valor                                              | Longitud   |
 -------------------------------------------------------------------------------------------------------------------------------------
+<<<<<<< Updated upstream
 | a1                                                 | Float      | -                                                  | -          |
 | b1                                                 | Float      | -                                                  | -          |
 | a                                                  | Float      | -                                                  | -          |
@@ -62,4 +63,45 @@
 | 21                                                 | CTE_INT    | -                                                  | -          |
 | 20                                                 | CTE_INT    | -                                                  | -          |
 | _"Sintaxis OK"                                     | CTE_STRING | "Sintaxis OK"                                      | 13         |
+=======
+| a1                                                   | Float      | -                                                  | -          |
+| b1                                                   | Float      | -                                                  | -          |
+| a                                                    | Float      | -                                                  | -          |
+| b                                                    | Float      | -                                                  | -          |
+| ar0                                                  | Float      | -                                                  | -          |
+| var1                                                 | Int        | -                                                  | -          |
+| c                                                    | Int        | -                                                  | -          |
+| d                                                    | Int        | -                                                  | -          |
+| h                                                    | Int        | -                                                  | -          |
+| i                                                    | Int        | -                                                  | -          |
+| j                                                    | Int        | -                                                  | -          |
+| e                                                    | Int        | -                                                  | -          |
+| f                                                    | Int        | -                                                  | -          |
+| s                                                    | Int        | -                                                  | -          |
+| contador                                             | Int        | -                                                  | -          |
+| D                                                    | Int        | -                                                  | -          |
+| p1                                                   | String     | -                                                  | -          |
+| p2                                                   | String     | -                                                  | -          |
+| p3                                                   | String     | -                                                  | -          |
+| y                                                    | Boolean    | -                                                  | -          |
+| res                                                  | Boolean    | -                                                  | -          |
+| 1                                                    | CTE_INT    | 1                                                  | -          |
+| 2                                                    | CTE_INT    | 2                                                  | -          |
+| 99999.990000000                                      | CTE_REAL   | 99999.990000000                                    | -          |
+| 99.000000000                                         | CTE_REAL   | 99.000000000                                       | -          |
+| 0.999900000                                          | CTE_REAL   | 0.999900000                                        | -          |
+| 0.500000000                                          | CTE_REAL   | 0.500000000                                        | -          |
+| 8                                                    | CTE_INT    | 8                                                  | -          |
+| 43                                                   | CTE_INT    | 43                                                 | -          |
+| 342                                                  | CTE_INT    | 342                                                | -          |
+| 324                                                  | CTE_INT    | 324                                                | -          |
+| @resExpresionAritmetica                              | Int        | -                                                  | -          |
+| @resExpresionRelacional_0                            | Boolean    | -                                                  | -          |
+| 3                                                    | CTE_INT    | 3                                                  | -          |
+| 0                                                    | CTE_INT    | 0                                                  | -          |
+| @resExpresion_1                                      | Boolean    | -                                                  | -          |
+| @resExpresion_2                                      | Boolean    | -                                                  | -          |
+| @resExpresion_3                                      | Boolean    | -                                                  | -          |
+| 5                                                    | CTE_INT    | 5                                                  | -          |
+>>>>>>> Stashed changes
 -------------------------------------------------------------------------------------------------------------------------------------

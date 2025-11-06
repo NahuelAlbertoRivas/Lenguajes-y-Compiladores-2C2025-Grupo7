@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#define MAX_TERCETOS 3000
+#define MAX_TERCETOS 4000
 
 /*VARIABLES GLOBALES*/
 extern FILE *ptercetos;
@@ -17,13 +17,6 @@ typedef struct {
     char operandoIzq[50];    
     char operandoDer[50];      
 }terceto;
-
-/*
-typedef struct {
-    int indiceBuscado;      // Índice del terceto que quieres actualizar
-    char nuevoOperandoIzq[20];   // Nuevo valor para el operador izquierdo
-} DatosAccion;
-*/
 
 extern terceto tercetos[MAX_TERCETOS];
 extern int indiceTerceto;

@@ -31,9 +31,10 @@ FILE  *yyin;
 extern Tabla tabla;
 extern HashMap *hashmap;
 extern tPila pilaVars;
-extern tPila pilaSentencias;
+// extern tPila pilaSentencias;
 extern FILE *ptercetos;
 extern int _inicioExpresion;
+extern int _inicioBloqueAsociado;
 
 char *yyltext; 
 
@@ -180,7 +181,7 @@ COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMB
 {OP_RES}		        {return OP_RES;}
 {OP_DIV}		        {return OP_DIV;}
 {PAR_ABR}			    {return PAR_ABR;}
-{PAR_CIE}			    {return PAR_CIE;}
+{PAR_CIE}			    {_inicioBloqueAsociado = getIndice();return PAR_CIE;}
 {PUNTO_COMA}            {return PUNTO_COMA;}
 {COR_ABR}               {return COR_ABR;}
 {COR_CIE}               {return COR_CIE;}
@@ -306,6 +307,6 @@ void finalizar_recursos()
     guardar_tabla_en_archivo(&tabla, "Symbol-Table.txt");
     fclose(yyin);
     vaciar_pila(&pilaVars);
-    vaciar_pila(&pilaSentencias);
+    // vaciar_pila(&pilaSentencias);
     destroy_HashMap(hashmap);
 }
