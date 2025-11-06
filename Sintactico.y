@@ -85,19 +85,20 @@ char operandoIzqAux[50];
 char operadorAux[50];
 
 int _contadorExpresionesLogicas = 0;
+int _ultRefContadorEstructuras = 0;
 int _contadorSecuenciaAnd = 0;
+int _contadorThenActual = 0;
+int _contadorThenTotal = 0;
 int _contadorBucles = 0;
 int _inicioBucle;
 int _inicioExpresion;
 int _inicioBloqueAsociado;
+int _indiceBIif;
 const char *_tipoDatoExpresionActual;
 
 tLista listaAuxiliar;
 tPila pilaBranchThen;
 tPila pilaBranchElse;
-tPila pilaResExpresionesRelacionales;
-tPila pilaResExpresionesLogicas;
-tPila pilaExpresionesLogicas;
 tPila pilaValoresBooleanos;
 tPila pilaIndiceTercetosFuncionesEspeciales;
 tPila pilaBI;
@@ -111,6 +112,7 @@ int indiceBranchElse;
 int indiceExpresiones = 0;
 
 int _contadorExpresionesAnidadas = 0;
+int _contadorEstructurasAnidadas = 0;
 
 bool _secuenciaAND = false;
 bool _secuenciaNOT = false;
@@ -126,6 +128,7 @@ char _expresionEmparentadaActual[4];
 
 Tabla tabla;
 HashMap *hashmap;
+HashMap *hashmapEstructurasAnidadas;
 tPila pilaVars;
 FILE *ptercetos;
 
@@ -416,10 +419,36 @@ asignacion:
 condicional_si:
     IF PAR_ABR expresion PAR_CIE bloque_asociado %prec MENOS_QUE_ELSE
     {
-        sprintf(operandoIzqAux, "[%d]", _inicioBloqueAsociado);
-        while(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+        int i;
+        char aux[50];
+
+        if(_contadorEstructurasAnidadas >= 1)
         {
-            modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+            sprintf(aux, "estructura_%d", _contadorEstructurasAnidadas);
+
+            i = get_HashMapEntry_value(hashmapEstructurasAnidadas, aux);
+
+            if(i != HM_KEY_NOT_FOUND)
+            {
+                remove_HashMapEntry(hashmapEstructurasAnidadas, aux);
+            }
+            else
+            {
+                i = _contadorThenTotal;
+            }
+        }
+
+        _contadorEstructurasAnidadas--;
+        _ultRefContadorEstructuras--;
+
+        sprintf(operandoIzqAux, "[%d]", _inicioBloqueAsociado);
+        while(i > 0)
+        {
+            if(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+            {
+                modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+            }
+            i--;
         }
 
         indiceActual = getIndice(); // [como en crear_terceto() hacemos indiceTerceto++ en el retorno de cada llamada, con getIndice() siempre tenemos el nro. de terceto siguiente al último creado]
@@ -438,34 +467,64 @@ condicional_si:
     }
     | IF PAR_ABR expresion PAR_CIE bloque_asociado ELSE
     {
-        sprintf(operandoIzqAux, "[%d]", _inicioBloqueAsociado);
-        while(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+        int i = 0, i2 = 0;
+        char aux[50];
+
+        if(_contadorEstructurasAnidadas >= 1)
         {
-            modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+            sprintf(aux, "estructura_%d", _contadorEstructurasAnidadas);
+
+            i = get_HashMapEntry_value(hashmapEstructurasAnidadas, aux);
+
+            if(i != HM_KEY_NOT_FOUND)
+            {
+                remove_HashMapEntry(hashmapEstructurasAnidadas, aux);
+            }
+            else
+            {
+                i = _contadorThenTotal;
+            }
+            i2 = i;
+        }
+
+        _contadorEstructurasAnidadas--;
+        _ultRefContadorEstructuras--;
+
+        sprintf(operandoIzqAux, "[%d]", _inicioBloqueAsociado);
+        while(i > 0)
+        {
+            if(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+            {
+                modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+            }
+            i--;
         }
 
         // me guardo el nro. de terceto de BI para actualizarlo una vez que sepa donde termina la última instrucción del bloque ELSE
-        indiceActual = crearTerceto("BI", "_saltoCeldas", "_");
-        poner_en_pila(&pilaBranchThen, &indiceActual, sizeof(indiceActual));
+        _indiceBIif = crearTerceto("BI", "_saltoCeldas", "_");
         
         sprintf(operandoIzqAux, "[%d]", getIndice()); // ya sería el nro. de terceto correspondiente a la primer instrucción del bloque ELSE
         
-        while(sacar_de_pila(&pilaBranchElse, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+        while(i2 > 0)
         {
-            modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+            if(sacar_de_pila(&pilaBranchElse, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+            {
+                modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+            }
+            i2--;
         }
     }
     bloque_asociado
     {   
         sprintf(operandoIzqAux, "[%d]", getIndice());
-        sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado));
-        modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+        modificarOperandoIzquierdoConTerceto(_indiceBIif, operandoIzqAux);
         
-        printf("\t\t\tR24. Condicional_Si -> if(Expresion) Bloque_Asociado else Bloque_Asociado\n");
         _secuenciaAND = false;
         _soloAritmetica = true;
         _soloBooleana = true;
         _contadorSecuenciaAnd = 0;
+
+        printf("\t\t\tR24. Condicional_Si -> if(Expresion) Bloque_Asociado else Bloque_Asociado\n");
     }
     ;
 
@@ -491,14 +550,42 @@ bucle:
         _inicioBucle = crearTercetoUnitarioStr(operadorAux); // me guardo el inicio del bucle
         BucleInd = _inicioBucle;
         _contadorBucles++;
+    }
+    PAR_ABR expresion PAR_CIE 
+    {
+        int i = 0;
+        char aux[50];
+
+        if(_contadorEstructurasAnidadas >= 1)
+        {
+            sprintf(aux, "estructura_%d", _contadorEstructurasAnidadas);
+
+            i = get_HashMapEntry_value(hashmapEstructurasAnidadas, aux);
+
+            if(i != HM_KEY_NOT_FOUND)
+            {
+                remove_HashMapEntry(hashmapEstructurasAnidadas, aux);
+            }
+            else
+            {
+                i = _contadorThenTotal;
+            }
+        }
+
+        _contadorEstructurasAnidadas--;
+        _ultRefContadorEstructuras--;
 
         sprintf(operandoIzqAux, "[%d]", _inicioBucle);
-        while(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+        while(i > 0)
         {
-            modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+            if(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
+            {
+                modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+            }
+            i--;
         }
     }
-    PAR_ABR expresion PAR_CIE bloque_asociado
+    bloque_asociado
     {
         sprintf(operandoIzqAux, "[%d]", _inicioBucle);
         indiceActual = crearTerceto("BI", operandoIzqAux, "_");
@@ -649,19 +736,35 @@ entrada_salida:
 expresion: 
     expresion_logica 
     {
+        char aux[50];
         ExpresionInd = ExpresionLogicaInd;
 
         if(_contadorExpresionesLogicas == 1)
         {
             sacar_de_pila(&pilaBranchThen, &Xind, sizeof(Xind));
+            _contadorThenActual--;
         }
+        
+        if(_ultRefContadorEstructuras != _contadorEstructurasAnidadas)
+        {
+            sprintf(aux, "estructura_%d", _contadorEstructurasAnidadas);
+            add_HashMapEntry(hashmapEstructurasAnidadas, aux, _contadorThenTotal);
+            _ultRefContadorEstructuras++;
+            _contadorThenTotal = 0;
+        }
+
+        _contadorThenTotal += _contadorThenActual;
 
         _soloAritmetica = true;
         _soloBooleana = true;
         _expresionNueva = true;
-        _contadorExpresionesAnidadas=0;
+        vaciarLista(&listaAuxiliar);
+        _contadorThenActual = 0;
 
         _contadorExpresionesLogicas = 0;
+
+        _inicioBloqueAsociado = getIndice();
+        
         printf("\t\t\t\tR35. Expresion -> Expresion_Logica\n");
     }
 	;
@@ -671,6 +774,7 @@ expresion_logica:
     {
         // desestimo el then previo ya que siempre va a ser a la siguiente instrucción
         sacar_de_pila(&pilaBranchThen, &Xind, sizeof(Xind));
+        _contadorThenActual--;
 
         // si estamos en secuencia negada o no, todos los else
         // deben manejarlos una instancia superior
@@ -716,6 +820,7 @@ expresion_logica:
             sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
             indiceActual = crearTerceto("BI", operandoIzqAux, "_");
             poner_en_pila(&pilaBranchThen, &indiceActual, sizeof(indiceActual));
+            _contadorThenActual++;
             
             _contadorSecuenciaAnd++;
 
@@ -741,6 +846,7 @@ expresion_logica:
                 }
 
                 sacar_de_pila(&pilaBranchThen, &indiceBranchThen, sizeof(indiceBranchThen));
+                _contadorThenActual--;
                 // dejo que una instancia superior establezca el fin de cuerpo true
                 poner_en_pila(&pilaBranchElse, &indiceBranchThen, sizeof(indiceBranchThen));
             }
@@ -769,23 +875,44 @@ expresion_logica:
             {
                 // los then se comportan como else
                 sacar_de_pila(&pilaBranchThen, &Xind, sizeof(Xind));
+                _contadorThenActual--;
                 poner_en_pila(&pilaBranchElse, &Xind, sizeof(Xind));
             }
         }
         else if(_contadorSecuenciaAnd) // si TENEMOS SECUENCIA AND
         {
-            // sea negada o no,
-            // los branchs else los maneja una instancia superior
-
             // si además ES NEGADA,
             if(_secuenciaNOT)
-            {                
+            {   
+                // el último else va hacia la parte true de instancia superior
+                sacar_de_pila(&pilaBranchElse, &indiceBranchElse, sizeof(indiceBranchElse));
+
                 // el último then debe comportarse como else
-                sacar_de_pila(&pilaBranchThen, &Xind, sizeof(Xind));
-                poner_en_pila(&pilaBranchElse, &Xind, sizeof(Xind));
+                sacar_de_pila(&pilaBranchThen, &indiceBranchThen, sizeof(indiceBranchThen));
+                
+                poner_en_pila(&pilaBranchThen, &indiceBranchElse, sizeof(indiceBranchElse));
+
+                _contadorSecuenciaAnd--;
+                while(_contadorSecuenciaAnd > 0)
+                {
+                    sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
+                    _contadorSecuenciaAnd--;
+                }
+
+                poner_en_pila(&pilaBranchElse, &indiceBranchThen, sizeof(indiceBranchThen));
             }
-            
-            _contadorSecuenciaAnd = 0;
+            else
+            {
+                sprintf(operandoIzqAux, "[%d]", getIndice());
+                // si no es negada, desestimo los else van hacia la prox eval
+                while(_contadorSecuenciaAnd > 0)
+                {
+                    sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
+                    modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
+                    _contadorSecuenciaAnd--;
+                }
+            }
+
             _secuenciaAND = false;
         }
 
@@ -813,8 +940,9 @@ expresion_logica:
             // necesito sí o sí tener uno para cada resultado de expresion relacional ya que
             // en casos de negación cambian los comportamientos
             sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
-            indiceActual = crearTerceto("BI", operandoIzqAux, "_");
-            poner_en_pila(&pilaBranchThen, &indiceActual, sizeof(indiceActual));
+            indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
+            poner_en_pila(&pilaBranchThen, &indiceBranchThen, sizeof(indiceBranchThen));
+            _contadorThenActual++;
 
             // si estamos en una SECUENCIA NEGADA
             if(_secuenciaNOT)
@@ -826,21 +954,22 @@ expresion_logica:
                 // todos los then se comportan como un else
                 while(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
                 {
+                    _contadorThenActual--;
                     poner_en_pila(&pilaBranchElse, &indiceDesapilado, sizeof(indiceDesapilado));
                 }
 
                 poner_en_pila(&pilaBranchThen, &indiceBranchElse, sizeof(indiceBranchElse));
+                _contadorThenActual++;
             }
             else // si NO ES UNA SECUENCIA NEGADA
             {
                 // los then de cada miembro del OR deben ir a la siguiente instrucción de la parte true superior
-                /*
-                sprintf(operandoDerAux, "[%d]", getIndice());
-                while(sacar_de_pila(&pilaBranchThen, &Xind, sizeof(Xind)) == TODO_OK)
-                {
-                    modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
-                }
-                */
+                // sprintf(operandoDerAux, "[%d]", getIndice());
+                // while(sacar_de_pila(&pilaBranchThen, &Xind, sizeof(Xind)) == TODO_OK)
+                //{
+                //    _contadorThenActual--;
+                //   modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
+                //}
             }
 
             // tengo que tener en cuenta tantos branchs else como operandos izquierdos hayan habido
@@ -894,6 +1023,7 @@ expresion_logica:
             sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
             indiceActual = crearTerceto("BI", operandoIzqAux, "_");
             poner_en_pila(&pilaBranchThen, &indiceActual, sizeof(indiceActual));
+            _contadorThenActual++;
 
             _contadorSecuenciaAnd++;
             _contadorExpresionesLogicas++;
@@ -1410,11 +1540,10 @@ int main(int argc, char *argv[])
     crear_pila(&pilaVars);
     crear_pila(&pilaBranchThen);
     crear_pila(&pilaBranchElse);
-    crear_pila(&pilaResExpresionesRelacionales);
-    crear_pila(&pilaResExpresionesLogicas);
     crear_pila(&pilaIndiceTercetosFuncionesEspeciales);
     crear_pila(&pilaBI);
     crear_pila(&pilaValoresBooleanos);
+    hashmapEstructurasAnidadas = create_HashMap(HASHMAP_SIZE);
 
     printf("\n-----------------------------------------------------------------------------------------------------------------\n");
     printf("                                        INICIO PROCESO ANALISIS SINTACTICO                                        ");
@@ -1443,11 +1572,10 @@ int main(int argc, char *argv[])
     vaciar_pila(&pilaVars);
     vaciar_pila(&pilaBranchThen);
     vaciar_pila(&pilaBranchElse);
-    vaciar_pila(&pilaResExpresionesRelacionales);
-    vaciar_pila(&pilaResExpresionesLogicas);
     vaciar_pila(&pilaIndiceTercetosFuncionesEspeciales);
     vaciar_pila(&pilaBI);
     vaciar_pila(&pilaValoresBooleanos);
+    destroy_HashMap(hashmapEstructurasAnidadas);
 
     imprimirTercetos();
 

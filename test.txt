@@ -9,12 +9,6 @@ init { #+|+#
 	y, res : Boolean
 }
 
-
-if(a==0 OR b<c OR f)
-{ #++#
-	a:=5
-}
-
 if(a==0 OR b<c OR f)
 { #++#
 	a:=5
