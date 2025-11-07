@@ -17,6 +17,7 @@
 #include "tabla.h" /* Archivo para la tabla de simbolos */
 #include "utilidades/pila.h"
 #include "utilidades/hashmap.h"
+#include "utilidades/lista.h"
 #include "utilidades/acciones_semanticas.h"
 #include "Tercetos.h"
 
@@ -25,15 +26,35 @@
 #define TAM_MAX_ID     100
 #define CARACTER_NO_RECONOCIDO -4322
 
+typedef struct {
+    int cantThenTotal;
+    int cantElseTotal;
+    int cantSecuenciaAnd;
+    int inicioBloqueAsociado;
+} DatosEstructura;
+
 /* Variables Globales */
 FILE  *yyin;
 
 extern Tabla tabla;
 extern HashMap *hashmap;
+extern HashMap *hashmapEstructurasAnidadas;
 extern tPila pilaVars;
-extern tPila pilaSentencias;
+extern tPila pilaValoresBooleanos;
+extern tLista listaAuxiliar;
+extern tPila pilaBranchThen;
+extern tPila pilaBranchElse;
+extern tPila pilaIndiceTercetosFuncionesEspeciales;
+extern tPila pilaBI;
 extern FILE *ptercetos;
 extern int _inicioExpresion;
+extern int _inicioBloqueAsociado;
+extern int _contadorThenActual;
+extern int _contadorEstructurasAnidadas;
+extern int _ultRefContadorEstructuras;
+extern DatosEstructura datosEstructuraActual;
+extern int _contadorThenTotal;
+extern int _contadorElseTotal;
 
 char *yyltext; 
 
@@ -46,6 +67,7 @@ int validar_real(const char* lexema);
 int validar_string(const char* lexema);
 int validar_id(const char* lexema);
 void finalizar_recursos();
+void guardar_conteo_then();
 
 %}
 
@@ -156,8 +178,8 @@ COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMB
 /*---------------------------------------------*/
 
 %%
-{IF}			        {_inicioExpresion = getIndice();return IF;}
-{WHILE}			        {return WHILE;}
+{IF}			        {_inicioExpresion = getIndice();guardar_conteo_then();return IF;}
+{WHILE}			        {guardar_conteo_then();return WHILE;}
 {ELSE}			        {return ELSE;}
 {WRITE}			        {return WRITE;}
 {READ}			        {return READ;}
@@ -180,11 +202,11 @@ COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMB
 {OP_RES}		        {return OP_RES;}
 {OP_DIV}		        {return OP_DIV;}
 {PAR_ABR}			    {return PAR_ABR;}
-{PAR_CIE}			    {return PAR_CIE;}
+{PAR_CIE}			    {_inicioBloqueAsociado = getIndice();return PAR_CIE;}
 {PUNTO_COMA}            {return PUNTO_COMA;}
 {COR_ABR}               {return COR_ABR;}
 {COR_CIE}               {return COR_CIE;}
-{LLA_ABR}               {return LLA_ABR;}
+{LLA_ABR}               {_inicioBloqueAsociado = getIndice();return LLA_ABR;}
 {LLA_CIE}               {return LLA_CIE;}
 {CMP_MAYOR}			    {return CMP_MAYOR;}
 {CMP_MENOR}			    {return CMP_MENOR;}
@@ -305,7 +327,29 @@ void finalizar_recursos()
     printf("\n\nFinalizando recursos y saliendo...\n\n");
     guardar_tabla_en_archivo(&tabla, "Symbol-Table.txt");
     fclose(yyin);
-    vaciar_pila(&pilaVars);
-    vaciar_pila(&pilaSentencias);
     destroy_HashMap(hashmap);
+    vaciarLista(&listaAuxiliar);
+    vaciar_pila(&pilaVars);
+    vaciar_pila(&pilaBranchThen);
+    vaciar_pila(&pilaBranchElse);
+    vaciar_pila(&pilaVars);
+    vaciar_pila(&pilaIndiceTercetosFuncionesEspeciales);
+    vaciar_pila(&pilaBI);
+    vaciar_pila(&pilaValoresBooleanos);
+    destroy_HashMap(hashmapEstructurasAnidadas);
+}
+
+void guardar_conteo_then()
+{
+    char aux [20];
+    _contadorEstructurasAnidadas++;
+
+    if(_contadorEstructurasAnidadas == 1)
+    {
+        _contadorThenTotal = 0;
+        _contadorElseTotal = 0;
+        _ultRefContadorEstructuras = _contadorEstructurasAnidadas;
+        sprintf(aux, "estructura_%d", _contadorEstructurasAnidadas);
+        add_HashMapEntry(hashmapEstructurasAnidadas, aux, 0);
+    }
 }

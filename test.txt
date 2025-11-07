@@ -9,19 +9,46 @@ init { #+|+#
 	y, res : Boolean
 }
 
-#+ ASignaciones +#
-a := 1
-b := 1
-c := 2
+if(c AND d)
+	if(y)
+		if(res)
+			if(a OR b)
+			{
+				if(D < 100)
+				{
+					if(j)
+					{
+						p3 := "parte true estructura mas interna"
+					}
+				}
+				else
+					p1 := "parte else estructura mas interna"
+			}
 
-a := 99999.99
-a := 99.
-a := .9999
+if((1==0 AND b<c) OR (f == true))
+{ #++#
+	a:=5
+}
 
-b := 0.5
-b := 8
+if(2==0 AND b<c OR f == true)
+{
+	a:=5
+}
 
-p1 := p2
+if(3==0 OR b<c OR f)
+{ #++#
+	a:=5
+}
+
+if(4==0 AND false OR f)
+{ #++#
+	a:=5
+}
+
+if(5==0 AND (false OR f))
+{ #++#
+	a:=5
+}
 
 while(43+342+324)
 {
@@ -100,147 +127,3 @@ while (a > b)
     write("a es mas grande que b")
     a := a + 1
 }
-
-#+ Operaciones Aritmeticas +#
-s := 27 - c
-s := a1 + 500
-s := 34 * 3
-s := b1 / a1
-
-#+ Entrada y Salida +#
-read(b1)
-read(c) #+ base es una variable +#
-write(var1)  #+ var1 es una variable numerica definida previamente +#
-
-#+ Llamada a funcion izZero() +#
-s := 3
-h := 44
-contador := 10
-while (isZero( contador - 10 ))
-{
-    write("El contador vale 10")
-    contador := contador - 1
-}
-if (isZero( s*7+1-h/2 ))
-{
-    write("La expresion es igual a cero")
-}
-
-#+ Llamada a funcion equalExpressions() +#
-a := 2
-b := 3
-
-y := equalExpressions(a + b, 5, b * 2, 3 + 2, a + b) 
-y := equalExpressions(0, -5, a + b)
-
-y := equalExpressions(0, 0, -5, 1, 5, 0)
-
-#+ ---------------------- +#
-#+ EJEMPLO DE UN PROGRAMA +#
-#+ ---------------------- +#
-a1 := 5
-a1 := 0.500
-a1 := 0.5000000000000
-a1 := .500000000
-a1 := 00000.50000000
-a1 := 00005.50000000
-a1 := 00005.500000000001 #+ Precision 9 decimales, este numero es considerado igual que los de arriba +#
-p1 := "hola"
-p1 := "hola"
-p2 := "chau"
-y  := true
-p3 := "SI"
-ar0 := 1
-c:=d*(e-21)/4+j
-while(h<20)
-#+ Este es un comentario que se tiene que ignorar +#
-{ #+ Este es otro comentario que se tiene que ignorar +#
-	if( (ar0 / a1) == b )
-	{
-		a1 := a * ar0
-	}
-	else
-		c := 5
-}
-
-if(a==0 AND b<c){a:=5}
-else
-{
-	res := equalExpressions(0, -5, a + b)
-	if( 5 == 5)
-		a++
-	if(NOT false)
-		c := 3
-	else
-			b1--
-}
-
-write(var1)
-read(var1)
-write(5)
-
-p3 := "Sintaxis OK"
-
-
-#+ ---------------------- +#
-#+ EJEMPLO DE ERRORES +#
-#+ ---------------------- +#
-
-#+ Esta es una asignacion incorrecta +#
-#+ a ::= 5 +#
-
-#+ Esta es un while incorrecto +#
-#+ while [a > b] { write("a es mas grande que b") a := a + 1 } +#
-
-#+ Esta es una sentencia if incorrecta +#
-#+ 	if( (a == b ) 	+#
-#+		a:=c   +#		
-#+	else if	+#		
-#+		c:=A	+#		
-#+	else	+#	
-#+		a:=c2	+#	
-
-#+ Esta es una resta incorrecta +#
-#+ x := 27 -- c +#
-
-#+ Esta es una suma incorrecta +#
-#+ x := r ++ 500 +#
-
-#+ Esta es una multiplicacion incorrecta +#
-#+ x := 34 ** 3 +#
-
-#+ Esta es una division incorrecta +#
-#+ x := z // f +#
-
-#+ Esta es una entrada incorrecta+#
-#+ x := read var1 +#
-
-#+ Esta es una entrada incorrecta+#
-#+ x := read var1 +#
-
-#+ Esta es una salida incorrecta+#
-#+ write var1 +#
-
-#+ Esta es una declaracion de variables incorrecta +#
-#+ int a,b,c +#
-
-#+ Esta es un tipo de dato int que supera el rango maximo +#
-#+ a := 9999999999999999999999999999 +#
-
-#+ Esta es un tipo de dato float que supera el rango maximo +#
-#+ a := 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999.9999999999999999999999999999999 +#
-
-#+ Esta es un tipo de dato string que supera el rango maximo +#
-#+ a := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +#
-
-#+ Este es un comentario erroneo +#
-#+ // comentario +#
-
-#+ Esta es un condicional AND incorrecto +#
-#+ AND(var1,var2) +#
-
-#+ Este es un condicional OR incorrecto +#
-#+ if (a > b || c > b) +#
-
-#+ Esta es un condicional NOT incorrecto +#
-#+  a =! b +#

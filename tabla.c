@@ -61,8 +61,8 @@ int agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
     if (existe_en_tabla(tabla, salida, tipo_token) == FALSE){
         int lexemas_ingresados = tabla->nFilas;
         char* nombre1;
-        if(strcmp(tipo_token, "ID") == 0){
-            nombre1 = malloc(strlen(salida) + 1);
+        if(strcmp(tipo_token, "ID") == 0 || strcmp(tipo_token, "CTE_INT") == 0 || strcmp(tipo_token, "CTE_REAL") == 0){
+            nombre1 = malloc(strlen(nombre) + 1);
             if (!nombre1) { perror("malloc"); return SIN_MEMORIA; }
 
             if(strcmp(tipo_token, "CTE_INT") == 0 || strcmp(tipo_token, "CTE_REAL") == 0){
@@ -96,11 +96,11 @@ int agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
             free(nombre1);
         }
         else {
-            nombre1 = malloc(strlen(salida) + 2); // +1 para "_" +1 para '\0'
+            nombre1 = malloc(strlen(nombre) + 2); // +1 para "_" +1 para '\0'
             if (!nombre1) { perror("malloc"); return SIN_MEMORIA; }
             /* Asignar de memoria */
-            tabla->filas[lexemas_ingresados].nombre = malloc(strlen(salida) + 2);
-            tabla->filas[lexemas_ingresados].valor = malloc(strlen(salida) + 1);
+            tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 2);
+            tabla->filas[lexemas_ingresados].valor = malloc(strlen(nombre) + 1);
             tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
             tabla->filas[lexemas_ingresados].longitud = (int) strlen(salida);
 
@@ -167,6 +167,41 @@ int actualizar_tipo_dato(Tabla *tabla, int pos, const char *tipoDato)
     {
         return TABLA_NO_INICIALIZADA;
     }
+
+    //tabla->filas[pos].tipoDato = malloc(strlen(tipoDato) + 1);
+    //strcpy(tabla->filas[pos].tipoDato, tipoDato);
+    tabla->filas[pos].tipoDato = strdup(tipoDato);
+
+    return ACTUALIZACION_CORRECTA;
+}
+
+void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_token){
+    int lexemas_ingresados = tabla->nFilas;
+    
+    tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 2);
+    tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
+
+    strcpy(tabla->filas[lexemas_ingresados].nombre, nombre);
+    strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+
+    tabla->nFilas++;
+}
+
+const char *obtener_tipo_dato(Tabla *tabla, int pos)
+{
+    if(bandera == 0)
+    {
+        return NULL;
+    }
+
+    return tabla->filas[pos].tipoDato;
+}
+
+void mostrar_tabla(const Tabla *tabla) {
+    printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
+    printf("| %-50s | %-10s | %-50s | %-10s |\n", 
+           "Nombre", "TipoDato", "Valor", "Longitud");
+    printf("-------------------------------------------------------------------------------------------------------------------------------------\n");
 
     //tabla->filas[pos].tipoDato = malloc(strlen(tipoDato) + 1);
     //strcpy(tabla->filas[pos].tipoDato, tipoDato);
