@@ -389,8 +389,11 @@ asignacion:
             free($1.str); 
             YYABORT;
         }
-        sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
-        AsignacionInd = crearTerceto("OP_UN_INC", operandoIzqAux, "_");
+        int idInd = crearTercetoUnitarioStr($1.str);
+        sprintf(operandoIzqAux, "[%d]", idInd);
+        AsignacionInd = crearTerceto("+", operandoIzqAux, "1");
+        sprintf(operandoDerAux, "[%d]", AsignacionInd);
+        crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR20. Asignacion -> [ID: '%s']++\n",$1.str);
         free($1.str);
     }
@@ -401,8 +404,11 @@ asignacion:
             free($1.str); 
             YYABORT;
         }
-        sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
-        AsignacionInd = crearTerceto("OP_UN_DEC", operandoIzqAux, "_");
+        int idInd = crearTercetoUnitarioStr($1.str);
+        sprintf(operandoIzqAux, "[%d]", idInd);
+        AsignacionInd = crearTerceto("-", operandoIzqAux, "1");
+        sprintf(operandoDerAux, "[%d]", AsignacionInd);
+        crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR21. Asignacion -> [ID: '%s']--\n",$1.str);
         free($1.str);
     }
@@ -581,11 +587,12 @@ bucle:
             }
         }
 
-        sprintf(operandoIzqAux, "[%d]", _inicioBucle);
+        sprintf(operandoIzqAux, "[%d]", getIndice());
         while(i > 0)
         {
             if(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
             {
+                printf("\nSACO %d\n", indiceDesapilado);
                 modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
             }
             i--;
@@ -776,6 +783,7 @@ expresion:
             {
                 sacar_de_pila(&pilaBranchThen, &Xind, sizeof(Xind));
                 _contadorThenActual--;
+                printf("DESESTIMO THEN");
             }
 
             if(_ultRefContadorEstructuras != _contadorEstructurasAnidadas)
