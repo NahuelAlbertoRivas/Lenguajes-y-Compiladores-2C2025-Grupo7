@@ -110,6 +110,28 @@ int remove_HashMapEntry(HashMap *hashmap, const char *key)
     return HM_SUCCESS;
 }
 
+int update_HashMapEntry_value(HashMap *hashmap, const char *key, int val)
+{
+    unsigned int index = _hash(key) % hashmap->hsize;
+    HashMapEntry *prev = NULL;
+    HashMapEntry *entry = hashmap->table[index];
+
+    while (entry != NULL && strcmp(entry->key, key) != 0)
+    {
+        prev = entry;
+        entry = entry->next;
+    }
+
+    if (entry == NULL)
+    {
+        return HM_KEY_NOT_FOUND;
+    }
+
+    entry->value = val;
+
+    return HM_SUCCESS;
+}
+
 void destroy_HashMap(HashMap *hashmap)
 {
     for (int i = 0; i < hashmap->hsize; i++)

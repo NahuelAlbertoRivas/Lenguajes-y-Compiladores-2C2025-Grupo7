@@ -9,6 +9,22 @@ init { #+|+#
 	y, res : Boolean
 }
 
+if(c AND d)
+	if(y)
+		if(res)
+			if(a OR b)
+			{
+				if(D < 100)
+				{
+					if(j)
+					{
+						p3 := "parte true estructura mas interna"
+					}
+				}
+				else
+					p1 := "parte else estructura mas interna"
+			}
+
 if(a==0 OR b<c OR f)
 { #++#
 	a:=5

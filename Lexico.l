@@ -26,6 +26,13 @@
 #define TAM_MAX_ID     100
 #define CARACTER_NO_RECONOCIDO -4322
 
+typedef struct {
+    int cantThenTotal;
+    int cantElseTotal;
+    int cantSecuenciaAnd;
+    int inicioBloqueAsociado;
+} DatosEstructura;
+
 /* Variables Globales */
 FILE  *yyin;
 
@@ -45,6 +52,7 @@ extern int _inicioBloqueAsociado;
 extern int _contadorThenActual;
 extern int _contadorEstructurasAnidadas;
 extern int _ultRefContadorEstructuras;
+extern DatosEstructura datosEstructuraActual;
 
 char *yyltext; 
 
@@ -192,7 +200,7 @@ COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMB
 {OP_RES}		        {return OP_RES;}
 {OP_DIV}		        {return OP_DIV;}
 {PAR_ABR}			    {return PAR_ABR;}
-{PAR_CIE}			    {return PAR_CIE;}
+{PAR_CIE}			    {_inicioBloqueAsociado = getIndice();return PAR_CIE;}
 {PUNTO_COMA}            {return PUNTO_COMA;}
 {COR_ABR}               {return COR_ABR;}
 {COR_CIE}               {return COR_CIE;}
@@ -331,10 +339,13 @@ void finalizar_recursos()
 
 void guardar_conteo_then()
 {
+    char aux [20];
     _contadorEstructurasAnidadas++;
 
     if(_contadorEstructurasAnidadas == 1)
     {
         _ultRefContadorEstructuras = _contadorEstructurasAnidadas;
+        sprintf(aux, "estructura_%d", _contadorEstructurasAnidadas);
+        add_HashMapEntry(hashmapEstructurasAnidadas, aux, 0);
     }
 }
