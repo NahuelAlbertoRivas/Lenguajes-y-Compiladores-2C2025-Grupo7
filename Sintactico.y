@@ -837,6 +837,9 @@ expresion:
             datosEstructuraActual.inicioBloqueAsociado = getIndice();
 
             _accionesExpresionAnidada = false;
+
+            // a1: agregar
+            _expresionAnidada = false;
             
             printf("\t\t\t\tR35. Expresion -> Expresion_Logica\n");
         }
@@ -937,7 +940,8 @@ expresion_logica:
             _contadorExpresionesLogicas++;
             _contadorExpresionesAnidadas++;
             
-            _expresionAnidada = false;
+            // a2: eliminar
+            // _expresionAnidada = false;
 
             printf("\t\t\t\t\tR36. Expresion_Logica -> Expresion AND Expresion\n");
         }
@@ -1004,7 +1008,7 @@ expresion_logica:
                 if(!_expresionAnidada)
                 {
                     sprintf(operandoIzqAux, "[%d]", getIndice());
-                    // desestimo los else van hacia la prox eval
+                    // desestimo los else, van hacia la prox eval
                     while(_contadorSecuenciaAnd > 0)
                     {
                         sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
@@ -1012,6 +1016,12 @@ expresion_logica:
                         modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
                         _contadorSecuenciaAnd--;
                     }
+                }
+                else
+                {
+                    // si hay anidamiento
+                    // desestimo solo el último else
+                    sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
                 }
             }
         }
