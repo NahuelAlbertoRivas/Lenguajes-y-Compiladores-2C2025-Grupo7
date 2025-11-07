@@ -1,23 +1,15 @@
 #+ \ Esto es un "programa" # +#
 
-#+ ---------------------------------------- +#
 #+ /* Bloque de declaracion de variables // +#
-#+ ---------------------------------------- +#
 init { #+|+#
-	varFloat: Float
-	varInt, a, b, c, d, e, f, x: Int
-	varStr, base : String 
-	varBool, y : Boolean
+	a1, b1, a, b, ar0 : Float
+	var1, c, d, h, i, j, e, f: Int
+	s, contador, D : Int
+	p1, p2, p3 : String 
+	y, res : Boolean
 }
 
-
-#+ ---------------------------------------- +#
-#+ While +#
-#+ ---------------------------------------- +#
-a := 1
-b := 3
-
-while (a > b AND a > b)
+while (a > b)
 {
     write("a es mas grande que b")
     a := a + 1

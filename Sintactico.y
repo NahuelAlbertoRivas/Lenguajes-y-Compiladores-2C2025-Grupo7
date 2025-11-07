@@ -209,6 +209,8 @@ FILE *ptercetos;
 programa:
     def_init lista_sentencias
     {
+        sprintf(operandoIzqAux, "[%d]", DefInitInd);
+        sprintf(operandoDerAux, "[%d]", ListaSentenciasInd);
         printf("R1. Programa -> Def_Init Lista_Sentencias\n");
     }
     ;
@@ -216,6 +218,7 @@ programa:
 def_init:
     INIT LLA_ABR bloque_asig LLA_CIE
     {
+        DefInitInd = BloqueAsigInd;
         printf("\t\tR2. Def_Init -> init { Bloque_Asig }\n");
     }
     ;
@@ -234,20 +237,26 @@ bloque_asig:
 lista_id:
     ID
     {
+        ListaIdInd2 = ListaIdInd;
         if(acciones_definicion_variable($1.str, $1.codValidacion) != ACCION_EXITOSA)
         {
             free($1.str);
             YYABORT;
         }
+        ListaIdInd = crearTercetoUnitarioStr($1.str);
         printf("\t\t\t\tR5. Lista_Id -> [ID: '%s']\n", $1.str);
         free($1.str);
     } 
     | lista_id COMA ID 
     {
+        ListaIdInd2 = ListaIdInd;
         if(acciones_definicion_variable($3.str, $3.codValidacion) != ACCION_EXITOSA)
         {
             YYABORT;
         } 
+        sprintf(operandoIzqAux, "[%d]", ListaIdInd);
+        sprintf(operandoDerAux, "[%d]", crearTercetoUnitarioStr($3.str));
+        ListaIdInd = crearTerceto("COMA", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\tR6. Lista_Id -> Lista_Id COMA [ID: '%s']\n",$3.str); 
         free($3.str);
     }
@@ -256,6 +265,7 @@ lista_id:
 tipo_dato:
     TD_BOOLEAN 
     {
+        TipoDatoInd = crearTercetoUnitarioStr(DBOOLEAN);
         printf("\t\t\t\tR7. Tipo_Dato -> %s\n", $1.str); 
         if(acciones_asignacion_tipo($1.str) != ACCION_EXITOSA)
         {
@@ -265,6 +275,7 @@ tipo_dato:
     }
     | TD_INT 
     {
+        TipoDatoInd = crearTercetoUnitarioStr(DINTEGER);
         if(acciones_asignacion_tipo($1.str) != ACCION_EXITOSA)
         {
             free($1.str);
@@ -275,6 +286,7 @@ tipo_dato:
     }
     | TD_FLOAT 
     {
+        TipoDatoInd = crearTercetoUnitarioStr(DFLOAT);
         printf("\t\t\t\tR9. Tipo_Dato -> %s\n", $1.str); 
         if(acciones_asignacion_tipo($1.str) != ACCION_EXITOSA)
         {
@@ -284,6 +296,7 @@ tipo_dato:
     }
     | TD_STRING 
     {
+        TipoDatoInd = crearTercetoUnitarioStr(DSTRING);
         if(acciones_asignacion_tipo($1.str)!=ACCION_EXITOSA)
         {
             free($1.str);
@@ -376,8 +389,11 @@ asignacion:
             free($1.str); 
             YYABORT;
         }
-        sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
-        AsignacionInd = crearTerceto("OP_UN_INC", operandoIzqAux, "_");
+        int idInd = crearTercetoUnitarioStr($1.str);
+        sprintf(operandoIzqAux, "[%d]", idInd);
+        AsignacionInd = crearTerceto("+", operandoIzqAux, "1");
+        sprintf(operandoDerAux, "[%d]", AsignacionInd);
+        crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR20. Asignacion -> [ID: '%s']++\n",$1.str);
         free($1.str);
     }
@@ -388,8 +404,11 @@ asignacion:
             free($1.str); 
             YYABORT;
         }
-        sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
-        AsignacionInd = crearTerceto("OP_UN_DEC", operandoIzqAux, "_");
+        int idInd = crearTercetoUnitarioStr($1.str);
+        sprintf(operandoIzqAux, "[%d]", idInd);
+        AsignacionInd = crearTerceto("-", operandoIzqAux, "1");
+        sprintf(operandoDerAux, "[%d]", AsignacionInd);
+        crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR21. Asignacion -> [ID: '%s']--\n",$1.str);
         free($1.str);
     }
@@ -573,6 +592,7 @@ bucle:
         {
             if(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
             {
+                printf("\nSACO %d\n", indiceDesapilado);
                 modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
             }
             i--;
@@ -763,6 +783,7 @@ expresion:
             {
                 sacar_de_pila(&pilaBranchThen, &Xind, sizeof(Xind));
                 _contadorThenActual--;
+                printf("DESESTIMO THEN");
             }
 
             if(_ultRefContadorEstructuras != _contadorEstructurasAnidadas)
