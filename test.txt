@@ -17,7 +17,7 @@ init { #+|+#
 a := 1
 b := 3
 
-while (a > b)
+while (a > b AND a > b)
 {
     write("a es mas grande que b")
     a := a + 1
