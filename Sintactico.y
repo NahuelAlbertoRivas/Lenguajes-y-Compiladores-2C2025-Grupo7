@@ -568,7 +568,7 @@ bucle:
             }
         }
 
-        sprintf(operandoIzqAux, "[%d]", _inicioBucle);
+        sprintf(operandoIzqAux, "[%d]", getIndice());
         while(i > 0)
         {
             if(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
