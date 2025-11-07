@@ -34,6 +34,7 @@ int actualizar_tipo_dato(Tabla *tabla, int pos, const char *tipoDato);
 const char *obtener_tipo_dato(Tabla *tabla, int pos);
 
 void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_token);
+void reemplazar(char* palabra, char buscar, char reemplazar);
 
 //int copiarTablaDeSimbolos(Lista* lista_externa);
 
