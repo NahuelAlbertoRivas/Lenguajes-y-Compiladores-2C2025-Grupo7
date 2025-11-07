@@ -9,8 +9,16 @@ init { #+|+#
 	y, res : Boolean
 }
 
-while (a > b)
+a := c
+b := 3
+
+while (a < b)
 {
     write("a es mas grande que b")
     a := a + 1
 }
+
+
+
+
+

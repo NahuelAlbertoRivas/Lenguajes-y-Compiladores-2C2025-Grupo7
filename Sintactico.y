@@ -2110,7 +2110,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
     printf("\n[DEBUG-ASM] Iniciando generacion .DATA. Total de filas en tabla: %d\n", tabla.nFilas);
     fflush(stdout); // Forzamos la salida por si acaso
 
-    for (int i = 0; i < tabla.nFilas; i++) {
+    for (int i = 0; i < tabla.nFilas; i++) 
+    {
         InformacionToken* _simbolo = &tabla.filas[i];
 
         // DEBUG: Imprimir datos crudos del simbolo actual
@@ -2120,7 +2121,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
                _simbolo->valor ? _simbolo->valor : "(null)", 
                _simbolo->longitud);
 
-        if (strcmp(_simbolo->valor, "-") == 0) {
+        if (strcmp(_simbolo->valor, "-") == 0) 
+        {
             
             // DEBUG: Detectado como VARIABLE
             printf("    -> Detectado como: VARIABLE\n");
@@ -2134,7 +2136,9 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
                 strcpy(dato.indice, _simbolo->nombre);
                 sprintf(dato.variable, "s_%s", _simbolo->nombre);
                 VectorDatos_Add(&ListaVariables, dato);
-            } else {
+            } 
+            else 
+            {
                 // DEBUG: Es otra variable
                 printf("    -> Tipo: OTRO (Int/Float). Escribiendo en ASM: %s\n", _simbolo->nombre);
 
@@ -2143,40 +2147,51 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
                 strcpy(dato.variable, _simbolo->nombre);
                 VectorDatos_Add(&ListaVariables, dato);
             }
-        } else {
+        } 
+        else 
+        {
             // DEBUG: Detectado como CONSTANTE
             printf("    -> Detectado como: CONSTANTE\n");
 
             char nombre_limpio[100];
             strcpy(nombre_limpio, _simbolo->nombre);
 
-            if (_simbolo->longitud > 0) {
+            if (_simbolo->longitud > 0) 
+            {
                 // DEBUG: Constante de String
                 printf("    -> Tipo: CONSTANTE STRING. Valor: %s\n", _simbolo->valor);
 
                 reemplazarGuionBajo(nombre_limpio);
-                fprintf(fileASM, "_cte_cad_%d\t\tdb\t\t\"%s\",'$', %d dup (?)\n", contCteCad, _simbolo->valor, _simbolo->longitud);
+                fprintf(fileASM, "_cte_cad_%d\t\tdb\t\t%s,'$', %d dup (?)\n", contCteCad, _simbolo->valor, _simbolo->longitud);
                 strcpy(dato.indice, _simbolo->valor);
                 sprintf(dato.variable, "_cte_cad_%d", contCteCad);
                 contCteCad++;
                 VectorDatos_Add(&ListaVariables, dato);
-            } else {
+            } 
+            else 
+            {
                 // DEBUG: Constante numerica
                 printf("    -> Tipo: CONSTANTE NUMERICA. Valor: %s\n", _simbolo->valor);
 
-                if (strchr(_simbolo->valor, '.') == NULL) {
+                if (strchr(_simbolo->valor, '.') == NULL) 
+                {
                     strcpy(dato.indice, _simbolo->nombre);
                     reemplazarGuionBajo(nombre_limpio);
                     fprintf(fileASM, "_cte_%s\t\tdd\t\t%s.0\n", nombre_limpio, _simbolo->valor);
                     sprintf(dato.variable, "_cte_%s", nombre_limpio);
                     VectorDatos_Add(&ListaVariables, dato);
-                } else {
+                } 
+                else 
+                {
                     strcpy(dato.indice, _simbolo->nombre);
                     reemplazarGuionBajo(nombre_limpio);
-                    if (_simbolo->valor[0] == '.') {
+                    if (_simbolo->valor[0] == '.') 
+                    {
                         fprintf(fileASM, "_cte_0%s\t\tdd\t\t0%s\n", nombre_limpio, _simbolo->valor);
                         sprintf(dato.variable, "_cte_0%s", nombre_limpio);
-                    } else {
+                    } 
+                    else 
+                    {
                         fprintf(fileASM, "_cte_%s\t\tdd\t\t%s\n", nombre_limpio, _simbolo->valor);
                         sprintf(dato.variable, "_cte_%s", nombre_limpio);
                     }
@@ -2209,12 +2224,14 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
     int band;
     const char* varAsm;
     // Recorre el vector global 'tercetos'
-    for (int i = 0; i < indiceTerceto; i++) {
+    for (int i = 0; i < indiceTerceto; i++) 
+    {
         terceto* _terceto = &tercetos[i];
         band = 0;
         
         sprintf(etiquetaComparacion, "%d", _terceto->indice);
-        if (VectorStr_Buscar(&pilaCiclos, etiquetaComparacion) >= 0) {
+        if (VectorStr_Buscar(&pilaCiclos, etiquetaComparacion) >= 0) 
+        {
             fprintf(fileASM, "ETIQUETA_%s:\n", etiquetaComparacion);
             VectorStr_Eliminar(&pilaCiclos, etiquetaComparacion);
             band = 1;
@@ -2224,7 +2241,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             Pila_Pop(&pilaASM, operadorDer);
             Pila_Pop(&pilaASM, operadorIzq);
 
-            if (strcmp(operadorIzq, "@@@") != 0) {
+            if (strcmp(operadorIzq, "@@@") != 0) 
+            {
                 varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
                 fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorIzq);
                 if (strcmp(operadorDer, "@@@") == 0) {
@@ -2260,7 +2278,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             fprintf(fileASM, "fsub\n\n");
             Pila_Push(&pilaASM, "@@@");
         } 
-        else if (strcmp(_terceto->operador, "*") == 0) {
+        else if (strcmp(_terceto->operador, "*") == 0) 
+        {
             Pila_Pop(&pilaASM, operadorDer);
             Pila_Pop(&pilaASM, operadorIzq);
 
@@ -2280,7 +2299,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             fprintf(fileASM, "fmul\n\n");
             Pila_Push(&pilaASM, "@@@");
         } 
-        else if (strcmp(_terceto->operador, "/") == 0) {
+        else if (strcmp(_terceto->operador, "/") == 0) 
+        {
             Pila_Pop(&pilaASM, operadorDer);
             Pila_Pop(&pilaASM, operadorIzq);
 
@@ -2300,26 +2320,37 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             fprintf(fileASM, "fdiv\n\n");
             Pila_Push(&pilaASM, "@@@");
         } 
-        else if (strcmp(_terceto->operador, "=") == 0) {
+        else if (strcmp(_terceto->operador, "=") == 0) 
+        {
             const char* varDer = VectorDatos_Buscar(&ListaVariables, _terceto->operandoDer);
             const char* varIzq = VectorDatos_Buscar(&ListaVariables, _terceto->operandoIzq);
 
-            if (varDer != NULL && (strncmp(varDer, "s_", 2) == 0 || strncmp(varDer, "_cte_cad_", 9) == 0)) {
+            if (varDer != NULL 
+                && (strncmp(varDer, "s_", 2) == 0 
+                || strncmp(varDer, "_cte_cad_", 9) == 0)) 
+            {
                 fprintf(fileASM, "MOV SI, OFFSET %s\n", varDer);
                 fprintf(fileASM, "MOV DI, OFFSET %s\n", varIzq);
                 fprintf(fileASM, "CALL COPIAR\n\n");
-            } else {
+            } 
+            else 
+            {
                 Pila_Pop(&pilaASM, operadorIzq);
-                if (strcmp(operadorIzq, "@@@") == 0) {
+                if (strcmp(operadorIzq, "@@@") == 0) 
+                {
                     fprintf(fileASM, "fstp %s\n\n", varIzq);
-                } else {
+                } 
+                else // asignacion simple
+                {
                     const char* varPila = VectorDatos_Buscar(&ListaVariables, operadorIzq);
                     fprintf(fileASM, "fld %s\n", varPila ? varPila : operadorIzq);
-                    fprintf(fileASM, "fstp %s\n\n", varIzq);
+                    
+                    fprintf(fileASM, "fstp %s\n\n", varPila ? varPila : operadorIzq);
                 }
             }
         } 
-        else if (strcmp(_terceto->operador, "ENTRADA_SALIDA") == 0 && strcmp(_terceto->operandoIzq, "READ") == 0) {
+        else if (strcmp(_terceto->operador, "ENTRADA_SALIDA") == 0 && strcmp(_terceto->operandoIzq, "READ") == 0) 
+        {
             Pila_Pop(&pilaASM, operadorIzq);
             varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
             if (strncmp(varAsm, "s_", 2) == 0) {
@@ -2329,7 +2360,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             }
             fprintf(fileASM, "newLine\n\n");
         } 
-        else if (strcmp(_terceto->operador, "ENTRADA_SALIDA") == 0 && strcmp(_terceto->operandoIzq, "WRITE") == 0) {
+        else if (strcmp(_terceto->operador, "ENTRADA_SALIDA") == 0 && strcmp(_terceto->operandoIzq, "WRITE") == 0) 
+        {
             Pila_Pop(&pilaASM, operadorIzq);
             varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
             if (strncmp(varAsm, "s_", 2) == 0 || strncmp(varAsm, "_cte_cad_", 9) == 0) {
@@ -2339,18 +2371,22 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             }
             fprintf(fileASM, "newLine\n\n");
         } 
-        else if (strcmp(_terceto->operador, "CMP") == 0) {
+        else if (strcmp(_terceto->operador, "CMP") == 0) 
+        {
             const char* varIzq = VectorDatos_Buscar(&ListaVariables, _terceto->operandoIzq);
             const char* varDer = VectorDatos_Buscar(&ListaVariables, _terceto->operandoDer);
 
-            if (varIzq == NULL) {
+            if (varIzq == NULL) 
+            {
                 Pila_Pop(&pilaASM, operadorDer);
                 Pila_Pop(&pilaASM, operadorIzq);
                 varIzq = VectorDatos_Buscar(&ListaVariables, operadorIzq);
                 varDer = VectorDatos_Buscar(&ListaVariables, operadorDer);
                 fprintf(fileASM, "fld %s\n", varIzq ? varIzq : operadorIzq);
                 fprintf(fileASM, "fld %s\n", varDer ? varDer : operadorDer);
-            } else {
+            } 
+            else 
+            {
                 fprintf(fileASM, "fld %s\n", varIzq);
                 fprintf(fileASM, "fld %s\n", varDer);
             }  
@@ -2361,22 +2397,26 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             fprintf(fileASM, "sahf\n");
             fprintf(fileASM, "ffree\n");
         } 
-        else if (strcmp(_terceto->operador, "BGE") == 0) {
+        else if (strcmp(_terceto->operador, "BGE") == 0) 
+        {
             eliminar_corchetes(_terceto->operandoIzq);
             fprintf(fileASM, "jae ETIQUETA_%s\n\n", _terceto->operandoIzq);
             VectorStr_Add(&pilaCiclos, _terceto->operandoIzq);
         } 
-        else if (strcmp(_terceto->operador, "BGT") == 0) {
+        else if (strcmp(_terceto->operador, "BGT") == 0) 
+        {
             eliminar_corchetes(_terceto->operandoIzq);
             fprintf(fileASM, "ja ETIQUETA_%s\n\n", _terceto->operandoIzq);
             VectorStr_Add(&pilaCiclos, _terceto->operandoIzq);
         } 
-        else if (strcmp(_terceto->operador, "BLE") == 0) {
+        else if (strcmp(_terceto->operador, "BLE") == 0) 
+        {
             eliminar_corchetes(_terceto->operandoIzq);
             fprintf(fileASM, "jbe ETIQUETA_%s\n\n", _terceto->operandoIzq);
             VectorStr_Add(&pilaCiclos, _terceto->operandoIzq);
         } 
-        else if (strcmp(_terceto->operador, "BLT") == 0) {
+        else if (strcmp(_terceto->operador, "BLT") == 0) 
+        {
             eliminar_corchetes(_terceto->operandoIzq);
             fprintf(fileASM, "jb ETIQUETA_%s\n\n", _terceto->operandoIzq);
             VectorStr_Add(&pilaCiclos, _terceto->operandoIzq);
@@ -2386,7 +2426,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             fprintf(fileASM, "je ETIQUETA_%s\n\n", _terceto->operandoIzq);
             VectorStr_Add(&pilaCiclos, _terceto->operandoIzq);
         } 
-        else if (strcmp(_terceto->operador, "BNE") == 0) {
+        else if (strcmp(_terceto->operador, "BNE") == 0) 
+        {
             eliminar_corchetes(_terceto->operandoIzq);
             fprintf(fileASM, "jne ETIQUETA_%s\n\n", _terceto->operandoIzq);
             VectorStr_Add(&pilaCiclos, _terceto->operandoIzq);
@@ -2396,17 +2437,20 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             fprintf(fileASM, "jmp ETIQUETA_%s\n\n", _terceto->operandoIzq);
             VectorStr_Add(&pilaCiclos, _terceto->operandoIzq);
         } 
-        else if (strncmp(_terceto->operador, "Bucle_", 6) == 0 && band == 0) {
+        else if (strncmp(_terceto->operador, "Bucle_", 6) == 0 && band == 0) 
+        {
             sprintf(etiquetaComparacion, "%d", _terceto->indice);
             fprintf(fileASM, "ETIQUETA_%s:\n\n", etiquetaComparacion);
         }
-        else {
+        else 
+        {
             Pila_Push(&pilaASM, _terceto->operador);
         }
     } 
 
     sprintf(etiquetaComparacion, "%d", indiceTerceto);
-    if (VectorStr_Buscar(&pilaCiclos, etiquetaComparacion) >= 0) {
+    if (VectorStr_Buscar(&pilaCiclos, etiquetaComparacion) >= 0) 
+    {
         fprintf(fileASM, "ETIQUETA_%s:\n", etiquetaComparacion);
         VectorStr_Eliminar(&pilaCiclos, etiquetaComparacion);
     }

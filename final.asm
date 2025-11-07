@@ -30,8 +30,9 @@ s_p2		db MAXTEXTSIZE dup (?), '$'
 s_p3		db MAXTEXTSIZE dup (?), '$'
 y		dd		?
 res		dd		?
-_cte_cad_1		db		""a es mas grande que b"",'$', 23 dup (?)
-1		dd		?
+_cte_3		dd		3.0
+_cte_cad_1		db		"a es mas grande que b",'$', 23 dup (?)
+_cte_1		dd		1.0
 
 .CODE
 
@@ -41,7 +42,13 @@ mov  AX, @data
 mov  DS, AX
 mov  es, ax
 
-ETIQUETA_0:
+fld a
+fstp a
+
+fld b
+fstp b
+
+ETIQUETA_6:
 
 fld a
 fld b
@@ -50,24 +57,24 @@ fcom
 fstsw ax
 sahf
 ffree
-jbe ETIQUETA_14
+jae ETIQUETA_20
 
-jmp ETIQUETA_6
+jmp ETIQUETA_12
 
-ETIQUETA_6:
+ETIQUETA_12:
 displayString _cte_cad_1
 newLine
 
 fld a
-fld 1
+fld _cte_1
 fadd
 
 fld a
-fstp (null)
+fstp a
 
-jmp ETIQUETA_0
+jmp ETIQUETA_6
 
-ETIQUETA_14:
+ETIQUETA_20:
 mov  ax, 4c00h
 int  21h
 STRLEN PROC NEAR
