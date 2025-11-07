@@ -1,52 +1,20 @@
 -------------------------------------------------------------------------------------------------------------------------------------
 | Nombre                                             | TipoDato   | Valor                                              | Longitud   |
 -------------------------------------------------------------------------------------------------------------------------------------
-| a1                                                 | Float      | -                                                  | -          |
-| b1                                                 | Float      | -                                                  | -          |
-| a                                                  | Float      | -                                                  | -          |
-| b                                                  | Float      | -                                                  | -          |
-| ar0                                                | Float      | -                                                  | -          |
-| var1                                               | Int        | -                                                  | -          |
+| varFloat                                           | Float      | -                                                  | -          |
+| varInt                                             | Int        | -                                                  | -          |
+| a                                                  | Int        | -                                                  | -          |
+| b                                                  | Int        | -                                                  | -          |
 | c                                                  | Int        | -                                                  | -          |
 | d                                                  | Int        | -                                                  | -          |
-| h                                                  | Int        | -                                                  | -          |
-| i                                                  | Int        | -                                                  | -          |
-| j                                                  | Int        | -                                                  | -          |
 | e                                                  | Int        | -                                                  | -          |
 | f                                                  | Int        | -                                                  | -          |
-| s                                                  | Int        | -                                                  | -          |
-| contador                                           | Int        | -                                                  | -          |
-| D                                                  | Int        | -                                                  | -          |
-| p1                                                 | String     | -                                                  | -          |
-| p2                                                 | String     | -                                                  | -          |
-| p3                                                 | String     | -                                                  | -          |
+| x                                                  | Int        | -                                                  | -          |
+| varStr                                             | String     | -                                                  | -          |
+| base                                               | String     | -                                                  | -          |
+| varBool                                            | Boolean    | -                                                  | -          |
 | y                                                  | Boolean    | -                                                  | -          |
-| res                                                | Boolean    | -                                                  | -          |
-| 100                                                | CTE_INT    | -                                                  | -          |
-| _"parte true estructura mas interna"               | CTE_STRING | "parte true estructura mas interna"                | 35         |
-| _"parte else estructura mas interna"               | CTE_STRING | "parte else estructura mas interna"                | 35         |
 | 1                                                  | CTE_INT    | -                                                  | -          |
-| 0                                                  | CTE_INT    | -                                                  | -          |
-| 5                                                  | CTE_INT    | -                                                  | -          |
-| 2                                                  | CTE_INT    | -                                                  | -          |
 | 3                                                  | CTE_INT    | -                                                  | -          |
-| 4                                                  | CTE_INT    | -                                                  | -          |
-| 43                                                 | CTE_INT    | -                                                  | -          |
-| 342                                                | CTE_INT    | -                                                  | -          |
-| 324                                                | CTE_INT    | -                                                  | -          |
-| 6                                                  | CTE_INT    | -                                                  | -          |
-| 35                                                 | CTE_INT    | -                                                  | -          |
-| @resIsZero                                         | Boolean    | -                                                  | -          |
-| @resEqualExpressions                               | Boolean    | -                                                  | -          |
-| @pivote                                            | Int        | -                                                  | -          |
-| @actual                                            | Int        | -                                                  | -          |
-| _"un string"                                       | CTE_STRING | "un string"                                        | 11         |
-| _"a es mas grande que b (a > b)"                   | CTE_STRING | "a es mas grande que b (a > b)"                    | 31         |
-| _"a es mas chico o igual a b (a <= b)"             | CTE_STRING | "a es mas chico o igual a b (a <= b)"              | 37         |
-| _"a y c mas grandes que b [a > b & c > b]"         | CTE_STRING | "a y c mas grandes que b [a > b & c > b]"          | 41         |
-| _"a es mas grande que b y c es mas grande que b"   | CTE_STRING | "a es mas grande que b y c es mas grande que b"    | 47         |
-| _"a no es mas grande que b -> !(a > b)"            | CTE_STRING | "a no es mas grande que b -> !(a > b)"             | 38         |
-| 5.100000000                                        | CTE_REAL   | -                                                  | -          |
-| _"a es mas grande que b y c"                       | CTE_STRING | "a es mas grande que b y c"                        | 27         |
 | _"a es mas grande que b"                           | CTE_STRING | "a es mas grande que b"                            | 23         |
 -------------------------------------------------------------------------------------------------------------------------------------

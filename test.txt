@@ -1,124 +1,19 @@
 #+ \ Esto es un "programa" # +#
 
+#+ ---------------------------------------- +#
 #+ /* Bloque de declaracion de variables // +#
+#+ ---------------------------------------- +#
 init { #+|+#
-	a1, b1, a, b, ar0 : Float
-	var1, c, d, h, i, j, e, f: Int
-	s, contador, D : Int
-	p1, p2, p3 : String 
-	y, res : Boolean
+	varFloat: Float
+	varInt, a, b, c, d, e, f, x: Int
+	varStr, base : String 
+	varBool, y : Boolean
 }
 
-if(c AND d)
-	if(y)
-		if(res)
-			if(a OR b)
-			{
-				if(D < 100)
-				{
-					if(j)
-					{
-						p3 := "parte true estructura mas interna"
-					}
-				}
-				else
-					p1 := "parte else estructura mas interna"
-			}
 
-if((1==0 AND b<c) OR (f == true))
-{ #++#
-	a:=5
-}
-
-if(2==0 AND b<c OR f == true)
-{
-	a:=5
-}
-
-if(3==0 OR b<c OR f)
-{ #++#
-	a:=5
-}
-
-if(4==0 AND false OR f)
-{ #++#
-	a:=5
-}
-
-if(5==0 AND (false OR f))
-{ #++#
-	a:=5
-}
-
-while(43+342+324)
-{
-	c := 3
-}
-
-if(a > 5 AND c > 5 AND d < 3 OR (NOT res == false) AND 4 + 5 + 6 OR isZero(35 - f) AND equalExpressions(contador, D))
-{
-	if(true OR c != h)
-		res := false
-	else
-	{
-		contador++
-		p1 := "un string"
-	}
-}
-
-#+ Condicional simple sin else +#
-if(a==0 AND b<c AND y != true)
-{ #++#
-	a:=5
-}
-
-#+ Condicional simple con else +#
-if (a > b)
-{
-    write("a es mas grande que b (a > b)")
-}
-else
-{
-    write("a es mas chico o igual a b (a <= b)")
-}
-
-#+ Condicional compuesto AND sin else +#
-if (a > b AND c > b)
-{
-    write("a y c mas grandes que b [a > b & c > b]")
-}
-
-#+ Condicional compuesto OR sin else +#
-if (a > b OR c > b)
-{
-    write("a es mas grande que b y c es mas grande que b")
-}
-
-#+ Condicional compuesto NOT sin else +#
-if (NOT a > b)
-{
-    write("a no es mas grande que b -> !(a > b)")
-}
-
-#+ Condicional compuesto con else +#
-if(a==0 AND b<c)
-{ 
-	a:=5
-} else 
-{
-	b := 5.1
-}
-
-#+ If anidado +#
-if (a > b)
-{
-    if (a > b)
-	{
-    	write("a es mas grande que b y c")
-	}
-}
-
-#+ while +#
+#+ ---------------------------------------- +#
+#+ While +#
+#+ ---------------------------------------- +#
 a := 1
 b := 3
 
