@@ -211,7 +211,6 @@ programa:
     {
         sprintf(operandoIzqAux, "[%d]", DefInitInd);
         sprintf(operandoDerAux, "[%d]", ListaSentenciasInd);
-        ProgramaInd = crearTerceto("PROGRAMA", operandoIzqAux, operandoDerAux);
         printf("R1. Programa -> Def_Init Lista_Sentencias\n");
     }
     ;
@@ -433,7 +432,7 @@ asignacion:
 condicional_si:
     IF PAR_ABR expresion PAR_CIE bloque_asociado %prec MENOS_QUE_ELSE
     {
-        int i = 0, i2 = 0, tieneEstructuraDatosApilada = 0, inicioExpresionAsociada = _inicioBloqueAsociado;
+        int i = _contadorThenTotal, i2 = _contadorElseTotal, tieneEstructuraDatosApilada = 0, inicioExpresionAsociada = _inicioBloqueAsociado;
         DatosEstructura auxDatosEstructura;
         char aux[20];
 
@@ -449,11 +448,6 @@ condicional_si:
                 i2 = auxDatosEstructura.cantElseTotal;
                 inicioExpresionAsociada = auxDatosEstructura.inicioBloqueAsociado;
             }
-        }
-        else
-        {
-            i = _contadorThenTotal;
-            i2 = _contadorElseTotal;
         }
 
         remove_HashMapEntry(hashmapEstructurasAnidadas, aux);
@@ -488,7 +482,7 @@ condicional_si:
     }
     | IF PAR_ABR expresion PAR_CIE bloque_asociado ELSE
     {
-        int i = 0, i2 = 0, tieneEstructuraDatosApilada = 0, inicioExpresionAsociada = _inicioBloqueAsociado;
+        int i = _contadorThenTotal, i2 = _contadorElseTotal, tieneEstructuraDatosApilada = 0, inicioExpresionAsociada = _inicioBloqueAsociado;
         DatosEstructura auxDatosEstructura;
         char aux[20];
 
@@ -506,11 +500,6 @@ condicional_si:
                 i2 = auxDatosEstructura.cantElseTotal;
                 inicioExpresionAsociada = auxDatosEstructura.inicioBloqueAsociado;
             }
-        }
-        else
-        {
-            i = _contadorThenTotal;
-            i2 = _contadorElseTotal;
         }
 
         sprintf(operandoIzqAux, "[%d]", inicioExpresionAsociada);
@@ -577,7 +566,7 @@ bucle:
     PAR_ABR expresion PAR_CIE 
     {
         char aux[20];
-        int i = 0, tieneEstructuraDatosApilada = 0;
+        int i = _contadorThenTotal, tieneEstructuraDatosApilada = 0;
         DatosEstructura auxDatosEstructura;
 
         sprintf(aux, "estructura_%d", _contadorEstructurasAnidadas);
@@ -590,10 +579,6 @@ bucle:
             {
                 i = auxDatosEstructura.cantThenTotal;
             }
-        }
-        else
-        {
-            i = _contadorThenTotal;
         }
 
         sprintf(operandoIzqAux, "[%d]", _inicioBucle);
@@ -609,7 +594,7 @@ bucle:
     bloque_asociado
     {
         char aux[20];
-        int i = 0, tieneEstructuraDatosApilada = 0;
+        int i = _contadorElseTotal, tieneEstructuraDatosApilada = 0;
         DatosEstructura auxDatosEstructura;
 
         sprintf(operandoIzqAux, "[%d]", _inicioBucle);
@@ -626,10 +611,6 @@ bucle:
             {
                 i = auxDatosEstructura.cantElseTotal;
             }
-        }
-        else
-        {
-            i = _contadorElseTotal;
         }
 
         remove_HashMapEntry(hashmapEstructurasAnidadas, aux);
@@ -1002,9 +983,12 @@ expresion_logica:
                 // desestimo los else del mismo nivel (considerando anidamiento, o no), van hacia la prox eval
                 while(_contadorSecuenciaAnd > 0)
                 {
-                    sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
-                    _contadorElseActual--;
-                    modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
+                    if(sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind)) == TODO_OK)
+                    {
+                        _contadorElseActual--;
+                        printf("\nSACO EL BRANCH NRO  %d\n", Xind);
+                        modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
+                    }
                     _contadorSecuenciaAnd--;
                 }
             }
@@ -1209,8 +1193,7 @@ expresion_para_condicion:
 expresion_relacional:
     expresion_relacional CMP_MAYOR expresion_aritmetica %prec PREC_RELACIONAL
     {
-        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
@@ -1242,8 +1225,7 @@ expresion_relacional:
     }
     | expresion_relacional CMP_MENOR expresion_aritmetica %prec PREC_RELACIONAL
     {
-        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         
@@ -1275,8 +1257,7 @@ expresion_relacional:
     }
     | expresion_relacional CMP_ES_IGUAL expresion_aritmetica %prec PREC_RELACIONAL
     {
-        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         
@@ -1308,8 +1289,7 @@ expresion_relacional:
     }
     | expresion_relacional CMP_DISTINTO expresion_aritmetica %prec PREC_RELACIONAL
     {
-        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         
@@ -1341,8 +1321,7 @@ expresion_relacional:
     }
     | expresion_relacional CMP_MAYOR_IGUAL expresion_aritmetica %prec PREC_RELACIONAL
     {
-        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
@@ -1374,8 +1353,7 @@ expresion_relacional:
     }
     | expresion_relacional CMP_MENOR_IGUAL expresion_aritmetica %prec PREC_RELACIONAL
     {
-        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
+        sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
@@ -1407,14 +1385,15 @@ expresion_relacional:
     }
     | expresion_relacional CMP_ES_IGUAL valor_booleano 
     {
-        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
-        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
+        sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
+        sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
         sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
         poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
         indiceExpresiones++;
+
+        if(_tipoDatoExpresionActual)
 
         if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
         {
@@ -1440,9 +1419,8 @@ expresion_relacional:
     }
     | expresion_relacional CMP_DISTINTO valor_booleano 
     {
-        ExpresionRelacionalInd2 = ExpresionRelacionalInd;
-        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd2);
-        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
+        sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
+        sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
         sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);

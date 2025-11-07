@@ -53,6 +53,8 @@ extern int _contadorThenActual;
 extern int _contadorEstructurasAnidadas;
 extern int _ultRefContadorEstructuras;
 extern DatosEstructura datosEstructuraActual;
+extern int _contadorThenTotal;
+extern int _contadorElseTotal;
 
 char *yyltext; 
 
@@ -344,6 +346,8 @@ void guardar_conteo_then()
 
     if(_contadorEstructurasAnidadas == 1)
     {
+        _contadorThenTotal = 0;
+        _contadorElseTotal = 0;
         _ultRefContadorEstructuras = _contadorEstructurasAnidadas;
         sprintf(aux, "estructura_%d", _contadorEstructurasAnidadas);
         add_HashMapEntry(hashmapEstructurasAnidadas, aux, 0);

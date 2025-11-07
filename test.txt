@@ -25,67 +25,27 @@ if(c AND d)
 					p1 := "parte else estructura mas interna"
 			}
 
-if((a==0 AND b<c) OR (f == true))
+if((1==0 AND b<c) OR (f == true))
 { #++#
 	a:=5
 }
 
-if(a==0 AND b<c OR f == true)
+if(2==0 AND b<c OR f == true)
 {
 	a:=5
 }
 
-if(4 OR (5 AND ((a==0 AND (b<c OR f == true)) OR y) AND 6 AND 7))
-{
-	a:=5
-}
-
-if(4 OR (5 AND ((a==0 AND (b<c AND f == true)) OR y) AND 6 AND 7))
-{
-	a:=5
-}
-
-if(4 OR (5 AND ((a==0 OR (b<c AND f == true)) OR y) AND 6 AND 7))
-{
-	a:=5
-}
-
-if(4 OR (5 AND ((a==0 OR (b<c AND f == true)) AND (4 AND 3 OR y AND 6 AND 7))))
-{
-	a:=5
-}
-
-if(4 OR 5 AND f AND a==0 OR b<c AND f == true OR y AND 6 AND 7)
-{
-	a:=5
-}
-
-if(4 OR 7 AND 2 OR (5 AND (4 AND 5 AND a==0 OR b<c OR f == true)) AND y AND 6 AND 7)
-{
-	a:=5
-}
-
-if(4 AND (5 AND (a==0 AND (b<c AND f == true) OR 5)) AND 6 AND 7)
-{
-	a:=5
-}
-
-if(4 AND (5 AND (a==0 AND (b<c AND (f == true AND j OR b)) OR 5)))
-{
-	a:=5
-}
-
-if(a==0 OR b<c OR f)
+if(3==0 OR b<c OR f)
 { #++#
 	a:=5
 }
 
-if(a==0 AND false OR f)
+if(4==0 AND false OR f)
 { #++#
 	a:=5
 }
 
-if(a==0 AND (false OR f))
+if(5==0 AND (false OR f))
 { #++#
 	a:=5
 }
