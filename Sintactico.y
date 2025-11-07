@@ -114,7 +114,7 @@ tPila pilaValoresBooleanos;
 tPila pilaIndiceTercetosFuncionesEspeciales;
 tPila pilaBI;
 tPila pilaEstructurasAnidadas;
-tPila pilaIniciosBloquesAsociados;
+tPila pilaSecuenciaAnd;
 
 int indice=0;
 int indiceActual=0;
@@ -828,8 +828,12 @@ expresion:
             _soloBooleana = true;
             _contadorThenActual = 0;
             _contadorElseActual = 0;
-            _contadorSecuenciaAnd = 0;
-            _secuenciaAND = false;
+
+            if(!_expresionAnidada)
+            {
+                _contadorSecuenciaAnd = 0;
+                _secuenciaAND = false;
+            }
 
             _contadorExpresionesLogicas = 0;
 
@@ -938,7 +942,6 @@ expresion_logica:
             // según corresponda
 
             _contadorExpresionesLogicas++;
-            _contadorExpresionesAnidadas++;
             
             // a2: eliminar
             // _expresionAnidada = false;
@@ -954,16 +957,6 @@ expresion_logica:
             // desestimo los else
             sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
             _contadorElseActual--;
-
-            /*
-            if(_accionesExpresionAnidada = false)
-            {
-                _contadorExpresionesAnidadas++;
-                acciones_expresion_logica();
-
-                _accionesExpresionAnidada = true;
-            }
-            */
 
             // y si NO es una SECUENCIA NEGADA, los then van al inicio del cuerpo true superior
 
@@ -1003,32 +996,23 @@ expresion_logica:
             }
             else
             {
-                // si no es negada,
-                // y no hay anidamiento
-                if(!_expresionAnidada)
+                // si hay una secuencia AND y NO es negada,
+                
+                sprintf(operandoIzqAux, "[%d]", getIndice());
+                // desestimo los else del mismo nivel (considerando anidamiento, o no), van hacia la prox eval
+                while(_contadorSecuenciaAnd > 0)
                 {
-                    sprintf(operandoIzqAux, "[%d]", getIndice());
-                    // desestimo los else, van hacia la prox eval
-                    while(_contadorSecuenciaAnd > 0)
-                    {
-                        sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
-                        _contadorElseActual--;
-                        modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
-                        _contadorSecuenciaAnd--;
-                    }
-                }
-                else
-                {
-                    // si hay anidamiento
-                    // desestimo solo el último else
                     sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind));
+                    _contadorElseActual--;
+                    modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
+                    _contadorSecuenciaAnd--;
                 }
             }
         }
 
-        _contadorSecuenciaAnd = 0;
         _secuenciaAND = false;
-
+        _contadorSecuenciaAnd = 0;
+        
         _expresionNueva = true;
         _soloAritmetica = true;
         _soloBooleana = true;
@@ -1091,8 +1075,6 @@ expresion_logica:
             // tengo que tener en cuenta tantos branchs else como operandos izquierdos hayan habido
 
             _contadorExpresionesLogicas++;
-            _contadorExpresionesAnidadas++;
-            _expresionAnidada = false;
 
             printf("\t\t\t\t\tR37. Expresion_Logica -> Expresion OR Expresion\n");
         }
@@ -1145,7 +1127,6 @@ expresion_logica:
 
             _contadorSecuenciaAnd++;
             _contadorExpresionesLogicas++;
-            _contadorExpresionesAnidadas++;
         }
 
         printf("\t\t\t\t\tR39. Expresion_Logica -> Expresion_Para_Condicion\n");
@@ -1633,12 +1614,33 @@ factor:
         _soloAritmetica = true;
         _soloBooleana = true;
         _expresionAnidada = true;
+        poner_en_pila(&pilaSecuenciaAnd, &_contadorSecuenciaAnd, sizeof(_contadorSecuenciaAnd));
+        _contadorSecuenciaAnd = 0;
+        _contadorExpresionesAnidadas++;
+
     }
     expresion PAR_CIE 
     {
+        int aux;
         FactorInd = ExpresionInd;
         
         _expresionNueva = false;
+        
+        if(sacar_de_pila(&pilaSecuenciaAnd, &aux, sizeof(aux)) == TODO_OK)
+        {
+            _contadorSecuenciaAnd += aux;
+        }
+        else
+        {
+            _contadorSecuenciaAnd = 0;
+        }
+
+        _contadorExpresionesAnidadas--;
+
+        if(_contadorExpresionesAnidadas == 0)
+        {
+            _expresionAnidada = false;
+        }
 
         printf("\t\t\t\t\t\t\tR60. Factor -> (Expresion)\n");
     }
@@ -1662,7 +1664,7 @@ int main(int argc, char *argv[])
     crear_pila(&pilaBI);
     crear_pila(&pilaValoresBooleanos);
     crear_pila(&pilaEstructurasAnidadas);
-    crear_pila(&pilaIniciosBloquesAsociados);
+    crear_pila(&pilaSecuenciaAnd);
     hashmapEstructurasAnidadas = create_HashMap(HASHMAP_SIZE);
 
     printf("\n-----------------------------------------------------------------------------------------------------------------\n");
@@ -1696,7 +1698,7 @@ int main(int argc, char *argv[])
     vaciar_pila(&pilaBI);
     vaciar_pila(&pilaValoresBooleanos);
     vaciar_pila(&pilaEstructurasAnidadas);
-    vaciar_pila(&pilaIniciosBloquesAsociados);
+    vaciar_pila(&pilaSecuenciaAnd);
     destroy_HashMap(hashmapEstructurasAnidadas);
 
     imprimirTercetos();
