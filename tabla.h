@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "utilidades/lista.h"
 
 #define TAM_TABLA 10000
 #define SIN_MEMORIA -33
@@ -34,5 +35,7 @@ int actualizar_tipo_dato(Tabla *tabla, int pos, const char *tipoDato);
 const char *obtener_tipo_dato(Tabla *tabla, int pos);
 
 void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_token);
+
+int copiarTablaDeSimbolos(Lista* lista_externa);
 
 #endif

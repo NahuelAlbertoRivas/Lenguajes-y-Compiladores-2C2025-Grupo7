@@ -119,3 +119,33 @@ void imprimirTercetos()
         
     return;
 }
+
+int copiarListaDeTercetos(Lista* lista_externa) {
+    Nodo* current = lista_tercetos;  // Lista interna de tercetos
+
+    // Recorremos toda la lista de tercetos
+    while (current != NULL) {
+        terceto* terceto_actual = (terceto*)current->dato;  // Obtener el terceto desde el nodo
+
+        terceto nuevo_terceto;
+        // Copiar los datos del terceto a la nueva estructura
+        strncpy(nuevo_terceto.operando, terceto_actual->operando, sizeof(nuevo_terceto.operando) - 1);
+        nuevo_terceto.operando[sizeof(nuevo_terceto.operando) - 1] = '\0';  // Asegura la terminación de la cadena
+
+        strncpy(nuevo_terceto.operadorIzq, terceto_actual->operadorIzq, sizeof(nuevo_terceto.operadorIzq) - 1);
+        nuevo_terceto.operadorIzq[sizeof(nuevo_terceto.operadorIzq) - 1] = '\0';  // Asegura la terminación de la cadena
+
+        strncpy(nuevo_terceto.operadorDer, terceto_actual->operadorDer, sizeof(nuevo_terceto.operadorDer) - 1);
+        nuevo_terceto.operadorDer[sizeof(nuevo_terceto.operadorDer) - 1] = '\0';  // Asegura la terminación de la cadena
+
+        nuevo_terceto.indice = terceto_actual->indice;  // Copiar el índice
+
+        // Insertar el nuevo terceto en la lista externa
+        insertarListaAlFinal(lista_externa, &nuevo_terceto, sizeof(nuevo_terceto));
+
+        // Avanzamos al siguiente nodo de la lista interna
+        current = current->sig;
+    }
+
+    return TODO_OK;
+}

@@ -250,3 +250,33 @@ void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
 
     fclose(f);
 }
+
+int copiarTablaDeSimbolos(Lista* lista_externa) {
+    Nodo* current = lista_simbolos;  // Lista es un puntero a Nodo
+
+    while (current != NULL) {
+        simbolo* simbolo_actual = (simbolo*)current->dato;  // Obtener el símbolo desde el nodo
+
+        simbolo nuevo_simbolo;
+        // Copiar los datos del símbolo a la nueva estructura
+        strncpy(nuevo_simbolo.nombre, simbolo_actual->nombre, sizeof(nuevo_simbolo.nombre) - 1);
+        nuevo_simbolo.nombre[sizeof(nuevo_simbolo.nombre) - 1] = '\0';
+
+        strncpy(nuevo_simbolo.tipo_de_dato, simbolo_actual->tipo_de_dato, sizeof(nuevo_simbolo.tipo_de_dato) - 1);
+        nuevo_simbolo.tipo_de_dato[sizeof(nuevo_simbolo.tipo_de_dato) - 1] = '\0';
+
+        strncpy(nuevo_simbolo.valor, simbolo_actual->valor, sizeof(nuevo_simbolo.valor) - 1);
+        nuevo_simbolo.valor[sizeof(nuevo_simbolo.valor) - 1] = '\0';
+
+        strncpy(nuevo_simbolo.longitud, simbolo_actual->longitud, sizeof(nuevo_simbolo.longitud) - 1);
+        nuevo_simbolo.longitud[sizeof(nuevo_simbolo.longitud) - 1] = '\0';
+
+        // Llamamos a la función que agrega el símbolo a la lista interna
+        insertarListaAlFinal(lista_externa, &nuevo_simbolo, sizeof(nuevo_simbolo)); 
+
+        // Avanzamos al siguiente nodo de la lista externa
+        current = current->sig;
+    }
+
+    return TODO_OK;
+}
