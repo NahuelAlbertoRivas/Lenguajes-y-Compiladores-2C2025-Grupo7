@@ -443,20 +443,20 @@ condicional_si:
 
         if((tieneEstructuraDatosApilada != HM_KEY_NOT_FOUND) && (tieneEstructuraDatosApilada == 1))
         {
-            if(ver_tope(&pilaEstructurasAnidadas, &auxDatosEstructura, sizeof(auxDatosEstructura)) == TODO_OK)
+            if(sacar_de_pila(&pilaEstructurasAnidadas, &auxDatosEstructura, sizeof(auxDatosEstructura)) == TODO_OK)
             {
                 i = auxDatosEstructura.cantThenTotal;
                 i2 = auxDatosEstructura.cantElseTotal;
                 inicioExpresionAsociada = auxDatosEstructura.inicioBloqueAsociado;
             }
-            
-            remove_HashMapEntry(hashmapEstructurasAnidadas, aux);
         }
         else
         {
             i = _contadorThenTotal;
             i2 = _contadorElseTotal;
         }
+
+        remove_HashMapEntry(hashmapEstructurasAnidadas, aux);
 
         sprintf(operandoIzqAux, "[%d]", inicioExpresionAsociada);
         while(i > 0)
@@ -485,10 +485,6 @@ condicional_si:
         _ultRefContadorEstructuras--;
 
         printf("\t\t\tR23. Condicional_Si -> if(Expresion) Bloque_Asociado\n");
-        _secuenciaAND = false;
-        _soloAritmetica = true;
-        _soloBooleana = true;
-        _contadorSecuenciaAnd = 0;
     }
     | IF PAR_ABR expresion PAR_CIE bloque_asociado ELSE
     {
@@ -504,7 +500,7 @@ condicional_si:
 
         if((tieneEstructuraDatosApilada != HM_KEY_NOT_FOUND) && (tieneEstructuraDatosApilada == 1))
         {
-            if(ver_tope(&pilaEstructurasAnidadas, &auxDatosEstructura, sizeof(auxDatosEstructura)) == TODO_OK)
+            if(sacar_de_pila(&pilaEstructurasAnidadas, &auxDatosEstructura, sizeof(auxDatosEstructura)) == TODO_OK)
             {
                 i = auxDatosEstructura.cantThenTotal;
                 i2 = auxDatosEstructura.cantElseTotal;
@@ -543,8 +539,6 @@ condicional_si:
 
         _contadorEstructurasAnidadas--;
         _ultRefContadorEstructuras--;
-
-        _contadorSecuenciaAnd = 0;
     }
     bloque_asociado
     {   
@@ -552,9 +546,6 @@ condicional_si:
 
         sprintf(operandoIzqAux, "[%d]", getIndice());
         modificarOperandoIzquierdoConTerceto(_indiceBIif, operandoIzqAux);
-        
-        sprintf(aux, "estructura_%d", _contadorEstructurasAnidadas);
-        remove_HashMapEntry(hashmapEstructurasAnidadas, aux);
 
         printf("\t\t\tR24. Condicional_Si -> if(Expresion) Bloque_Asociado else Bloque_Asociado\n");
     }
@@ -635,13 +626,13 @@ bucle:
             {
                 i = auxDatosEstructura.cantElseTotal;
             }
-
-            remove_HashMapEntry(hashmapEstructurasAnidadas, aux);
         }
         else
         {
             i = _contadorElseTotal;
         }
+
+        remove_HashMapEntry(hashmapEstructurasAnidadas, aux);
 
         _contadorEstructurasAnidadas--;
         _ultRefContadorEstructuras--;
@@ -832,9 +823,9 @@ expresion:
             _contadorThenTotal += _contadorThenActual;
             _contadorElseTotal += _contadorElseActual;
 
+            vaciarLista(&listaAuxiliar);
             _soloAritmetica = true;
             _soloBooleana = true;
-            vaciarLista(&listaAuxiliar);
             _contadorThenActual = 0;
             _contadorElseActual = 0;
             _contadorSecuenciaAnd = 0;
@@ -843,7 +834,7 @@ expresion:
             _contadorExpresionesLogicas = 0;
 
             _inicioBloqueAsociado = getIndice();
-            datosEstructuraActual.inicioBloqueAsociado = _inicioBloqueAsociado;
+            datosEstructuraActual.inicioBloqueAsociado = getIndice();
 
             _accionesExpresionAnidada = false;
             
