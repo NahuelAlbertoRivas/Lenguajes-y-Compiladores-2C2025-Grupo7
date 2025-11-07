@@ -863,13 +863,16 @@ expresion_logica:
 
         if(_expresionNueva)
         {
-            sacar_de_pila(&pilaValoresBooleanos, _resExpresionRelacional, MAX_RES_EXP);
+            // a4
+            //sacar_de_pila(&pilaValoresBooleanos, _resExpresionRelacional, MAX_RES_EXP);
 
-            crearTerceto("CMP", _resExpresionRelacional, "VERDADERO");
+            // q4
+            //crearTerceto("CMP", _resExpresionRelacional, "VERDADERO");
 
             // branch a else
             sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-            indiceBranchElse = crearTerceto("BNE", operandoIzqAux, "_");
+            // a4
+            //indiceBranchElse = crearTerceto("BNE", operandoIzqAux, "_");
             if(_secuenciaNOT == false)
             {
                 poner_en_pila(&pilaBranchElse, &indiceBranchElse, sizeof(indiceBranchElse));
@@ -884,8 +887,9 @@ expresion_logica:
             // necesito sí o sí tener uno para cada resultado de expresion relacional ya que
             // en casos de negación cambian los comportamientos
             sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
-            indiceActual = crearTerceto("BI", operandoIzqAux, "_");
-            poner_en_pila(&pilaBranchThen, &indiceActual, sizeof(indiceActual));
+            // a4
+            //indiceActual = crearTerceto("BI", operandoIzqAux, "_");
+            poner_en_pila(&pilaBranchThen, &indiceBranchThen, sizeof(indiceBranchThen));
             _contadorThenActual++;
             
             _contadorSecuenciaAnd++;
@@ -1010,19 +1014,22 @@ expresion_logica:
         {
             sacar_de_pila(&pilaValoresBooleanos, _resExpresionRelacional, MAX_RES_EXP);
 
-            crearTerceto("CMP", _resExpresionRelacional, "VERDADERO");
+            // a4
+            //crearTerceto("CMP", _resExpresionRelacional, "VERDADERO");
 
             // branch a else
             sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-            indiceActual = crearTerceto("BNE", operandoIzqAux, "_");
-            poner_en_pila(&pilaBranchElse, &indiceActual, sizeof(indiceActual));
+            // a4
+            //indiceActual = crearTerceto("BNE", operandoIzqAux, "_");
+            poner_en_pila(&pilaBranchElse, &indiceBranchElse, sizeof(indiceBranchElse));
             _contadorElseActual++;
 
             // branch incondicional then
             // necesito sí o sí tener uno para cada resultado de expresion relacional ya que
             // en casos de negación cambian los comportamientos
             sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
-            indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
+            
+            //indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
             poner_en_pila(&pilaBranchThen, &indiceBranchThen, sizeof(indiceBranchThen));
             _contadorThenActual++;
 
@@ -1091,22 +1098,22 @@ expresion_logica:
 
         if(_expresionNueva)
         {
-            sacar_de_pila(&pilaValoresBooleanos, _resExpresionRelacional, MAX_RES_EXP);
-
-            crearTerceto("CMP", _resExpresionRelacional, "VERDADERO");
+            // a4: eliminar
+            //sacar_de_pila(&pilaValoresBooleanos, _resExpresionRelacional, MAX_RES_EXP);
+            //crearTerceto("CMP", _resExpresionRelacional, "VERDADERO");
 
             // branch a else
-            sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-            indiceActual = crearTerceto("BNE", operandoIzqAux, "_");
-            poner_en_pila(&pilaBranchElse, &indiceActual, sizeof(indiceActual));
+            //sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
+            //indiceBranchElse = crearTerceto("BNE", operandoIzqAux, "_");
+            poner_en_pila(&pilaBranchElse, &indiceBranchElse, sizeof(indiceBranchElse));
             _contadorElseActual++;
 
             // branch incondicional then
             // necesito sí o sí tener uno para cada resultado de expresion relacional ya que
             // en casos de negación cambian los comportamientos
-            sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
-            indiceActual = crearTerceto("BI", operandoIzqAux, "_");
-            poner_en_pila(&pilaBranchThen, &indiceActual, sizeof(indiceActual));
+            //sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+            //indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
+            poner_en_pila(&pilaBranchThen, &indiceBranchThen, sizeof(indiceBranchThen));
             _contadorThenActual++;
 
             _contadorSecuenciaAnd++;
@@ -1122,66 +1129,77 @@ expresion_para_condicion:
     {
         if(_soloAritmetica && _expresionNueva)
         {   
-            sprintf(operandoDerAux, "[%d]", ExpresionRelacionalInd);
+            // a4
+            //if(get_HashMapEntry_value(hashmap, "@resExpresionAritmetica") == HM_KEY_NOT_FOUND)
+            //{
+            //    add_HashMapEntry(hashmap, "@resExpresionAritmetica", 0);
+            //    agregar_a_tabla_variables_internas(&tabla, "@resExpresionAritmetica", "Int");
+            //}
+            //crearTerceto(":=", "@resExpresionAritmetica", operandoDerAux);
 
-            if(get_HashMapEntry_value(hashmap, "@resExpresionAritmetica") == HM_KEY_NOT_FOUND)
-            {
-                add_HashMapEntry(hashmap, "@resExpresionAritmetica", 0);
-                agregar_a_tabla_variables_internas(&tabla, "@resExpresionAritmetica", "Int");
-            }
+            sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
+            crearTerceto("CMP", operandoIzqAux, "0"); // cero ya que una expresión aritmética es VERDADERO si es <> 0
 
-            crearTerceto(":=", "@resExpresionAritmetica", operandoDerAux);
+            // a4: eliminar
+            //sprintf(_resExpresionRelacional, "@resExpresionRelacional_%d", indiceExpresiones);
+            //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
+            //indiceExpresiones++;
 
-            crearTerceto("CMP", "@resExpresionAritmetica", "0"); // cero ya que una expresión aritmética es VERDADERO si es <> 0
-
-            sprintf(_resExpresionRelacional, "@resExpresionRelacional_%d", indiceExpresiones);
-            poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-            indiceExpresiones++;
-
-            if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-            {
-                add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-                agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-            }
+            // a4: eliminar
+            //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
+            //{
+            //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
+            //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
+            //}
             
+            // a4: modificar
             // branch por else
-            sprintf(operandoIzqAux, "[%d]", getIndice() + 3);
-            crearTerceto("BE", operandoIzqAux, "_");
-            
-            crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
-
-            // branch incondicional del then
             sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-            crearTerceto("BI", operandoIzqAux, "_");
+            indiceBranchElse = crearTerceto("BE", operandoIzqAux, "_");
+            
+            // a4: eliminar
+            //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
 
-            crearTerceto(":=", _resExpresionRelacional, "FALSO");
+            // a4: modificar
+            // branch incondicional del then
+            sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+            indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
+
+            // a4: eliminar
+            //crearTerceto(":=", _resExpresionRelacional, "FALSO");
         }
         if(_soloBooleana && _expresionNueva)
         {
+            // a4: eliminar
+            //sprintf(_resExpresionRelacional, "@resExpresionRelacional_%d", indiceExpresiones);
+            //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
+            //indiceExpresiones++;
+
             sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
             crearTerceto("CMP", operandoIzqAux, "VERDADERO");
 
-            sprintf(_resExpresionRelacional, "@resExpresionRelacional_%d", indiceExpresiones);
-            poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-            indiceExpresiones++;
+            // a4: eliminar
+            //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
+            //{
+            //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
+            //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
+            //}
 
-            if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-            {
-                add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-                agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-            }
-
+            // a4: modificar
             // branch por else
-            sprintf(operandoIzqAux, "[%d]", getIndice() + 3);
-            crearTerceto("BNE", operandoIzqAux, "_");
-
-            crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
-
-            // branch incondicional del then
             sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-            crearTerceto("BI", operandoIzqAux, "_");
+            indiceBranchElse = crearTerceto("BNE", operandoIzqAux, "_");
 
-            crearTerceto(":=", _resExpresionRelacional, "FALSO");
+            // a4: eliminar
+            //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
+
+            // a4: modificar
+            // branch incondicional del then
+            sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+            indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
+
+            // a4: eliminar
+            //crearTerceto(":=", _resExpresionRelacional, "FALSO");
         }
         ExpresionParaCondicionInd2 = ExpresionparaCondicionInd;
         ExpresionparaCondicionInd = ExpresionRelacionalInd;
@@ -1197,27 +1215,27 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
-        sprintf(_resExpresionRelacional, "@resExpresionRelacional_%d", indiceExpresiones);
-        poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-        indiceExpresiones++;
+        //sprintf(_resExpresionRelacional, "@resExpresionRelacional_%d", indiceExpresiones);
+        //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
+        //indiceExpresiones++;
         
-        if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-        {
-            add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-            agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-        }
+        //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
+        //{
+        //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
+        //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
+        //}
 
         // branch por else
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 3);
-        indiceActual = crearTerceto("BLE", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
+        indiceBranchElse = crearTerceto("BLE", operandoIzqAux, "_");
 
-        crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
+        //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
         
         // branch incondicional del then
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-        crearTerceto("BI", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+        indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
 
-        crearTerceto(":=", _resExpresionRelacional, "FALSO");
+        //crearTerceto(":=", _resExpresionRelacional, "FALSO");
         
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -1229,27 +1247,27 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         
-        sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
-        poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-        indiceExpresiones++;
+        //sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
+        //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
+        //indiceExpresiones++;
 
-        if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-        {
-            add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-            agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-        }
+        //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
+        //{
+        //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
+        //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
+        //}
         
         // branch por else
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 3);
-        crearTerceto("BGE", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
+        indiceBranchElse = crearTerceto("BGE", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
+        //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
         
         // branch incondicional del then
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-        crearTerceto("BI", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+        indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "FALSO");
+        //crearTerceto(":=", _resExpresionRelacional, "FALSO");
 
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -1261,27 +1279,27 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         
-        sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
-        poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-        indiceExpresiones++;
+        //sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
+        //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
+        //indiceExpresiones++;
 
-        if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-        {
-            add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-            agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-        }
+        //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
+        //{
+        //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
+        //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
+        //}
         
         // branch por else
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 3);
-        crearTerceto("BNE", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
+        indiceBranchElse = crearTerceto("BNE", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
+        //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
         
         // branch incondicional del then
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-        crearTerceto("BI", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+        indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "FALSO");
+        //crearTerceto(":=", _resExpresionRelacional, "FALSO");
 
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -1293,27 +1311,27 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
         
-        sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
-        poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-        indiceExpresiones++;
+        //sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
+        //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
+        //indiceExpresiones++;
         
-        if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-        {
-            add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-            agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-        }
+        //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
+        //{
+        //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
+        //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
+        //}
         
         // branch por else
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 3);
-        crearTerceto("BE", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
+        indiceBranchElse = crearTerceto("BE", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
+        //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
         
         // branch incondicional del then
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-        crearTerceto("BI", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+        indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "FALSO");
+        //crearTerceto(":=", _resExpresionRelacional, "FALSO");
 
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -1325,27 +1343,27 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
-        sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
-        poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-        indiceExpresiones++;
+        //sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
+        //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
+        //indiceExpresiones++;
         
-        if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-        {
-            add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-            agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-        }
+        //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
+        //{
+        //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
+        //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
+        //}
 
         // branch por else
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 3);
-        crearTerceto("BLT", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
+        indiceBranchElse = crearTerceto("BLT", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
+        //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
         
         // branch incondicional del then
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-        crearTerceto("BI", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+        indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "FALSO");
+        //crearTerceto(":=", _resExpresionRelacional, "FALSO");
 
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -1357,27 +1375,27 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
-        sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
-        poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-        indiceExpresiones++;
+        //sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
+        //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
+        //indiceExpresiones++;
 
-        if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-        {
-            add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-            agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-        }
+        //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
+        //{
+        //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
+        //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
+        //}
         
         // branch por else
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 3);
-        crearTerceto("BGT", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
+        indiceBranchElse = crearTerceto("BGT", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
+        //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
         
         // branch incondicional del then
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-        crearTerceto("BI", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+        indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "FALSO");
+        //crearTerceto(":=", _resExpresionRelacional, "FALSO");
 
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -1389,29 +1407,29 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
-        sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
-        poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-        indiceExpresiones++;
+        //sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
+        //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
+        //indiceExpresiones++;
 
-        if(_tipoDatoExpresionActual)
+        //if(_tipoDatoExpresionActual)
 
-        if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-        {
-            add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-            agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-        }
+        //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
+        //{
+        //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
+        //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
+        //}
         
         // branch por else
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 3);
-        crearTerceto("BNE", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
+        indiceBranchElse = crearTerceto("BNE", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
+        //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
         
         // branch incondicional del then
-        sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-        crearTerceto("BI", operandoIzqAux, "_");
+        sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
+        indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "FALSO");
+        //crearTerceto(":=", _resExpresionRelacional, "FALSO");
 
         _soloAritmetica = false;
         _soloBooleana = false;
@@ -1423,27 +1441,27 @@ expresion_relacional:
         sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
         ExpresionRelacionalInd = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
-        sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
-        poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-        indiceExpresiones++;
+        //sprintf(_resExpresionRelacional, "@resExpresion_%d", indiceExpresiones);
+        //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
+        //indiceExpresiones++;
 
-        if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-        {
-            add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-            agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-        }
+        //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
+        //{
+        //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
+        //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
+        //}
         
         // branch por else
         sprintf(operandoIzqAux, "[%d]", getIndice() + 3);
-        crearTerceto("BE", operandoIzqAux, "_");
+        indiceBranchElse = crearTerceto("BE", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
+        //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
         
         // branch incondicional del then
         sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
-        crearTerceto("BI", operandoIzqAux, "_");
+        indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
         
-        crearTerceto(":=", _resExpresionRelacional, "FALSO");
+        //crearTerceto(":=", _resExpresionRelacional, "FALSO");
 
         _soloAritmetica = false;
         _soloBooleana = false;
