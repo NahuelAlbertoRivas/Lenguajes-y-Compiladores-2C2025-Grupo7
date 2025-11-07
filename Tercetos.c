@@ -120,6 +120,7 @@ void imprimirTercetos()
     return;
 }
 
+/*
 int copiarListaDeTercetos(Lista* lista_externa) {
     Nodo* current = lista_tercetos;  // Lista interna de tercetos
 
@@ -149,3 +150,4 @@ int copiarListaDeTercetos(Lista* lista_externa) {
 
     return TODO_OK;
 }
+    */

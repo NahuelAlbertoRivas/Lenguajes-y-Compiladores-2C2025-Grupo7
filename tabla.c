@@ -251,6 +251,7 @@ void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
     fclose(f);
 }
 
+/*
 int copiarTablaDeSimbolos(Lista* lista_externa) {
     Nodo* current = lista_simbolos;  // Lista es un puntero a Nodo
 
@@ -279,4 +280,4 @@ int copiarTablaDeSimbolos(Lista* lista_externa) {
     }
 
     return TODO_OK;
-}
+}*/
