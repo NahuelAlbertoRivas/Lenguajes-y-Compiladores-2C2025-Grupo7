@@ -35,4 +35,6 @@ const char *obtener_tipo_dato(Tabla *tabla, int pos);
 
 void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_token);
 
+//int copiarTablaDeSimbolos(Lista* lista_externa);
+
 #endif
