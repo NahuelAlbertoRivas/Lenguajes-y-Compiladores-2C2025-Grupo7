@@ -1,6 +1,3 @@
-// Usa Lexico_ClasePractica
-//Solo expresion_aritmeticaes sin ()
-
 %{
 #include <stdio.h>
 #include <stdlib.h>
