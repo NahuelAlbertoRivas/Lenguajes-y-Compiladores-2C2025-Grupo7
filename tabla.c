@@ -192,9 +192,12 @@ void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_t
     
     tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 2);
     tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
+    tabla->filas[lexemas_ingresados].valor = malloc(sizeof(char)*10);
 
     strcpy(tabla->filas[lexemas_ingresados].nombre, nombre);
+    strcpy(tabla->filas[lexemas_ingresados].valor, "-");
     strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+    tabla->filas[lexemas_ingresados].longitud = 0;
 
     tabla->nFilas++;
 }
