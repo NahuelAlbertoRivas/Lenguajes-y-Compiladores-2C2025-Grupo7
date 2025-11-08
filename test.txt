@@ -89,8 +89,8 @@ varFloat := 99.
 varFloat := .9999
 
 varStr := "@sdADaSjfla%dfg"
-varStr := "asldk  fh sjf"
 
+varStr := "asldk  fh sjf"
 
 #+ ---------------------------------------- +#
 #+ Operaciones Aritmeticas +#
@@ -104,6 +104,7 @@ x := e / f
 #+ ---------------------------------------- +#
 #+ Entrada y Salida +#
 #+ ---------------------------------------- +#
+
 read(base)  #+ base es una variable Str+#
 
 write("ewr")  #+ "ewr" es una cte string +#

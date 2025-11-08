@@ -78,6 +78,8 @@ fld a
 fld _cte_1
 fadd
 
+fstp a
+
 jmp ETIQUETA_6
 
 ETIQUETA_20:
@@ -262,13 +264,37 @@ fstp varFloat
 fld _cte_0_999900000
 fstp varFloat
 
+lea si, _cte_cad_8
+lea di, s_varStr
+call COPIAR
+
+lea si, _cte_cad_9
+lea di, s_varStr
+call COPIAR
+
 fld _cte_27
 fld c
 fsub
 
+fstp x
+
 fld d
 fld _cte_500
 fadd
+
+fstp x
+
+fld _cte_34
+fld _cte_3
+fmul
+
+fstp x
+
+fld e
+fld f
+fdiv
+
+fstp x
 
 getString s_base
 newLine
