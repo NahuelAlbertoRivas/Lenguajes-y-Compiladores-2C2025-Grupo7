@@ -2095,6 +2095,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         return;
     }
 
+    HashMap *hashmapCteString = create_HashMap(3);
+
     fprintf(fileASM, "include number.asm\n");
     fprintf(fileASM, "include macros2.asm\n\n");
     
@@ -2168,6 +2170,9 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
 
                 reemplazarGuionBajo(nombre_limpio);
                 fprintf(fileASM, "_cte_cad_%d\t\tdb\t\t%s,'$', %d dup (?)\n", contCteCad, _simbolo->valor, _simbolo->longitud);
+                
+                add_HashMapEntry(hashmapCteString, _simbolo->valor, contCteCad);
+
                 strcpy(dato.indice, _simbolo->valor);
                 sprintf(dato.variable, "_cte_cad_%d", contCteCad);
                 contCteCad++;
@@ -2342,7 +2347,7 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             {
                 Pila_Pop(&pilaASM, operadorIzq);
                 Pila_Pop(&pilaASM, operadorDer);
-
+                
                 if (strcmp(operadorDer, "@@@") == 0) 
                 {
                     fprintf(fileASM, "fstp %s\n\n", operadorIzq);
@@ -2359,14 +2364,28 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
                         reemplazarGuionBajo(aux);
 
                         fprintf(fileASM, "fld _cte_%s\n", aux);
+                        fprintf(fileASM, "fstp %s\n\n", operadorIzq);
                     }
                     else
                     {
-                        fprintf(fileASM, "fld %s\n", operadorDer);
+                        int i;
+                        char auxStr[50];
+
+                        // op der destino
+
+                        for (int i = 0; i < strlen(operadorIzq); i++) 
+                        {
+                            auxStr[i] = tolower((unsigned char) operadorIzq[i]);
+                        }
+                        auxStr[strlen(operadorIzq)] = '\0';
+                        
+                        i = get_HashMapEntry_value(hashmapCteString, auxStr);
+                        sprintf(operadorIzq, "_cte_cad_%d", i);
+
+                        fprintf(fileASM, "lea si, %s\n", operadorIzq);
+                        fprintf(fileASM, "lea di, s_%s\n", operadorDer);
+                        fprintf(fileASM, "call COPIAR\n\n");
                     }
-                    
-                    
-                    fprintf(fileASM, "fstp %s\n\n", operadorIzq);
                 }
             }
         } 
@@ -2475,6 +2494,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         fprintf(fileASM, "ETIQUETA_%s:\n", etiquetaComparacion);
         VectorStr_Eliminar(&pilaCiclos, etiquetaComparacion);
     }
+
+    destroy_HashMap(hashmapCteString);
 
     fprintf(fileASM, "mov  ax, 4c00h\n");
     fprintf(fileASM, "int  21h\n");
