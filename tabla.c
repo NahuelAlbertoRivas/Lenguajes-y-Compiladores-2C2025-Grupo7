@@ -203,9 +203,28 @@ void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_t
 
     tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
 
+    if(tabla->filas[lexemas_ingresados].tipoDato == NULL)
+    {
+        free(tabla->filas[lexemas_ingresados].nombre);
+        return;
+    }
+
+    tabla->filas[lexemas_ingresados].valor = malloc(2);
+
+    if(tabla->filas[lexemas_ingresados].valor == NULL)
+    {
+        free(tabla->filas[lexemas_ingresados].nombre);
+        free(tabla->filas[lexemas_ingresados].tipoDato);
+        return;
+    }
+
     strcpy(tabla->filas[lexemas_ingresados].nombre, nombre);
-    strcpy(tabla->filas[lexemas_ingresados].valor, "-");
     strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+    strcpy(tabla->filas[lexemas_ingresados].valor, "-");
+    tabla->filas[lexemas_ingresados].longitud = 0;
+
+    printf("\n%s    %s      %d\n", tabla->filas[lexemas_ingresados].nombre, 
+                                    tabla->filas[lexemas_ingresados].tipoDato, lexemas_ingresados);
 
     tabla->nFilas++;
 }

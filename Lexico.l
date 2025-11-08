@@ -223,7 +223,7 @@ COMENTARIO              {COM_ABR}({LETRA}|{LETRA_ESP}|{DIGITO}|{OP_O_COMP}|{SIMB
 {CTE_REAL}              { return validar_real(yytext); }
 {CTE_STRING}            { return validar_string(yytext); }
 
-{COMENTARIO}            { }
+{COMENTARIO}            { printf("%s\n", yytext); }
 
 "\n"
 "\t"

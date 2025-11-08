@@ -411,11 +411,8 @@ asignacion:
             YYABORT;
         }
         sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
-
-        //sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
-        char valorBoleanoString[50];
-        sacar_de_pila(&pilaValoresBooleanos, valorBoleanoString, sizeof(valorBoleanoString));
-        AsignacionInd = crearTerceto(":=", operandoIzqAux, valorBoleanoString);
+        sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
+        AsignacionInd = crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR19. Asignacion -> [ID: '%s']:= valor_booleano\n", $1.str);
         free($1.str);
     }
@@ -687,23 +684,24 @@ bucle:
 llamada_func:
     FN_EQUALEXPRESSIONS PAR_ABR 
     {
-        crearTerceto(":=", "@resEqualExpressions", "FALSO");
-        if(get_HashMapEntry_value(hashmap, "@resEqualExpressions") == HM_KEY_NOT_FOUND){
-            add_HashMapEntry(hashmap, "@resEqualExpressions", 0);
-            agregar_a_tabla_variables_internas(&tabla, "@resEqualExpressions", "Boolean");
-        }
+        _tipoDatoExpresionActual = NULL;
+
+        int indOpDer = crearTercetoUnitarioStr("FALSE");
+        sprintf(operandoDerAux, "[%d]", indOpDer);
+        int indOpIzq = crearTercetoUnitarioStr("@resEqualExpressions");
+        sprintf(operandoIzqAux, "[%d]", indOpIzq);
+        crearTerceto("=", operandoIzqAux, operandoDerAux);
     }
     lista_args PAR_CIE 
     {
         recorrer_lista_argumentos_equalexpressions(&pilaIndiceTercetosFuncionesEspeciales);
-        //sprintf(operandoDerAux, "[%d]", ListaArgsInd);
-        //LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_EQUALEXPRESSIONS", operandoDerAux);
+        
         printf("\t\t\tR28. Llamada_Func -> equalExpressions(Lista_Args)\n");
 
         completar_bi_equalexpressions(&pilaBI);
-        //sacar_de_pila(&pilaBI, &indiceDesapilado, sizeof(indiceActual));
-        //modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
 
+        LlamadaFuncInd = crearTercetoUnitarioStr("@resEqualExpressions");
+        
         char valoroBoolStr[50] = "@resEqualExpressions";
         poner_en_pila(&pilaValoresBooleanos, valoroBoolStr, sizeof(valoroBoolStr));
     }
