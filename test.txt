@@ -4,23 +4,23 @@
 #+ /* Bloque de declaracion de variables // +#
 #+ ---------------------------------------- +#
 init { #+|+#
-	varFloat: Float
+	varFloat, j, G: Float
 	varInt, a, b, c, d, e, f, x: Int
-	varStr, base : String 
-	varBool, y : Boolean
+	varStr, base, p1, p2, p3 : String 
+	varBool, y, res : Boolean
 }
 
 
 #+ ---------------------------------------- +#
 #+ While +#
 #+ ---------------------------------------- +#
-a := 1
+a := 4
 b := 3
 
 while (a > b)
 {
     write("a es mas grande que b")
-    a := a + 1
+    a--
 }
 
 
@@ -44,16 +44,21 @@ else
     write("a es mas chico o igual a b (a <= b)")
 }
 
+c := 4
+a++
+
 #+ 3- Condicional compuesto AND sin else +#
 if (a > b AND c > b)
 {
     write("a y c mas grandes que b [a > b & c > b]")
 }
 
+a := 0
+
 #+ 4- Condicional compuesto OR sin else +#
 if (a > b OR c > b)
 {
-    write("a es mas grande que b y c es mas grande que b")
+    write("a es mas grande que b o c es mas grande que b")
 }
 
 #+ 5- Condicional compuesto NOT sin else +#
@@ -62,24 +67,21 @@ if (NOT a > b)
     write("a no es mas grande que b -> !(a > b)")
 }
 
+b++
+
 #+ 6- Condicional compuesto con else +#
 if(a==0 AND b<c)
 { 
 	a:=5
 } else 
 {
+    write("b ahora vale 1")
 	b := 1
 }
 
-#+ 7- If anidado +#
-if (a > b)
-{
-    if (a > b)
-	{
-    	write("a es mas grande que b y c")
-	}
-}
+a := 10
 
+#+ 7- If anidado +#
 if (a > b)
 {
     if (a > b)
@@ -103,11 +105,38 @@ varStr := "asldk  fh sjf"
 #+ ---------------------------------------- +#
 #+ Operaciones Aritmeticas +#
 #+ ---------------------------------------- +#
+
+c := 24
+
 x := 27 - c
+
+if(x == 3)
+    write("27 - c = 3")
+
+d := 1
+
 x := d + 500
+
+if(x == 500)
+    write("x es 500")
+else
+{
+    write("x en realidad es el siguiente nro:")
+    write(x)
+}
+
 x := 34 * 3
+
+write("34 * 3 =")
+write(x)
+
+e := 5
+f := 8
+
 x := e / f
 
+write("5/8 =")
+write(x)
 
 #+ ---------------------------------------- +#
 #+ Entrada y Salida +#
@@ -116,9 +145,39 @@ x := e / f
 write("Ingrese un nro")
 read(base)  #+ base es una variable Str+#
 
-write("ewr")  #+ "ewr" es una cte string +#
+write("ewr es una cte string")  #+ "ewr" es una cte string +#
 write(varInt)  #+ varInt es una variable numerica definida previamente +#
 
+#+ equalExpressions(a + b, 100) +#
+
+res := true
+c := 1
+d := 101
+y := true
+a := 0
+b := 45
+G := 99
+j := 0.5
+
+if(c AND d)
+	if(y)
+		if(res)
+			if(a OR b)
+			{
+				if(G < 100)
+				{
+					if(j)
+					{
+						p3 := "parte true estructura mas interna"
+                        write(p3)
+					}
+				}
+				else
+                {
+					p1 := "parte else estructura mas interna"
+                    write(p1)
+                }
+			}
 
 
 #+ ---------------------------------------------- +#

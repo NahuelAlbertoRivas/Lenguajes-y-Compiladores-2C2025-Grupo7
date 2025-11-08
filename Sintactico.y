@@ -14,6 +14,8 @@
 #include "utilidades/lista.h"
 #include "utilidades/acciones_semanticas.h"
 
+#define ES_LETRA_MAYUSC(x)((x>64) && (x<91))
+
 #define HASHMAP_SIZE 10
 #define ERROR_APERTURA_ARCHIVO -213
 #define PROCESO_EXITOSO 0
@@ -46,13 +48,13 @@ typedef struct {
 
 // Pila de strings (para operandos de la pila ASM)
 typedef struct {
-    char items[70][100];
+    char items[500][100];
     int count;
 } PilaStrings;
 
 // Vector de strings (para etiquetas de ciclos/saltos)
 typedef struct {
-    char items[70][100];
+    char items[500][100];
     int count;
 } VectorStrings;
 
@@ -85,6 +87,7 @@ void VectorStr_Eliminar(VectorStrings* vec, const char* str);
 void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, char* nombre_archivo_tercetos);
 int esNumero(const char *str);
 void reemplazarGuionBajo(char *str);
+void reemplazar_booleanos(char *operadorIzq, char *operadorDer);
 
 int ProgramaInd;
 int DefInitInd;
@@ -252,7 +255,6 @@ programa:
     def_init lista_sentencias
     {
         printf("R1. Programa -> Def_Init Lista_Sentencias\n");
-        printf("\nSACO TERCETO %d\n");
         generar_assembler("final.asm", "Symbol-Table.txt","intermediate-code.txt");
     }
     ;
@@ -422,9 +424,11 @@ asignacion:
         }
         int idInd = crearTercetoUnitarioStr($1.str);
         sprintf(operandoIzqAux, "[%d]", idInd);
-        AsignacionInd = crearTerceto("+", operandoIzqAux, "1");
+        int cteInd = crearTercetoUnitarioStr("1");
+        sprintf(operandoDerAux, "[%d]", cteInd);
+        AsignacionInd = crearTerceto("+", operandoIzqAux, operandoDerAux);
         sprintf(operandoDerAux, "[%d]", AsignacionInd);
-        crearTerceto("=", operandoIzqAux, operandoDerAux);
+        AsignacionInd = crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR20. Asignacion -> [ID: '%s']++\n",$1.str);
         free($1.str);
     }
@@ -437,9 +441,11 @@ asignacion:
         }
         int idInd = crearTercetoUnitarioStr($1.str);
         sprintf(operandoIzqAux, "[%d]", idInd);
-        AsignacionInd = crearTerceto("-", operandoIzqAux, "1");
+        int cteInd = crearTercetoUnitarioStr("1");
+        sprintf(operandoDerAux, "[%d]", cteInd);
+        AsignacionInd = crearTerceto("-", operandoIzqAux, operandoDerAux);
         sprintf(operandoDerAux, "[%d]", AsignacionInd);
-        crearTerceto("=", operandoIzqAux, operandoDerAux);
+        AsignacionInd = crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR21. Asignacion -> [ID: '%s']--\n",$1.str);
         free($1.str);
     }
@@ -623,7 +629,6 @@ bucle:
         {
             if(sacar_de_pila(&pilaBranchThen, &indiceDesapilado, sizeof(indiceDesapilado)) == TODO_OK)
             {
-                printf("\nSACO %d\n", indiceDesapilado);
                 modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
             }
             i--;
@@ -1029,7 +1034,6 @@ expresion_logica:
                     if(sacar_de_pila(&pilaBranchElse, &Xind, sizeof(Xind)) == TODO_OK)
                     {
                         _contadorElseActual--;
-                        printf("\nSACO EL BRANCH NRO  %d\n", Xind);
                         modificarOperandoIzquierdoConTerceto(Xind, operandoIzqAux);
                     }
                     _contadorSecuenciaAnd--;
@@ -1177,7 +1181,9 @@ expresion_para_condicion:
             //crearTerceto(":=", "@resExpresionAritmetica", operandoDerAux);
 
             sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
-            crearTerceto("CMP", operandoIzqAux, "0"); // cero ya que una expresión aritmética es VERDADERO si es <> 0
+            int indOpDer = crearTercetoUnitarioStr("0");
+            sprintf(operandoDerAux, "[%d]", indOpDer);
+            crearTerceto("CMP", operandoIzqAux, operandoDerAux); // cero ya que una expresión aritmética es VERDADERO si es <> 0
 
             // a4: eliminar
             //sprintf(_resExpresionRelacional, "@resExpresionRelacional_%d", indiceExpresiones);
@@ -1215,7 +1221,9 @@ expresion_para_condicion:
             //indiceExpresiones++;
 
             sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
-            crearTerceto("CMP", operandoIzqAux, "VERDADERO");
+            int indOpDer = crearTercetoUnitarioStr("true");
+            sprintf(operandoDerAux, "[%d]", indOpDer);
+            crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
             // a4: eliminar
             //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
@@ -1532,11 +1540,23 @@ valor_booleano:
     {
         ValorBooleanoInd = crearTercetoUnitarioStr("TRUE");
         printf("\t\t\t\t\tR42. Valor_Booleano -> TRUE\n");
+        
+        if(get_HashMapEntry_value(hashmap, "1") == HM_KEY_NOT_FOUND)
+        {
+            add_HashMapEntry(hashmap, "1", 0);
+            agregar_a_tabla(&tabla, "1", "CTE_INT");
+        }
     }
     | FALSE 
     {
         ValorBooleanoInd = crearTercetoUnitarioStr("FALSE");
         printf("\t\t\t\t\tR43. Valor_Booleano -> FALSE\n");
+
+        if(get_HashMapEntry_value(hashmap, "0") == HM_KEY_NOT_FOUND)
+        {
+            add_HashMapEntry(hashmap, "0", 0);
+            agregar_a_tabla(&tabla, "0", "CTE_INT");
+        }
     }
     ;
     
@@ -2051,7 +2071,7 @@ void VectorDatos_Add(VectorDatosAsm* vec, datoAsm dato) {
 
 const char* VectorDatos_Buscar(VectorDatosAsm* vec, const char* indice) {
     for (int i = 0; i < vec->count; i++) {
-        if (strcmpi(vec->items[i].indice, indice) == 0) {
+        if (strcmp(vec->items[i].indice, indice) == 0) {
             return vec->items[i].variable;
         }
     }
@@ -2085,14 +2105,12 @@ void VectorStr_Eliminar(VectorStrings* vec, const char* str) {
 
 void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, char* nombre_archivo_tercetos) 
 {
-    printf("\nSACO TERCETO %d\n");
     FILE *fileASM = fopen(nombre_archivo_asm, "w");
     if (fileASM == NULL) {
         printf("Error al intentar guardar el codigo assemblr en archivo %s.", nombre_archivo_asm);
         return;
     }
 
-    printf("\nSACO TERCETO %d\n");
     HashMap *hashmapCteString = create_HashMap(3);
 
     fprintf(fileASM, "include number.asm\n");
@@ -2105,8 +2123,6 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
     fprintf(fileASM, "\n.DATA\n");
 
     // Hasta aca esta bien
-
-    printf("\nSACO TERCETO %d\n");
 
     VectorDatosAsm ListaVariables;
     ListaVariables.count = 0;
@@ -2229,7 +2245,7 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
     VectorStrings pilaCiclos;
     pilaCiclos.count = 0;
 
-    char operadorIzq[100], operadorDer[100];
+    char operadorIzq[50], operadorDer[50];
     char etiquetaComparacion[100];
     int band;
     const char* varAsm;
@@ -2247,7 +2263,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             band = 1;
         }
 
-        if (strcmp(_terceto->operador, "+") == 0) {
+        if (strcmp(_terceto->operador, "+") == 0) 
+        {
             Pila_Pop(&pilaASM, operadorDer);
             Pila_Pop(&pilaASM, operadorIzq);
 
@@ -2255,7 +2272,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             {
                 varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
                 fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorIzq);
-                if (strcmp(operadorDer, "@@@") == 0) {
+                if (strcmp(operadorDer, "@@@") == 0) 
+                {
                     fprintf(fileASM, "fxch\n");
                 }
             }
@@ -2268,19 +2286,23 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             fprintf(fileASM, "fadd\n\n");
             Pila_Push(&pilaASM, "@@@");
         }
-        else if (strcmp(_terceto->operador, "-") == 0) {
+        else if (strcmp(_terceto->operador, "-") == 0) 
+        {
             Pila_Pop(&pilaASM, operadorDer);
             Pila_Pop(&pilaASM, operadorIzq);
 
-            if (strcmp(operadorIzq, "@@@") != 0) {
+            if (strcmp(operadorIzq, "@@@") != 0) 
+            {
                 varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
                 fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorIzq);
-                if (strcmp(operadorDer, "@@@") == 0) {
+                if (strcmp(operadorDer, "@@@") == 0) 
+                {
                     fprintf(fileASM, "fxch\n");
                 }
             }
 
-            if (strcmp(operadorDer, "@@@") != 0) {
+            if (strcmp(operadorDer, "@@@") != 0) 
+            {
                 varAsm = VectorDatos_Buscar(&ListaVariables, operadorDer);
                 fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorDer);
             }
@@ -2344,11 +2366,16 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
                 fprintf(fileASM, "CALL COPIAR\n\n");
             } 
             else 
-            {
-                Pila_Pop(&pilaASM, operadorIzq);
-                Pila_Pop(&pilaASM, operadorDer);
+            {             
+                char auxOperador[50];
+                Pila_Pop(&pilaASM, auxOperador);
+                if(strcmp(auxOperador, "@@@") != 0)
+                {
+                    strcpy(operadorIzq, auxOperador);
+                    Pila_Pop(&pilaASM, operadorDer);
+                }
                 
-                if (strcmp(operadorDer, "@@@") == 0) 
+                if (strcmp(auxOperador, "@@@") == 0) 
                 {
                     fprintf(fileASM, "fstp %s\n\n", operadorIzq);
                 } 
@@ -2368,32 +2395,49 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
                     }
                     else
                     {
-                        int i;
-                        char auxStr[50];
-
-                        // op der destino
-
-                        for (int i = 0; i < strlen(operadorIzq); i++) 
+                        if(strchr(operadorIzq, '\"') != NULL)
                         {
-                            auxStr[i] = tolower((unsigned char) operadorIzq[i]);
-                        }
-                        auxStr[strlen(operadorIzq)] = '\0';
-                        
-                        i = get_HashMapEntry_value(hashmapCteString, auxStr);
-                        sprintf(operadorIzq, "_cte_cad_%d", i);
+                            int i;
+                            char auxStr[50];
 
-                        fprintf(fileASM, "lea si, %s\n", operadorIzq);
-                        fprintf(fileASM, "lea di, s_%s\n", operadorDer);
-                        fprintf(fileASM, "call COPIAR\n\n");
+                            // op der destino
+
+                            for (int i = 0; i < strlen(operadorIzq); i++) 
+                            {
+                                auxStr[i] = tolower((unsigned char) operadorIzq[i]);
+                            }
+                            auxStr[strlen(operadorIzq)] = '\0';
+                            
+                            i = get_HashMapEntry_value(hashmapCteString, auxStr);
+                            sprintf(operadorIzq, "_cte_cad_%d", i);
+
+                            fprintf(fileASM, "lea si, %s\n", operadorIzq);
+                            fprintf(fileASM, "lea di, s_%s\n", operadorDer);
+                            fprintf(fileASM, "call COPIAR\n\n");
+                        }
+                        else
+                        { 
+                            if(strcmpi(operadorDer, "TRUE") == 0)
+                            {
+                                sprintf(operadorDer, "_cte_1");
+                            }
+                            if(strcmpi(operadorDer, "FALSE") == 0)
+                            {
+                                sprintf(operadorDer, "_cte_0");
+                            }
+
+                            fprintf(fileASM, "fld %s\n", operadorDer);
+                            fprintf(fileASM, "fstp %s\n\n", operadorIzq);
+                        }
                     }
                 }
+                Pila_Push(&pilaASM, "###");
             }
         } 
         else if (strcmp(_terceto->operador, "ENTRADA_SALIDA") == 0 && strcmp(_terceto->operandoIzq, "READ") == 0) 
         {
             Pila_Pop(&pilaASM, operadorIzq);
-            Pila_Pop(&pilaASM, operadorDer);
-            printf("\n READ 1   %s\n", operadorIzq);
+
             varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
             if (strncmp(varAsm, "s_", 2) == 0) {
                 fprintf(fileASM, "getString %s\n", varAsm);
@@ -2405,8 +2449,22 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         else if (strcmp(_terceto->operador, "ENTRADA_SALIDA") == 0 && strcmp(_terceto->operandoIzq, "WRITE") == 0) 
         {
             Pila_Pop(&pilaASM, operadorIzq);
+
+            if(strchr(operadorIzq, '\"'))
+            {
+                int longitud = strlen(operadorIzq);
+
+                for (int i = 0; i < longitud; i++) 
+                {
+                    if(ES_LETRA_MAYUSC(operadorIzq[i]))
+                    {
+                        operadorIzq[i] = tolower(operadorIzq[i]);
+                    }
+                }
+            }
+
             varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
-            printf("\n WRITE 1    %s\n", operadorIzq);
+
             if(varAsm)
             {
                 if(strncmp(varAsm, "s_", 2) == 0 || strncmp(varAsm, "_cte_cad_", 9) == 0)
@@ -2430,13 +2488,17 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
                 Pila_Pop(&pilaASM, operadorIzq);
                 varIzq = VectorDatos_Buscar(&ListaVariables, operadorIzq);
                 varDer = VectorDatos_Buscar(&ListaVariables, operadorDer);
+                reemplazar_booleanos(operadorIzq, operadorDer);
                 fprintf(fileASM, "fld %s\n", varIzq ? varIzq : operadorIzq);
                 fprintf(fileASM, "fld %s\n", varDer ? varDer : operadorDer);
             } 
             else 
             {
-                fprintf(fileASM, "fld %s\n", varIzq);
-                fprintf(fileASM, "fld %s\n", varDer);
+                strcpy(operadorIzq, varIzq);
+                strcpy(operadorDer, varDer);
+                reemplazar_booleanos(operadorIzq, operadorDer);
+                fprintf(fileASM, "fld %s\n", operadorIzq);
+                fprintf(fileASM, "fld %s\n", operadorDer);
             }  
 
             fprintf(fileASM, "fxch\n");
@@ -2492,7 +2554,23 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         }
         else 
         {
-            Pila_Push(&pilaASM, _terceto->operador);
+            char ultOp[50];
+
+            Pila_Pop(&pilaASM, ultOp);
+
+            if(strcmp(ultOp, "@@@") == 0)
+            {
+                strcpy(operadorIzq, _terceto->operador);
+                Pila_Push(&pilaASM, ultOp);
+            }
+            else
+            {
+                if(strcmp(ultOp, "###") != 0)
+                {
+                    Pila_Push(&pilaASM, ultOp);
+                }
+                Pila_Push(&pilaASM, _terceto->operador);
+            }
         }
     } 
 
@@ -2559,4 +2637,24 @@ int esNumero(const char *str) {
 
     // No puede ser solo un punto o signo
     return (*str != '\0');
+}
+
+void reemplazar_booleanos(char *operadorIzq, char *operadorDer)
+{
+    if(strcmpi(operadorIzq, "TRUE") == 0)
+    {
+        sprintf(operadorIzq, "_cte_1");
+    }
+    if(strcmpi(operadorIzq, "FALSE") == 0)
+    {
+        sprintf(operadorIzq, "_cte_0");
+    }
+    if(strcmpi(operadorDer, "TRUE") == 0)
+    {
+        sprintf(operadorDer, "_cte_1");
+    }
+    if(strcmpi(operadorDer, "FALSE") == 0)
+    {
+        sprintf(operadorDer, "_cte_0");
+    }
 }
