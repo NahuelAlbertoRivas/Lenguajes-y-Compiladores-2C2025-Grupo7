@@ -10,6 +10,8 @@ MAXTEXTSIZE equ 40
 
 .DATA
 varFloat		dd		?
+j		dd		?
+G		dd		?
 varInt		dd		?
 a		dd		?
 b		dd		?
@@ -20,32 +22,50 @@ f		dd		?
 x		dd		?
 s_varStr		db MAXTEXTSIZE dup (?), '$'
 s_base		db MAXTEXTSIZE dup (?), '$'
+s_p1		db MAXTEXTSIZE dup (?), '$'
+s_p2		db MAXTEXTSIZE dup (?), '$'
+s_p3		db MAXTEXTSIZE dup (?), '$'
 varBool		dd		?
 y		dd		?
-_cte_1		dd		1.0
+res		dd		?
+_cte_4		dd		4.0
 _cte_3		dd		3.0
 _cte_cad_1		db		"a es mas grande que b",'$', 23 dup (?)
 _cte_cad_2		db		"a es mas grande que b (a > b)",'$', 31 dup (?)
 _cte_cad_3		db		"a es mas chico o igual a b (a <= b)",'$', 37 dup (?)
 _cte_cad_4		db		"a y c mas grandes que b [a > b & c > b]",'$', 41 dup (?)
-_cte_cad_5		db		"a es mas grande que b y c es mas grande que b",'$', 47 dup (?)
-_cte_cad_6		db		"a no es mas grande que b -> !(a > b)",'$', 38 dup (?)
 _cte_0		dd		0.0
+_cte_cad_5		db		"a es mas grande que b o c es mas grande que b",'$', 47 dup (?)
+_cte_cad_6		db		"a no es mas grande que b -> !(a > b)",'$', 38 dup (?)
 _cte_5		dd		5.0
-_cte_cad_7		db		"a es mas grande que b y c",'$', 27 dup (?)
+_cte_cad_7		db		"b ahora vale 1",'$', 16 dup (?)
+_cte_1		dd		1.0
+_cte_10		dd		10.0
+_cte_cad_8		db		"a es mas grande que b y c",'$', 27 dup (?)
 _cte_99999_990000000		dd		99999.990000000
 _cte_99_000000000		dd		99.000000000
 _cte_0_999900000		dd		0.999900000
-_cte_cad_8		db		"@sdadasjfla%dfg",'$', 17 dup (?)
-_cte_cad_9		db		"asldk  fh sjf",'$', 15 dup (?)
+_cte_cad_9		db		"@sdadasjfla%dfg",'$', 17 dup (?)
+_cte_cad_10		db		"asldk  fh sjf",'$', 15 dup (?)
+_cte_24		dd		24.0
 _cte_27		dd		27.0
+_cte_cad_11		db		"27 - c = 3",'$', 12 dup (?)
 _cte_500		dd		500.0
+_cte_cad_12		db		"x es 500",'$', 10 dup (?)
+_cte_cad_13		db		"x en realidad es el siguiente nro:",'$', 36 dup (?)
 _cte_34		dd		34.0
-_cte_cad_10		db		"ewr",'$', 5 dup (?)
-_cte_2		dd		2.0
-@resEqualExpressions		dd		?
-@pivote		dd		?
-@actual		dd		?
+_cte_cad_14		db		"34 * 3 =",'$', 10 dup (?)
+_cte_8		dd		8.0
+_cte_cad_15		db		"5/8 =",'$', 7 dup (?)
+_cte_cad_16		db		"ingrese un nro",'$', 16 dup (?)
+_cte_cad_17		db		"ewr es una cte string",'$', 23 dup (?)
+_cte_101		dd		101.0
+_cte_45		dd		45.0
+_cte_99		dd		99.0
+_cte_0_500000000		dd		0.500000000
+_cte_100		dd		100.0
+_cte_cad_18		db		"parte true estructura mas interna",'$', 35 dup (?)
+_cte_cad_19		db		"parte else estructura mas interna",'$', 35 dup (?)
 
 .CODE
 
@@ -55,7 +75,7 @@ mov  AX, @data
 mov  DS, AX
 mov  es, ax
 
-fld _cte_1
+fld _cte_4
 fstp a
 
 fld _cte_3
@@ -70,7 +90,7 @@ fcom
 fstsw ax
 sahf
 ffree
-jbe ETIQUETA_20
+jbe ETIQUETA_19
 
 jmp ETIQUETA_12
 
@@ -80,13 +100,13 @@ newLine
 
 fld a
 fld _cte_1
-fadd
+fsub
 
 fstp a
 
 jmp ETIQUETA_6
 
-ETIQUETA_20:
+ETIQUETA_19:
 fld a
 fld b
 fxch
@@ -94,15 +114,15 @@ fcom
 fstsw ax
 sahf
 ffree
-jbe ETIQUETA_27
+jbe ETIQUETA_26
 
-jmp ETIQUETA_25
+jmp ETIQUETA_24
 
-ETIQUETA_25:
+ETIQUETA_24:
 displayString _cte_cad_1
 newLine
 
-ETIQUETA_27:
+ETIQUETA_26:
 fld a
 fld b
 fxch
@@ -110,21 +130,30 @@ fcom
 fstsw ax
 sahf
 ffree
-jbe ETIQUETA_35
+jbe ETIQUETA_34
 
-jmp ETIQUETA_32
+jmp ETIQUETA_31
 
-ETIQUETA_32:
+ETIQUETA_31:
 displayString _cte_cad_2
 newLine
 
-jmp ETIQUETA_37
+jmp ETIQUETA_36
 
-ETIQUETA_35:
+ETIQUETA_34:
 displayString _cte_cad_3
 newLine
 
-ETIQUETA_37:
+ETIQUETA_36:
+fld _cte_4
+fstp c
+
+fld a
+fld _cte_1
+fadd
+
+fstp a
+
 fld a
 fld b
 fxch
@@ -132,11 +161,11 @@ fcom
 fstsw ax
 sahf
 ffree
-jbe ETIQUETA_49
+jbe ETIQUETA_55
 
-jmp ETIQUETA_42
+jmp ETIQUETA_48
 
-ETIQUETA_42:
+ETIQUETA_48:
 fld c
 fld b
 fxch
@@ -144,15 +173,18 @@ fcom
 fstsw ax
 sahf
 ffree
-jbe ETIQUETA_49
+jbe ETIQUETA_55
 
-jmp ETIQUETA_47
+jmp ETIQUETA_53
 
-ETIQUETA_47:
+ETIQUETA_53:
 displayString _cte_cad_4
 newLine
 
-ETIQUETA_49:
+ETIQUETA_55:
+fld _cte_0
+fstp a
+
 fld a
 fld b
 fxch
@@ -160,11 +192,11 @@ fcom
 fstsw ax
 sahf
 ffree
-jbe ETIQUETA_54
+jbe ETIQUETA_63
 
-jmp ETIQUETA_59
+jmp ETIQUETA_68
 
-ETIQUETA_54:
+ETIQUETA_63:
 fld c
 fld b
 fxch
@@ -172,15 +204,15 @@ fcom
 fstsw ax
 sahf
 ffree
-jbe ETIQUETA_61
+jbe ETIQUETA_70
 
-jmp ETIQUETA_59
+jmp ETIQUETA_68
 
-ETIQUETA_59:
+ETIQUETA_68:
 displayString _cte_cad_5
 newLine
 
-ETIQUETA_61:
+ETIQUETA_70:
 fld a
 fld b
 fxch
@@ -188,15 +220,21 @@ fcom
 fstsw ax
 sahf
 ffree
-jbe ETIQUETA_66
+jbe ETIQUETA_75
 
-jmp ETIQUETA_68
+jmp ETIQUETA_77
 
-ETIQUETA_66:
+ETIQUETA_75:
 displayString _cte_cad_6
 newLine
 
-ETIQUETA_68:
+ETIQUETA_77:
+fld b
+fld _cte_1
+fadd
+
+fstp b
+
 fld a
 fld _cte_0
 fxch
@@ -204,11 +242,11 @@ fcom
 fstsw ax
 sahf
 ffree
-jne ETIQUETA_82
+jne ETIQUETA_95
 
-jmp ETIQUETA_73
+jmp ETIQUETA_86
 
-ETIQUETA_73:
+ETIQUETA_86:
 fld b
 fld c
 fxch
@@ -216,49 +254,55 @@ fcom
 fstsw ax
 sahf
 ffree
-jae ETIQUETA_82
+jae ETIQUETA_95
 
-jmp ETIQUETA_78
+jmp ETIQUETA_91
 
-ETIQUETA_78:
+ETIQUETA_91:
 fld _cte_5
 fstp a
 
-jmp ETIQUETA_85
-
-ETIQUETA_82:
-fld _cte_1
-fstp b
-
-ETIQUETA_85:
-fld a
-fld b
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jbe ETIQUETA_97
-
-jmp ETIQUETA_90
-
-ETIQUETA_90:
-fld a
-fld b
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jbe ETIQUETA_97
-
-jmp ETIQUETA_95
+jmp ETIQUETA_100
 
 ETIQUETA_95:
 displayString _cte_cad_7
 newLine
 
-ETIQUETA_97:
+fld _cte_1
+fstp b
+
+ETIQUETA_100:
+fld _cte_10
+fstp a
+
+fld a
+fld b
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+jbe ETIQUETA_115
+
+jmp ETIQUETA_108
+
+ETIQUETA_108:
+fld a
+fld b
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+jbe ETIQUETA_115
+
+jmp ETIQUETA_113
+
+ETIQUETA_113:
+displayString _cte_cad_8
+newLine
+
+ETIQUETA_115:
 fld _cte_99999_990000000
 fstp varFloat
 
@@ -268,13 +312,16 @@ fstp varFloat
 fld _cte_0_999900000
 fstp varFloat
 
-lea si, _cte_cad_8
-lea di, s_varStr
-call COPIAR
-
 lea si, _cte_cad_9
 lea di, s_varStr
 call COPIAR
+
+lea si, _cte_cad_10
+lea di, s_varStr
+call COPIAR
+
+fld _cte_24
+fstp c
 
 fld _cte_27
 fld c
@@ -282,17 +329,73 @@ fsub
 
 fstp x
 
+fld x
+fld _cte_3
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+jne ETIQUETA_145
+
+jmp ETIQUETA_143
+
+ETIQUETA_143:
+displayString _cte_cad_11
+newLine
+
+ETIQUETA_145:
+fld _cte_1
+fstp d
+
 fld d
 fld _cte_500
 fadd
 
 fstp x
 
+fld x
+fld _cte_500
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+jne ETIQUETA_161
+
+jmp ETIQUETA_158
+
+ETIQUETA_158:
+displayString _cte_cad_12
+newLine
+
+jmp ETIQUETA_165
+
+ETIQUETA_161:
+displayString _cte_cad_13
+newLine
+
+DisplayFloat x, 2
+newLine
+
+ETIQUETA_165:
 fld _cte_34
 fld _cte_3
 fmul
 
 fstp x
+
+displayString _cte_cad_14
+newLine
+
+DisplayFloat x, 2
+newLine
+
+fld _cte_5
+fstp e
+
+fld _cte_8
+fstp f
 
 fld e
 fld f
@@ -300,1093 +403,163 @@ fdiv
 
 fstp x
 
+displayString _cte_cad_15
+newLine
+
+DisplayFloat x, 2
+newLine
+
+displayString _cte_cad_16
+newLine
+
 getString s_base
 newLine
 
-displayString _cte_cad_10
+displayString _cte_cad_17
 newLine
 
 DisplayFloat varInt, 2
 newLine
 
-fld _cte_2
+fld _cte_1
+fstp res
+
+fld _cte_1
+fstp c
+
+fld _cte_101
+fstp d
+
+fld _cte_1
+fstp y
+
+fld _cte_0
 fstp a
 
-fld _cte_3
+fld _cte_45
 fstp b
 
-fld a
-fld b
-fadd
+fld _cte_99
+fstp G
 
-fld @pivote
-fld @actual
+fld _cte_0_500000000
+fstp j
+
+fld c
+fld _cte_0
 fxch
 fcom
 fstsw ax
 sahf
 ffree
-jne ETIQUETA_156
+je ETIQUETA_272
 
-jmp ETIQUETA_213
-
-ETIQUETA_156:
-fld b
-fld _cte_2
-fmul
-
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_164
-
-jmp ETIQUETA_213
-
-ETIQUETA_164:
-fld _cte_3
-fld _cte_2
-fadd
-
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_172
-
-jmp ETIQUETA_213
-
-ETIQUETA_172:
-fld a
-fld b
-fadd
-
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_180
-
-jmp ETIQUETA_213
-
-ETIQUETA_180:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_186
-
-jmp ETIQUETA_213
-
-ETIQUETA_186:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_191
-
-jmp ETIQUETA_213
-
-ETIQUETA_191:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_196
-
-jmp ETIQUETA_213
-
-ETIQUETA_196:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_202
-
-jmp ETIQUETA_213
-
-ETIQUETA_202:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_207
-
-jmp ETIQUETA_213
-
-ETIQUETA_207:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_213
-
-jmp ETIQUETA_213
-
-ETIQUETA_213:
-fld :=
-fld _cte_5
-fsub
-
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_226
-
-jmp ETIQUETA_314
+jmp ETIQUETA_226
 
 ETIQUETA_226:
+fld d
+fld _cte_0
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+je ETIQUETA_272
+
+jmp ETIQUETA_231
+
+ETIQUETA_231:
+fld y
+fld _cte_0
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+je ETIQUETA_272
+
+jmp ETIQUETA_236
+
+ETIQUETA_236:
+fld res
+fld _cte_0
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+je ETIQUETA_272
+
+jmp ETIQUETA_241
+
+ETIQUETA_241:
 fld a
+fld _cte_0
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+je ETIQUETA_246
+
+jmp ETIQUETA_251
+
+ETIQUETA_246:
 fld b
-fadd
-
-fld @pivote
-fld @actual
+fld _cte_0
 fxch
 fcom
 fstsw ax
 sahf
 ffree
-jne ETIQUETA_234
+je ETIQUETA_272
 
-jmp ETIQUETA_314
+jmp ETIQUETA_251
 
-ETIQUETA_234:
-fld @pivote
-fld @actual
+ETIQUETA_251:
+fld G
+fld _cte_100
 fxch
 fcom
 fstsw ax
 sahf
 ffree
-jne ETIQUETA_240
+jae ETIQUETA_267
 
-jmp ETIQUETA_314
+jmp ETIQUETA_256
 
-ETIQUETA_240:
-fld @pivote
-fld @actual
+ETIQUETA_256:
+fld j
+fld _cte_0
 fxch
 fcom
 fstsw ax
 sahf
 ffree
-jne ETIQUETA_245
+je ETIQUETA_266
 
-jmp ETIQUETA_314
+jmp ETIQUETA_261
 
-ETIQUETA_245:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_250
+ETIQUETA_261:
+lea si, _cte_cad_18
+lea di, s_p3
+call COPIAR
 
-jmp ETIQUETA_314
-
-ETIQUETA_250:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_255
-
-jmp ETIQUETA_314
-
-ETIQUETA_255:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_260
-
-jmp ETIQUETA_314
-
-ETIQUETA_260:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_266
-
-jmp ETIQUETA_314
+displayString s_p3
+newLine
 
 ETIQUETA_266:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_271
+jmp ETIQUETA_272
 
-jmp ETIQUETA_314
+ETIQUETA_267:
+lea si, _cte_cad_19
+lea di, s_p1
+call COPIAR
 
-ETIQUETA_271:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_276
+displayString s_p1
+newLine
 
-jmp ETIQUETA_314
-
-ETIQUETA_276:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_281
-
-jmp ETIQUETA_314
-
-ETIQUETA_281:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_287
-
-jmp ETIQUETA_314
-
-ETIQUETA_287:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_292
-
-jmp ETIQUETA_314
-
-ETIQUETA_292:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_297
-
-jmp ETIQUETA_314
-
-ETIQUETA_297:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_303
-
-jmp ETIQUETA_314
-
-ETIQUETA_303:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_308
-
-jmp ETIQUETA_314
-
-ETIQUETA_308:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_314
-
-jmp ETIQUETA_314
-
-ETIQUETA_314:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_326
-
-jmp ETIQUETA_636
-
-ETIQUETA_326:
-fld :=
-fld _cte_5
-fsub
-
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_333
-
-jmp ETIQUETA_636
-
-ETIQUETA_333:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_339
-
-jmp ETIQUETA_636
-
-ETIQUETA_339:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_345
-
-jmp ETIQUETA_636
-
-ETIQUETA_345:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_351
-
-jmp ETIQUETA_636
-
-ETIQUETA_351:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_357
-
-jmp ETIQUETA_636
-
-ETIQUETA_357:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_362
-
-jmp ETIQUETA_636
-
-ETIQUETA_362:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_367
-
-jmp ETIQUETA_636
-
-ETIQUETA_367:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_372
-
-jmp ETIQUETA_636
-
-ETIQUETA_372:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_377
-
-jmp ETIQUETA_636
-
-ETIQUETA_377:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_382
-
-jmp ETIQUETA_636
-
-ETIQUETA_382:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_387
-
-jmp ETIQUETA_636
-
-ETIQUETA_387:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_392
-
-jmp ETIQUETA_636
-
-ETIQUETA_392:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_397
-
-jmp ETIQUETA_636
-
-ETIQUETA_397:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_402
-
-jmp ETIQUETA_636
-
-ETIQUETA_402:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_408
-
-jmp ETIQUETA_636
-
-ETIQUETA_408:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_413
-
-jmp ETIQUETA_636
-
-ETIQUETA_413:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_418
-
-jmp ETIQUETA_636
-
-ETIQUETA_418:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_423
-
-jmp ETIQUETA_636
-
-ETIQUETA_423:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_428
-
-jmp ETIQUETA_636
-
-ETIQUETA_428:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_433
-
-jmp ETIQUETA_636
-
-ETIQUETA_433:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_438
-
-jmp ETIQUETA_636
-
-ETIQUETA_438:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_443
-
-jmp ETIQUETA_636
-
-ETIQUETA_443:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_448
-
-jmp ETIQUETA_636
-
-ETIQUETA_448:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_454
-
-jmp ETIQUETA_636
-
-ETIQUETA_454:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_459
-
-jmp ETIQUETA_636
-
-ETIQUETA_459:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_464
-
-jmp ETIQUETA_636
-
-ETIQUETA_464:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_469
-
-jmp ETIQUETA_636
-
-ETIQUETA_469:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_474
-
-jmp ETIQUETA_636
-
-ETIQUETA_474:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_479
-
-jmp ETIQUETA_636
-
-ETIQUETA_479:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_484
-
-jmp ETIQUETA_636
-
-ETIQUETA_484:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_489
-
-jmp ETIQUETA_636
-
-ETIQUETA_489:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_495
-
-jmp ETIQUETA_636
-
-ETIQUETA_495:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_500
-
-jmp ETIQUETA_636
-
-ETIQUETA_500:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_505
-
-jmp ETIQUETA_636
-
-ETIQUETA_505:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_510
-
-jmp ETIQUETA_636
-
-ETIQUETA_510:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_515
-
-jmp ETIQUETA_636
-
-ETIQUETA_515:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_520
-
-jmp ETIQUETA_636
-
-ETIQUETA_520:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_525
-
-jmp ETIQUETA_636
-
-ETIQUETA_525:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_531
-
-jmp ETIQUETA_636
-
-ETIQUETA_531:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_536
-
-jmp ETIQUETA_636
-
-ETIQUETA_536:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_541
-
-jmp ETIQUETA_636
-
-ETIQUETA_541:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_546
-
-jmp ETIQUETA_636
-
-ETIQUETA_546:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_551
-
-jmp ETIQUETA_636
-
-ETIQUETA_551:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_556
-
-jmp ETIQUETA_636
-
-ETIQUETA_556:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_562
-
-jmp ETIQUETA_636
-
-ETIQUETA_562:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_567
-
-jmp ETIQUETA_636
-
-ETIQUETA_567:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_572
-
-jmp ETIQUETA_636
-
-ETIQUETA_572:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_577
-
-jmp ETIQUETA_636
-
-ETIQUETA_577:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_582
-
-jmp ETIQUETA_636
-
-ETIQUETA_582:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_588
-
-jmp ETIQUETA_636
-
-ETIQUETA_588:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_593
-
-jmp ETIQUETA_636
-
-ETIQUETA_593:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_598
-
-jmp ETIQUETA_636
-
-ETIQUETA_598:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_603
-
-jmp ETIQUETA_636
-
-ETIQUETA_603:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_609
-
-jmp ETIQUETA_636
-
-ETIQUETA_609:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_614
-
-jmp ETIQUETA_636
-
-ETIQUETA_614:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_619
-
-jmp ETIQUETA_636
-
-ETIQUETA_619:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_625
-
-jmp ETIQUETA_636
-
-ETIQUETA_625:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_630
-
-jmp ETIQUETA_636
-
-ETIQUETA_630:
-fld @pivote
-fld @actual
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jne ETIQUETA_636
-
-jmp ETIQUETA_636
-
-ETIQUETA_636:
+ETIQUETA_272:
 mov  ax, 4c00h
 int  21h
 STRLEN PROC NEAR

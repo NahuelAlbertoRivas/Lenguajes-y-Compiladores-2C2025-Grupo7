@@ -58,7 +58,8 @@ int agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
     }
 
     
-    if (existe_en_tabla(tabla, salida, tipo_token) == FALSE){
+    if (existe_en_tabla(tabla, salida, tipo_token) == FALSE)
+    {
         int lexemas_ingresados = tabla->nFilas;
         char* nombre1;
         if(strcmp(tipo_token, "ID") == 0){
