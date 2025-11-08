@@ -38,4 +38,6 @@ void reemplazar(char* palabra, char buscar, char reemplazar);
 
 //int copiarTablaDeSimbolos(Lista* lista_externa);
 
+//int copiarTablaDeSimbolos(Lista* lista_externa);
+
 #endif

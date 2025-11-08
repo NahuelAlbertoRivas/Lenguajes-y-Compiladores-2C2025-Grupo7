@@ -36,7 +36,6 @@ typedef struct {
 typedef struct {
     char indice[100];
     char variable[100];
-    InformacionToken datoTabla;
 } datoAsm;
 
 // Vector para la tabla de variables ASM
@@ -84,8 +83,8 @@ const char* VectorDatos_Buscar(VectorDatosAsm* vec, const char* indice);
 void VectorStr_Add(VectorStrings* vec, const char* str);
 void VectorStr_Eliminar(VectorStrings* vec, const char* str);
 void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, char* nombre_archivo_tercetos);
-
 int esNumero(const char *str);
+void reemplazarGuionBajo(char *str);
 
 int ProgramaInd;
 int DefInitInd;
@@ -2100,20 +2099,38 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
     fprintf(fileASM, "MAXTEXTSIZE equ 40\n\n");
     fprintf(fileASM, "\n.DATA\n");
 
+    // Hasta aca esta bien
+
     VectorDatosAsm ListaVariables;
     ListaVariables.count = 0;
     
     datoAsm dato;
     int contCteCad = 1;
 
+    printf("\n[DEBUG-ASM] Iniciando generacion .DATA. Total de filas en tabla: %d\n", tabla.nFilas);
+    fflush(stdout); // Forzamos la salida por si acaso
+
     for (int i = 0; i < tabla.nFilas; i++) 
     {
         InformacionToken* _simbolo = &tabla.filas[i];
 
+        // DEBUG: Imprimir datos crudos del simbolo actual
+        printf("\n[DEBUG-ASM] Procesando fila %d: Nombre='%s'\n", i, _simbolo->nombre);
+        printf("    -> TipoDato='%s', Valor='%s', Longitud=%d\n", 
+               _simbolo->tipoDato ? _simbolo->tipoDato : "(null)", 
+               _simbolo->valor ? _simbolo->valor : "(null)", 
+               _simbolo->longitud);
+
         if (strcmp(_simbolo->valor, "-") == 0) 
         {
+            
+            // DEBUG: Detectado como VARIABLE
+            printf("    -> Detectado como: VARIABLE\n");
+
             // Aseguramos que tipoDato no sea NULL antes de compararlo
             if (_simbolo->tipoDato && strcmp(_simbolo->tipoDato, DSTRING) == 0) {
+                // DEBUG: Es un DSTRING
+                printf("    -> Tipo: DSTRING. Escribiendo en ASM: s_%s\n", _simbolo->nombre);
                 
                 fprintf(fileASM, "s_%s\t\tdb MAXTEXTSIZE dup (?), '$'\n", _simbolo->nombre);
                 strcpy(dato.indice, _simbolo->nombre);
@@ -2122,6 +2139,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             } 
             else 
             {
+                // DEBUG: Es otra variable
+                printf("    -> Tipo: OTRO (Int/Float). Escribiendo en ASM: %s\n", _simbolo->nombre);
 
                 fprintf(fileASM, "%s\t\tdd\t\t?\n", _simbolo->nombre);
                 strcpy(dato.indice, _simbolo->nombre);
@@ -2131,11 +2150,17 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         } 
         else 
         {
+            // DEBUG: Detectado como CONSTANTE
+            printf("    -> Detectado como: CONSTANTE\n");
+
             char nombre_limpio[100];
             strcpy(nombre_limpio, _simbolo->nombre);
 
             if (_simbolo->longitud > 0) 
             {
+                // DEBUG: Constante de String
+                printf("    -> Tipo: CONSTANTE STRING. Valor: %s\n", _simbolo->valor);
+
                 reemplazarGuionBajo(nombre_limpio);
                 fprintf(fileASM, "_cte_cad_%d\t\tdb\t\t%s,'$', %d dup (?)\n", contCteCad, _simbolo->valor, _simbolo->longitud);
                 strcpy(dato.indice, _simbolo->valor);
@@ -2145,6 +2170,9 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             } 
             else 
             {
+                // DEBUG: Constante numerica
+                printf("    -> Tipo: CONSTANTE NUMERICA. Valor: %s\n", _simbolo->valor);
+
                 if (strchr(_simbolo->valor, '.') == NULL) 
                 {
                     strcpy(dato.indice, _simbolo->nombre);
@@ -2171,9 +2199,12 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
                 }
             }
         }
+        // DEBUG: Forzar la escritura al archivo en cada iteracion
         fflush(fileASM); 
     }
 
+    // DEBUG: Fin del bucle
+    printf("\n[DEBUG-ASM] Fin del bucle de generacion .DATA.\n");
     fflush(stdout);
 
     fprintf(fileASM, "\n.CODE\n");
@@ -2206,8 +2237,7 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             band = 1;
         }
 
-        if (strcmp(_terceto->operador, "+") == 0) 
-        {
+        if (strcmp(_terceto->operador, "+") == 0) {
             Pila_Pop(&pilaASM, operadorDer);
             Pila_Pop(&pilaASM, operadorIzq);
 
@@ -2307,20 +2337,29 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             {
                 Pila_Pop(&pilaASM, operadorIzq);
                 Pila_Pop(&pilaASM, operadorDer);
-                if (strcmp(operadorDer, "@@@") == 0) 
+                if (strcmp(operadorIzq, "@@@") == 0) 
                 {
-                    fprintf(fileASM, "fstp %s\n\n", operadorIzq);
+                    fprintf(fileASM, "fstp %s\n\n", varIzq);
                 } 
                 else // asignacion simple
                 {
                     const char* varPila = VectorDatos_Buscar(&ListaVariables, operadorIzq);
-                    
-                    if(esNumero(operadorDer) == 1){
-                        fprintf(fileASM, "fld _cte_%s\n", operadorDer);
-                    } else {
+
+                    if(esNumero(operadorDer) == 1)
+                    {
+                        char aux[50];
+
+                        strcpy(aux, operadorDer);
+                        reemplazarGuionBajo(aux);
+
+                        fprintf(fileASM, "fld _cte_%s\n", aux);
+                    }
+                    else
+                    {
                         fprintf(fileASM, "fld %s\n", operadorDer);
                     }
-
+                    
+                    
                     fprintf(fileASM, "fstp %s\n\n", operadorIzq);
                 }
             }
@@ -2464,7 +2503,6 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
     fclose(fileASM);
     printf("El archivo %s ha sido generado.\n", nombre_archivo_asm);
 }
-
 
 int esNumero(const char *str) {
     if (str == NULL || *str == '\0') return 0; // cadena vacía o nula

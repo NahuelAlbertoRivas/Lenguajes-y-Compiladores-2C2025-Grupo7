@@ -25,9 +25,9 @@
 | 0                                                    | CTE_INT    | 0                                                  | -          |
 | 5                                                    | CTE_INT    | 5                                                  | -          |
 | _"a es mas grande que b y c"                         | CTE_STRING | "a es mas grande que b y c"                        | 27         |
-| 99999_990000000                                      | CTE_REAL   | 99999.990000000                                    | -          |
-| 99_000000000                                         | CTE_REAL   | 99.000000000                                       | -          |
-| 0_999900000                                          | CTE_REAL   | 0.999900000                                        | -          |
+| 99999.990000000                                      | CTE_REAL   | 99999.990000000                                    | -          |
+| 99.000000000                                         | CTE_REAL   | 99.000000000                                       | -          |
+| 0.999900000                                          | CTE_REAL   | 0.999900000                                        | -          |
 | _"@sdadasjfla%dfg"                                   | CTE_STRING | "@sdadasjfla%dfg"                                  | 17         |
 | _"asldk  fh sjf"                                     | CTE_STRING | "asldk  fh sjf"                                    | 15         |
 | 27                                                   | CTE_INT    | 27                                                 | -          |

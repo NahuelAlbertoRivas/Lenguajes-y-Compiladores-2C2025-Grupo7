@@ -180,9 +180,4 @@ write(varInt)  #+ varInt es una variable numerica definida previamente +#
 #+  a =! b +#
 
 
-	
-
-
-
-
 

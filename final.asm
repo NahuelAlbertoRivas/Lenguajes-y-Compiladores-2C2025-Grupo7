@@ -78,8 +78,6 @@ fld a
 fld _cte_1
 fadd
 
-fstp a
-
 jmp ETIQUETA_6
 
 ETIQUETA_20:
@@ -255,44 +253,22 @@ displayString _cte_cad_7
 newLine
 
 ETIQUETA_97:
-fld _cte_99999.990000000
+fld _cte_99999_990000000
 fstp varFloat
 
-fld _cte_99.000000000
+fld _cte_99_000000000
 fstp varFloat
 
-fld _cte_0.999900000
+fld _cte_0_999900000
 fstp varFloat
-
-fld varStr
-fstp "@sdADaSjfla%dfg"
-
-fld varStr
-fstp "asldk  fh sjf"
 
 fld _cte_27
 fld c
 fsub
 
-fstp x
-
 fld d
 fld _cte_500
 fadd
-
-fstp x
-
-fld _cte_34
-fld _cte_3
-fmul
-
-fstp x
-
-fld e
-fld f
-fdiv
-
-fstp x
 
 getString s_base
 newLine
