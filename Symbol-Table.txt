@@ -1,6 +1,10 @@
 -------------------------------------------------------------------------------------------------------------------------------------
 | Nombre                                               | TipoDato   | Valor                                              | Longitud   |
 -------------------------------------------------------------------------------------------------------------------------------------
+| @resEqualExpressions                                 | Boolean    | -                                                  | -          |
+| @resIsZero                                           | Boolean    | -                                                  | -          |
+| @pivote                                              | Int        | -                                                  | -          |
+| @actual                                              | Int        | -                                                  | -          |
 | varFloat                                             | Float      | -                                                  | -          |
 | j                                                    | Float      | -                                                  | -          |
 | G                                                    | Float      | -                                                  | -          |
@@ -51,11 +55,13 @@
 | _"5/8 ="                                             | CTE_STRING | "5/8 ="                                            | 7          |
 | _"ingrese un nro"                                    | CTE_STRING | "ingrese un nro"                                   | 16         |
 | _"ewr es una cte string"                             | CTE_STRING | "ewr es una cte string"                            | 23         |
+| 100                                                  | CTE_INT    | 100                                                | -          |
 | 101                                                  | CTE_INT    | 101                                                | -          |
 | 45                                                   | CTE_INT    | 45                                                 | -          |
 | 99                                                   | CTE_INT    | 99                                                 | -          |
 | 0_500000000                                          | CTE_REAL   | 0.500000000                                        | -          |
-| 100                                                  | CTE_INT    | 100                                                | -          |
 | _"parte true estructura mas interna"                 | CTE_STRING | "parte true estructura mas interna"                | 35         |
 | _"parte else estructura mas interna"                 | CTE_STRING | "parte else estructura mas interna"                | 35         |
+| 55                                                   | CTE_INT    | 55                                                 | -          |
+| _"efectivamente no es 0"                             | CTE_STRING | "efectivamente no es 0"                            | 23         |
 -------------------------------------------------------------------------------------------------------------------------------------

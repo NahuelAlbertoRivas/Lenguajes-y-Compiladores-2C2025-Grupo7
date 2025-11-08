@@ -18,8 +18,10 @@
 
 int bandera = 0;
 
-void iniciar_tabla(Tabla *tabla) {
+void iniciar_tabla(Tabla *tabla) 
+{
     tabla->nFilas = 0;
+    bandera = 1;
 }
 
 
@@ -29,7 +31,8 @@ int agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
     char nombre2[10000] = "";
     int pos = NO_SE_AGREGA;
 
-    if(bandera == 0){
+    if(bandera == 0)
+    {
         bandera = 1;
         iniciar_tabla(tabla);
     }
@@ -187,14 +190,41 @@ const char *obtener_tipo_dato(Tabla *tabla, int pos)
     return tabla->filas[pos].tipoDato;
 }
 
-void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_token){
+void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_token)
+{
     int lexemas_ingresados = tabla->nFilas;
     
     tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 2);
+
+    if(tabla->filas[lexemas_ingresados].nombre == NULL)
+    {
+        return;
+    }
+
     tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
+
+    if(tabla->filas[lexemas_ingresados].tipoDato == NULL)
+    {
+        free(tabla->filas[lexemas_ingresados].nombre);
+        return;
+    }
+
+    tabla->filas[lexemas_ingresados].valor = malloc(2);
+
+    if(tabla->filas[lexemas_ingresados].valor == NULL)
+    {
+        free(tabla->filas[lexemas_ingresados].nombre);
+        free(tabla->filas[lexemas_ingresados].tipoDato);
+        return;
+    }
 
     strcpy(tabla->filas[lexemas_ingresados].nombre, nombre);
     strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+    strcpy(tabla->filas[lexemas_ingresados].valor, "-");
+    tabla->filas[lexemas_ingresados].longitud = 0;
+
+    printf("\n%s    %s      %d\n", tabla->filas[lexemas_ingresados].nombre, 
+                                    tabla->filas[lexemas_ingresados].tipoDato, lexemas_ingresados);
 
     tabla->nFilas++;
 }
@@ -209,17 +239,19 @@ void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
     char buffer[32];  // suficiente para un int
     const char* longitudStr;
 
-    
-
     fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
     fprintf(f, "| %-52s | %-10s | %-50s | %-10s |\n", 
             "Nombre", "TipoDato", "Valor", "Longitud");
     fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
 
-    for (int i = 0; i < tabla->nFilas; i++) {
+    for (int i = 0; i < tabla->nFilas; i++) 
+    {
         if (tabla->filas[i].longitud == 0)
+        {
             longitudStr = "-";
-        else {
+        }
+        else 
+        {
             snprintf(buffer, sizeof(buffer), "%d", tabla->filas[i].longitud);
             longitudStr = buffer;
         }
@@ -242,7 +274,6 @@ void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
         {
             free(tabla->filas[i].tipoDato);
         }
-        
     }
 
     fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
@@ -256,4 +287,9 @@ void reemplazar(char* palabra, char buscar, char reemplazar){
             *p = reemplazar;
         }
     }
+}
+
+void imprimir_datos_vars_internas(void *nombre, void *pf)
+{
+    ;
 }

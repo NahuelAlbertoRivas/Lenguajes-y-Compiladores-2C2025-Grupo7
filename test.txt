@@ -148,7 +148,7 @@ read(base)  #+ base es una variable Str+#
 write("ewr es una cte string")  #+ "ewr" es una cte string +#
 write(varInt)  #+ varInt es una variable numerica definida previamente +#
 
-#+ equalExpressions(a + b, 100) +#
+equalExpressions(a + b, 100)
 
 res := true
 c := 1
@@ -179,6 +179,11 @@ if(c AND d)
                 }
 			}
 
+
+if (isZero(55) != true)
+{
+    write("efectivamente no es 0")
+}
 
 #+ ---------------------------------------------- +#
 #+ ---------------------------------------------- +#

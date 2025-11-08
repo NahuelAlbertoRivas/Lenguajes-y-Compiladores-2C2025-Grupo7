@@ -150,6 +150,22 @@ void destroy_HashMap(HashMap *hashmap)
     hashmap = NULL;
 }
 
+void map_HashMap(HashMap *hashmap, Task td, void *context)
+{
+    for (int i = 0; i < hashmap->hsize; i++)
+    {
+        HashMapEntry *entry = hashmap->table[i];
+        while (entry != NULL)
+        {
+            HashMapEntry *next = entry->next;
+
+            td(entry->key, context);
+
+            entry = next;
+        }
+    }
+}
+
 void show_HashMap (HashMap *hashmap)
 {
     int i;

@@ -75,6 +75,7 @@ void recorrer_lista_argumentos_equalexpressions(tPila *pilaIndiceTercetosFuncion
 void completar_bi_equalexpressions(tPila *pilaBI);
 int establecer_nuevo_operando_izquierdo(void *nro_terceto, void *nro_branch_actualizado);
 void acciones_expresion_logica();
+void inicializar_recursos_internos();
 
 void reemplazarGuionBajo(char *str);
 void eliminar_corchetes(char *str);
@@ -683,48 +684,60 @@ bucle:
 llamada_func:
     FN_EQUALEXPRESSIONS PAR_ABR 
     {
-        crearTerceto(":=", "@resEqualExpressions", "FALSO");
-        if(get_HashMapEntry_value(hashmap, "@resEqualExpressions") == HM_KEY_NOT_FOUND){
-            add_HashMapEntry(hashmap, "@resEqualExpressions", 0);
-            agregar_a_tabla_variables_internas(&tabla, "@resEqualExpressions", "Boolean");
-        }
+        _tipoDatoExpresionActual = NULL;
+
+        int indOpDer = crearTercetoUnitarioStr("FALSE");
+        sprintf(operandoDerAux, "[%d]", indOpDer);
+        int indOpIzq = crearTercetoUnitarioStr("@resEqualExpressions");
+        sprintf(operandoIzqAux, "[%d]", indOpIzq);
+        crearTerceto("=", operandoIzqAux, operandoDerAux);
     }
     lista_args PAR_CIE 
     {
         recorrer_lista_argumentos_equalexpressions(&pilaIndiceTercetosFuncionesEspeciales);
-        //sprintf(operandoDerAux, "[%d]", ListaArgsInd);
-        //LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_EQUALEXPRESSIONS", operandoDerAux);
+        
         printf("\t\t\tR28. Llamada_Func -> equalExpressions(Lista_Args)\n");
 
         completar_bi_equalexpressions(&pilaBI);
-        //sacar_de_pila(&pilaBI, &indiceDesapilado, sizeof(indiceActual));
-        //modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
 
+        LlamadaFuncInd = crearTercetoUnitarioStr("@resEqualExpressions");
+        
         char valoroBoolStr[50] = "@resEqualExpressions";
         poner_en_pila(&pilaValoresBooleanos, valoroBoolStr, sizeof(valoroBoolStr));
     }
-    | FN_ISZERO PAR_ABR expresion_aritmetica PAR_CIE 
+    | FN_ISZERO 
     {
-        sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
-        //LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_ISZERO", operandoDerAux);
+        _tipoDatoExpresionActual = NULL;
+    }
+    PAR_ABR expresion_aritmetica PAR_CIE 
+    {
         printf("\t\t\tR29. Llamada_Func -> isZero(Lista_Args)\n");
+        
+        sprintf(operandoIzqAux, "[%d]", ExpresionAritmeticaInd);
+        int indOpDer = crearTercetoUnitarioStr("0");
+        sprintf(operandoDerAux, "[%d]", indOpDer);
+        Xind = crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
-        Xind = crearTerceto("CMP", operandoDerAux, "0");
-        sprintf(operandoIzqAux, "[%d]", Xind + 4);
+        sprintf(operandoIzqAux, "[%d]", Xind + 8);
         crearTerceto("BNE", operandoIzqAux, "_"); // + 1
-        Xind = crearTerceto(":=", "@resIsZero", "VERDADERO"); // + 2
-        if(get_HashMapEntry_value(hashmap, "@resIsZero") == HM_KEY_NOT_FOUND){
-            add_HashMapEntry(hashmap, "@resIsZero", 0);
-            agregar_a_tabla_variables_internas(&tabla, "@resIsZero", "Boolean");
-        }
+
+        indOpDer = crearTercetoUnitarioStr("TRUE");
+        sprintf(operandoDerAux, "[%d]", indOpDer);
+        int indOpIzq = crearTercetoUnitarioStr("@resIsZero");
+        sprintf(operandoIzqAux, "[%d]", indOpIzq);
+        Xind = crearTerceto("=", operandoIzqAux, operandoDerAux); // + 2
+        
         sprintf(operandoIzqAux, "[%d]", Xind + 3);
         crearTerceto("BI",operandoIzqAux, "_"); // + 3
-        crearTerceto(":=", "@resIsZero", "FALSO"); // + 4
-        if(get_HashMapEntry_value(hashmap, "@resIsZero") == HM_KEY_NOT_FOUND){
-            add_HashMapEntry(hashmap, "@resIsZero", 0);
-            agregar_a_tabla_variables_internas(&tabla, "@resIsZero", "Boolean");
-        }
 
+        indOpDer = crearTercetoUnitarioStr("FALSE");
+        sprintf(operandoDerAux, "[%d]", indOpDer);
+        indOpIzq = crearTercetoUnitarioStr("@resIsZero");
+        sprintf(operandoIzqAux, "[%d]", indOpIzq);
+        crearTerceto("=", operandoIzqAux, operandoDerAux); // + 4
+
+        LlamadaFuncInd = crearTercetoUnitarioStr("@resIsZero");
+        
         char valoroBoolStr[50] = "@resIsZero";
         poner_en_pila(&pilaValoresBooleanos, valoroBoolStr, sizeof(valoroBoolStr));
     }
@@ -733,12 +746,11 @@ llamada_func:
 lista_args:
     expresion_aritmetica
     {
-        sprintf(operandoDerAux, "[%d]", getIndice()-1);
-        ListaArgsInd = crearTerceto(":=", "@pivote", operandoDerAux);
-        if(get_HashMapEntry_value(hashmap, "@pivote") == HM_KEY_NOT_FOUND){
-            add_HashMapEntry(hashmap, "@pivote", 0);
-            agregar_a_tabla_variables_internas(&tabla, "@pivote", "Int");
-        }
+        int indOpIzq = crearTercetoUnitarioStr("@pivote");
+        sprintf(operandoIzqAux, "[%d]", indOpIzq);
+        sprintf(operandoDerAux, "[%d]", getIndice()-2);
+        ListaArgsInd = crearTerceto("=", operandoIzqAux, operandoDerAux);
+        
         printf("\t\t\t\tR30. lista_args -> expresion_aritmetica\n");
         
     }
@@ -748,25 +760,30 @@ lista_args:
         sprintf(operandoDerAux, "[%d]", ExpresionAritmeticaInd);
 
         poner_en_pila(&pilaIndiceTercetosFuncionesEspeciales, &ExpresionAritmeticaInd, sizeof(ExpresionAritmeticaInd));
-        printf("Apile %d\n", ExpresionAritmeticaInd);
-
-        sprintf(operandoDerAux, "[%d]", getIndice()-1);
-        ListaArgsInd = crearTerceto(":=", "@actual", operandoDerAux);
-        if(get_HashMapEntry_value(hashmap, "@actual") == HM_KEY_NOT_FOUND){
-            add_HashMapEntry(hashmap, "@actual", 0);
-            agregar_a_tabla_variables_internas(&tabla, "@actual", "Int");
-        }
         
+        int indOpIzq = crearTercetoUnitarioStr("@actual");
+        sprintf(operandoIzqAux, "[%d]", indOpIzq);
+        sprintf(operandoDerAux, "[%d]", getIndice()-2);
+        ListaArgsInd = crearTerceto("=", operandoIzqAux, operandoDerAux);
+                
         printf("\t\t\t\tR31. lista_args -> lista_args , expresion_aritmetica \n");
 
-        crearTerceto("CMP", "@pivote", "@actual");
-        sprintf(operandoIzqAux, "[%d]", ListaArgsInd+5);
+        indOpIzq = crearTercetoUnitarioStr("@pivote");
+        sprintf(operandoIzqAux, "[%d]", indOpIzq);
+        int indOpDer = crearTercetoUnitarioStr("@actual");
+        sprintf(operandoDerAux, "[%d]", indOpDer);    
+        crearTerceto("CMP", operandoIzqAux, operandoDerAux);
+
+
+        sprintf(operandoIzqAux, "[%d]", ListaArgsInd+7);
         crearTerceto("BNE", operandoIzqAux, "_");
-        crearTerceto(":=", "@resEqualExpressions", "VERDADERO");
-        if(get_HashMapEntry_value(hashmap, "@resEqualExpressions") == HM_KEY_NOT_FOUND){
-            add_HashMapEntry(hashmap, "@resEqualExpressions", 0);
-            agregar_a_tabla_variables_internas(&tabla, "@resEqualExpressions", "Boolean");
-        }
+
+        indOpDer = crearTercetoUnitarioStr("TRUE");
+        sprintf(operandoDerAux, "[%d]", indOpDer);  
+        indOpIzq = crearTercetoUnitarioStr("@resEqualExpressions");
+        sprintf(operandoIzqAux, "[%d]", indOpIzq);
+        crearTerceto("=", operandoIzqAux, operandoDerAux);
+        
         int IndBI = crearTerceto("BI","_", "_");
 
         poner_en_pila(&pilaBI, &IndBI, sizeof(IndBI));
@@ -1172,81 +1189,33 @@ expresion_para_condicion:
     {
         if(_soloAritmetica && _expresionNueva)
         {   
-            // a4
-            //if(get_HashMapEntry_value(hashmap, "@resExpresionAritmetica") == HM_KEY_NOT_FOUND)
-            //{
-            //    add_HashMapEntry(hashmap, "@resExpresionAritmetica", 0);
-            //    agregar_a_tabla_variables_internas(&tabla, "@resExpresionAritmetica", "Int");
-            //}
-            //crearTerceto(":=", "@resExpresionAritmetica", operandoDerAux);
-
             sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
             int indOpDer = crearTercetoUnitarioStr("0");
             sprintf(operandoDerAux, "[%d]", indOpDer);
             crearTerceto("CMP", operandoIzqAux, operandoDerAux); // cero ya que una expresión aritmética es VERDADERO si es <> 0
 
-            // a4: eliminar
-            //sprintf(_resExpresionRelacional, "@resExpresionRelacional_%d", indiceExpresiones);
-            //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-            //indiceExpresiones++;
-
-            // a4: eliminar
-            //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-            //{
-            //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-            //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-            //}
-            
-            // a4: modificar
             // branch por else
             sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
             indiceBranchElse = crearTerceto("BE", operandoIzqAux, "_");
             
-            // a4: eliminar
-            //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
-
-            // a4: modificar
             // branch incondicional del then
             sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
             indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
-
-            // a4: eliminar
-            //crearTerceto(":=", _resExpresionRelacional, "FALSO");
         }
         if(_soloBooleana && _expresionNueva)
         {
-            // a4: eliminar
-            //sprintf(_resExpresionRelacional, "@resExpresionRelacional_%d", indiceExpresiones);
-            //poner_en_pila(&pilaValoresBooleanos, _resExpresionRelacional, strlen(_resExpresionRelacional));
-            //indiceExpresiones++;
-
             sprintf(operandoIzqAux, "[%d]", ExpresionRelacionalInd);
             int indOpDer = crearTercetoUnitarioStr("true");
             sprintf(operandoDerAux, "[%d]", indOpDer);
             crearTerceto("CMP", operandoIzqAux, operandoDerAux);
 
-            // a4: eliminar
-            //if(get_HashMapEntry_value(hashmap, _resExpresionRelacional) == HM_KEY_NOT_FOUND)
-            //{
-            //    add_HashMapEntry(hashmap, _resExpresionRelacional, 0);
-            //    agregar_a_tabla_variables_internas(&tabla, _resExpresionRelacional, "Boolean");
-            //}
-
-            // a4: modificar
             // branch por else
             sprintf(operandoIzqAux, "[%d]", getIndice() + 2);
             indiceBranchElse = crearTerceto("BNE", operandoIzqAux, "_");
 
-            // a4: eliminar
-            //crearTerceto(":=", _resExpresionRelacional, "VERDADERO");
-
-            // a4: modificar
             // branch incondicional del then
             sprintf(operandoIzqAux, "[%d]", getIndice() + 1);
             indiceBranchThen = crearTerceto("BI", operandoIzqAux, "_");
-
-            // a4: eliminar
-            //crearTerceto(":=", _resExpresionRelacional, "FALSO");
         }
         ExpresionParaCondicionInd2 = ExpresionparaCondicionInd;
         ExpresionparaCondicionInd = ExpresionRelacionalInd;
@@ -1728,6 +1697,9 @@ int main(int argc, char *argv[])
 
     iniciar_tabla(&tabla);
     _tipoDatoExpresionActual = NULL;
+    
+    inicializar_recursos_internos();
+    
     if((yyin = fopen(argv[1], "rt"))==NULL)
     {
         printf("\nNo se puede abrir el archivo de prueba: %s\n", argv[1]);
@@ -1764,6 +1736,33 @@ int main(int argc, char *argv[])
 int yyerror(void)
 {
     printf("Error Sintactico\n");
+}
+
+void inicializar_recursos_internos()
+{
+    if(get_HashMapEntry_value(hashmap, "@resEqualExpressions") == HM_KEY_NOT_FOUND)
+    {
+	    add_HashMapEntry(hashmap, "@resEqualExpressions", 0);
+        agregar_a_tabla_variables_internas(&tabla, "@resEqualExpressions", "Boolean");
+    }
+
+    if(get_HashMapEntry_value(hashmap, "@resIsZero") == HM_KEY_NOT_FOUND)
+    {
+        add_HashMapEntry(hashmap, "@resIsZero", 0);
+        agregar_a_tabla_variables_internas(&tabla, "@resIsZero", "Boolean");
+    }
+
+    if(get_HashMapEntry_value(hashmap, "@pivote") == HM_KEY_NOT_FOUND)
+    {
+        add_HashMapEntry(hashmap, "@pivote", 0);
+        agregar_a_tabla_variables_internas(&tabla, "@pivote", "Int");
+    }
+
+    if(get_HashMapEntry_value(hashmap, "@actual") == HM_KEY_NOT_FOUND)
+    {
+        add_HashMapEntry(hashmap, "@actual", 0);
+        agregar_a_tabla_variables_internas(&tabla, "@actual", "Int");
+    }
 }
 
 /*----------------------------------------------------------------------------
@@ -1935,24 +1934,36 @@ void recorrer_lista_argumentos_equalexpressions(tPila *pilaIndiceTercetosFuncion
 
     // Paso 2: Doble bucle de comparación
     int indicePivote;
-    int IndBI;
+    int IndBI, indOpIzq, indOpDer;
     for (int i = 0; i < tam - 1; i++)
     {
         int indicePivote = vec[i];
+        indOpIzq = crearTercetoUnitarioStr("@pivote");
+        sprintf(operandoIzqAux, "[%d]", indOpIzq);
         sprintf(operandoDerAux, "[%d]", indicePivote);
-        crearTerceto(":=", "@pivote", operandoDerAux);
+        crearTerceto(":=", operandoIzqAux, operandoDerAux);
 
         for (int j = i + 1; j < tam; j++)
         {
             indiceActual = vec[j];
             sprintf(operandoDerAux, "[%d]", indiceActual);
-            ListaArgsInd = crearTerceto(":=", "@actual", operandoDerAux); // ListaArgsInd = 0
+            indOpIzq = crearTercetoUnitarioStr("@actual");
+            sprintf(operandoIzqAux, "[%d]", indOpIzq);
+            ListaArgsInd = crearTerceto("=", operandoIzqAux, operandoDerAux); // ListaArgsInd = 0
             
-            crearTerceto("CMP", "@pivote", "@actual"); // + 1
+            indOpIzq = crearTercetoUnitarioStr("@pivote");
+            sprintf(operandoIzqAux, "[%d]", indOpIzq);
+            indOpDer = crearTercetoUnitarioStr("@actual");
+            sprintf(operandoDerAux, "[%d]", indOpIzq);
+            crearTerceto("CMP", operandoIzqAux, operandoDerAux); // + 1
             sprintf(operandoIzqAux, "[%d]", ListaArgsInd + 5);
             crearTerceto("BNE", operandoIzqAux, "_"); // +2
-            crearTerceto(":=", "@resEqualExpressions", "VERDADERO"); // + 3
-            IndBI = crearTerceto("BI","_", "_"); // + 4
+            indOpDer = crearTercetoUnitarioStr("TRUE");
+            sprintf(operandoDerAux, "[%d]", indOpIzq);
+            indOpIzq = crearTercetoUnitarioStr("@resEqualExpressions");
+            sprintf(operandoIzqAux, "[%d]", indOpIzq);
+            crearTerceto("=", operandoIzqAux, operandoDerAux); // + 3
+            IndBI = crearTerceto("BI", "_", "_"); // + 4
 
             poner_en_pila(&pilaBI, &IndBI, sizeof(IndBI));
         }
@@ -2144,7 +2155,7 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
                _simbolo->valor ? _simbolo->valor : "(null)", 
                _simbolo->longitud);
 
-        if (strcmp(_simbolo->valor, "-") == 0) 
+        if (_simbolo->valor && (strcmp(_simbolo->valor, "-") == 0)) 
         {
             
             // DEBUG: Detectado como VARIABLE
@@ -2382,7 +2393,7 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
                 else // asignacion simple
                 {
                     const char* varPila = VectorDatos_Buscar(&ListaVariables, operadorIzq);
-
+                    
                     if(esNumero(operadorDer) == 1)
                     {
                         char aux[50];
@@ -2556,17 +2567,25 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         {
             char ultOp[50];
 
-            Pila_Pop(&pilaASM, ultOp);
+            if(pilaASM.count > 0)
+            {
+                Pila_Pop(&pilaASM, ultOp);
+            }
+            else
+            {
+                strcpy(ultOp, "###");
+            }
 
+            // si la operación previa fue arimética
             if(strcmp(ultOp, "@@@") == 0)
             {
                 strcpy(operadorIzq, _terceto->operador);
                 Pila_Push(&pilaASM, ultOp);
-            }
+            } 
             else
-            {
+            {  // si la operación previa NO fue aritmética
                 if(strcmp(ultOp, "###") != 0)
-                {
+                {  // y además NO fue una asignación o caso base
                     Pila_Push(&pilaASM, ultOp);
                 }
                 Pila_Push(&pilaASM, _terceto->operador);
@@ -2641,19 +2660,19 @@ int esNumero(const char *str) {
 
 void reemplazar_booleanos(char *operadorIzq, char *operadorDer)
 {
-    if(strcmpi(operadorIzq, "TRUE") == 0)
+    if(operadorIzq && (strcmpi(operadorIzq, "TRUE") == 0))
     {
         sprintf(operadorIzq, "_cte_1");
     }
-    if(strcmpi(operadorIzq, "FALSE") == 0)
+    if(operadorIzq && (strcmpi(operadorIzq, "FALSE") == 0))
     {
         sprintf(operadorIzq, "_cte_0");
     }
-    if(strcmpi(operadorDer, "TRUE") == 0)
+    if(operadorDer && (strcmpi(operadorDer, "TRUE") == 0))
     {
         sprintf(operadorDer, "_cte_1");
     }
-    if(strcmpi(operadorDer, "FALSE") == 0)
+    if(operadorDer && (strcmpi(operadorDer, "FALSE") == 0))
     {
         sprintf(operadorDer, "_cte_0");
     }

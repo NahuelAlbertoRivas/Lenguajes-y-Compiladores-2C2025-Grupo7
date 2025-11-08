@@ -64,6 +64,13 @@ int verificar_compatibilidad_asignacion(HashMap *hashmap, Tabla *tabla, const ch
 
 int verificar_compatibilidad_tipos_datos(const char *tipo1, const char *tipo2)
 {
+    printf("\n t1  %s     t2  %s \n", tipo1, tipo2);
+
+    if((tipo1 == NULL) || (tipo2 == NULL))
+    {
+        return VERIFICACION_OK;
+    }
+
     if(!strcmp(tipo1, DINTEGER) && !strcmp(tipo2, DFLOAT))
     {
         printf("\nADVERTENCIA: seria pertinente castear la operacion\n");
@@ -72,7 +79,8 @@ int verificar_compatibilidad_tipos_datos(const char *tipo1, const char *tipo2)
            && (strcmp(tipo1, DSTRING) || strcmp(tipo2, DCTESTRING))
            && (strcmp(tipo1, DFLOAT) || strcmp(tipo2, DCTEFLOAT))
            && (strcmp(tipo1, DINTEGER) || strcmp(tipo2, DCTEINT))  
-           && (strcmp(tipo1, DFLOAT) || strcmp(tipo2, DINTEGER))    )
+           && (strcmp(tipo1, DFLOAT) || strcmp(tipo2, DINTEGER))
+           && (strcmp(tipo1, DBOOLEAN) || strcmp(tipo2, DBOOLEAN))    )
     {
         return ASIGNACION_NO_COMPATIBLE;
     }

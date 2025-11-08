@@ -9,6 +9,10 @@ MAXTEXTSIZE equ 40
 
 
 .DATA
+@resEqualExpressions		dd		?
+@resIsZero		dd		?
+@pivote		dd		?
+@actual		dd		?
 varFloat		dd		?
 j		dd		?
 G		dd		?
@@ -59,13 +63,15 @@ _cte_8		dd		8.0
 _cte_cad_15		db		"5/8 =",'$', 7 dup (?)
 _cte_cad_16		db		"ingrese un nro",'$', 16 dup (?)
 _cte_cad_17		db		"ewr es una cte string",'$', 23 dup (?)
+_cte_100		dd		100.0
 _cte_101		dd		101.0
 _cte_45		dd		45.0
 _cte_99		dd		99.0
 _cte_0_500000000		dd		0.500000000
-_cte_100		dd		100.0
 _cte_cad_18		db		"parte true estructura mas interna",'$', 35 dup (?)
 _cte_cad_19		db		"parte else estructura mas interna",'$', 35 dup (?)
+_cte_55		dd		55.0
+_cte_cad_20		db		"efectivamente no es 0",'$', 23 dup (?)
 
 .CODE
 
@@ -421,6 +427,34 @@ newLine
 DisplayFloat varInt, 2
 newLine
 
+fld _cte_0
+fstp @resEqualExpressions
+
+fld a
+fld b
+fadd
+
+fstp @pivote
+
+fld _cte_100
+fstp @actual
+
+fld @pivote
+fld @actual
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+jne ETIQUETA_214
+
+ETIQUETA_214:
+fld _cte_1
+fstp @resEqualExpressions
+
+jmp ETIQUETA_216
+
+ETIQUETA_216:
 fld _cte_1
 fstp res
 
@@ -452,11 +486,11 @@ fcom
 fstsw ax
 sahf
 ffree
-je ETIQUETA_272
+je ETIQUETA_292
 
-jmp ETIQUETA_226
+jmp ETIQUETA_246
 
-ETIQUETA_226:
+ETIQUETA_246:
 fld d
 fld _cte_0
 fxch
@@ -464,11 +498,11 @@ fcom
 fstsw ax
 sahf
 ffree
-je ETIQUETA_272
+je ETIQUETA_292
 
-jmp ETIQUETA_231
+jmp ETIQUETA_251
 
-ETIQUETA_231:
+ETIQUETA_251:
 fld y
 fld _cte_0
 fxch
@@ -476,11 +510,11 @@ fcom
 fstsw ax
 sahf
 ffree
-je ETIQUETA_272
+je ETIQUETA_292
 
-jmp ETIQUETA_236
+jmp ETIQUETA_256
 
-ETIQUETA_236:
+ETIQUETA_256:
 fld res
 fld _cte_0
 fxch
@@ -488,48 +522,12 @@ fcom
 fstsw ax
 sahf
 ffree
-je ETIQUETA_272
+je ETIQUETA_292
 
-jmp ETIQUETA_241
+jmp ETIQUETA_261
 
-ETIQUETA_241:
+ETIQUETA_261:
 fld a
-fld _cte_0
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-je ETIQUETA_246
-
-jmp ETIQUETA_251
-
-ETIQUETA_246:
-fld b
-fld _cte_0
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-je ETIQUETA_272
-
-jmp ETIQUETA_251
-
-ETIQUETA_251:
-fld G
-fld _cte_100
-fxch
-fcom
-fstsw ax
-sahf
-ffree
-jae ETIQUETA_267
-
-jmp ETIQUETA_256
-
-ETIQUETA_256:
-fld j
 fld _cte_0
 fxch
 fcom
@@ -538,9 +536,45 @@ sahf
 ffree
 je ETIQUETA_266
 
-jmp ETIQUETA_261
+jmp ETIQUETA_271
 
-ETIQUETA_261:
+ETIQUETA_266:
+fld b
+fld _cte_0
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+je ETIQUETA_292
+
+jmp ETIQUETA_271
+
+ETIQUETA_271:
+fld G
+fld _cte_100
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+jae ETIQUETA_287
+
+jmp ETIQUETA_276
+
+ETIQUETA_276:
+fld j
+fld _cte_0
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+je ETIQUETA_286
+
+jmp ETIQUETA_281
+
+ETIQUETA_281:
 lea si, _cte_cad_18
 lea di, s_p3
 call COPIAR
@@ -548,10 +582,10 @@ call COPIAR
 displayString s_p3
 newLine
 
-ETIQUETA_266:
-jmp ETIQUETA_272
+ETIQUETA_286:
+jmp ETIQUETA_292
 
-ETIQUETA_267:
+ETIQUETA_287:
 lea si, _cte_cad_19
 lea di, s_p1
 call COPIAR
@@ -559,7 +593,42 @@ call COPIAR
 displayString s_p1
 newLine
 
-ETIQUETA_272:
+ETIQUETA_292:
+fld _cte_55
+fld _cte_0
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+jne ETIQUETA_302
+
+fld _cte_1
+fstp @resIsZero
+
+jmp ETIQUETA_301
+
+ETIQUETA_301:
+ETIQUETA_302:
+fld _cte_0
+fstp @resIsZero
+
+fld @resIsZero
+fld _cte_1
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+je ETIQUETA_310
+
+jmp ETIQUETA_309
+
+ETIQUETA_309:
+displayString _cte_cad_20
+newLine
+
+ETIQUETA_310:
 mov  ax, 4c00h
 int  21h
 STRLEN PROC NEAR

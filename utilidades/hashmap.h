@@ -20,6 +20,7 @@ typedef struct
     int hsize;
 } HashMap;
 
+typedef void (*Task)(void *, void *);
 
 HashMap *create_HashMap(int hsize);
 int add_HashMapEntry(HashMap *hashmap, const char *key, int value);
@@ -28,5 +29,7 @@ int update_HashMapEntry_value(HashMap *hashmap, const char *key, int val);
 int remove_HashMapEntry(HashMap *hashmap, const char *key);
 void destroy_HashMap(HashMap *hashmap);
 void show_HashMap (HashMap *hashmap);
+
+void map_HashMap(HashMap *hashmap, Task td, void *context);
 
 #endif
