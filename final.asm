@@ -22,9 +22,13 @@ s_varStr		db MAXTEXTSIZE dup (?), '$'
 s_base		db MAXTEXTSIZE dup (?), '$'
 varBool		dd		?
 y		dd		?
-_cte_1		dd		1.0
+_cte_2		dd		2.0
 _cte_3		dd		3.0
-_cte_cad_1		db		"a es mas grande que b",'$', 23 dup (?)
+@resEqualExpressions		dd		?
+_cte_0		dd		0.0
+@pivote		dd		?
+_cte_1		dd		1.0
+@actual		dd		?
 
 .CODE
 
@@ -34,36 +38,49 @@ mov  AX, @data
 mov  DS, AX
 mov  es, ax
 
-fld _cte_1
+fld _cte_2
 fstp a
 
 fld _cte_3
 fstp b
 
-ETIQUETA_6:
+DisplayFloat a, 2
+newLine
 
-fld a
-fld b
+fld @pivote
+fld @actual
 fxch
 fcom
 fstsw ax
 sahf
 ffree
-jbe ETIQUETA_20
+jne ETIQUETA_18
 
-jmp ETIQUETA_12
+jmp ETIQUETA_30
 
-ETIQUETA_12:
-displayString _cte_cad_1
-newLine
+ETIQUETA_18:
+fld @pivote
+fld @actual
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+jne ETIQUETA_24
 
-fld a
-fld _cte_1
-fadd
+jmp ETIQUETA_30
 
-fstp a
+ETIQUETA_24:
+fld @pivote
+fld @actual
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+jne ETIQUETA_30
 
-jmp ETIQUETA_6
+jmp ETIQUETA_30
 
 ETIQUETA_20:
 fld a

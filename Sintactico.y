@@ -407,8 +407,11 @@ asignacion:
             YYABORT;
         }
         sprintf(operandoIzqAux, "[%d]", crearTercetoUnitarioStr($1.str));
-        sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
-        AsignacionInd = crearTerceto("=", operandoIzqAux, operandoDerAux);
+
+        //sprintf(operandoDerAux, "[%d]", ValorBooleanoInd);
+        char valorBoleanoString[50];
+        sacar_de_pila(&pilaValoresBooleanos, valorBoleanoString, sizeof(valorBoleanoString));
+        AsignacionInd = crearTerceto(":=", operandoIzqAux, valorBoleanoString);
         printf("\t\t\tR19. Asignacion -> [ID: '%s']:= valor_booleano\n", $1.str);
         free($1.str);
     }
@@ -677,6 +680,7 @@ bucle:
 llamada_func:
     FN_EQUALEXPRESSIONS PAR_ABR 
     {
+        crearTerceto("FN_EQUALEXPRESSIONS", "_", "_");
         crearTerceto(":=", "@resEqualExpressions", "FALSO");
         if(get_HashMapEntry_value(hashmap, "@resEqualExpressions") == HM_KEY_NOT_FOUND){
             add_HashMapEntry(hashmap, "@resEqualExpressions", 0);
@@ -687,12 +691,13 @@ llamada_func:
     {
         recorrer_lista_argumentos_equalexpressions(&pilaIndiceTercetosFuncionesEspeciales);
         //sprintf(operandoDerAux, "[%d]", ListaArgsInd);
-        //LlamadaFuncInd = crearTerceto("LLAMADA_FUNC", "FN_EQUALEXPRESSIONS", operandoDerAux);
+        //LlamadaFuncInd = crearTerceto("FN_EQUALEXPRESSIONS", "_", "_");
         printf("\t\t\tR28. Llamada_Func -> equalExpressions(Lista_Args)\n");
 
         completar_bi_equalexpressions(&pilaBI);
         //sacar_de_pila(&pilaBI, &indiceDesapilado, sizeof(indiceActual));
         //modificarOperandoIzquierdoConTerceto(indiceDesapilado, operandoIzqAux);
+        //LlamadaFuncInd = indiceActual;
 
         char valoroBoolStr[50] = "@resEqualExpressions";
         poner_en_pila(&pilaValoresBooleanos, valoroBoolStr, sizeof(valoroBoolStr));
