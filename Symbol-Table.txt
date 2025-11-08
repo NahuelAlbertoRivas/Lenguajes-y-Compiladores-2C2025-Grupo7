@@ -14,7 +14,11 @@
 | base                                                 | String     | -                                                  | -          |
 | varBool                                              | Boolean    | -                                                  | -          |
 | y                                                    | Boolean    | -                                                  | -          |
-| 1                                                    | CTE_INT    | 1                                                  | -          |
+| 2                                                    | CTE_INT    | 2                                                  | -          |
 | 3                                                    | CTE_INT    | 3                                                  | -          |
-| _"a es mas grande que b"                             | CTE_STRING | "a es mas grande que b"                            | 23         |
+| @resEqualExpressions                                 | Boolean    | -                                                  | -          |
+| 0                                                    | CTE_INT    | 0                                                  | -          |
+| @pivote                                              | Int        | -                                                  | -          |
+| 1                                                    | CTE_INT    | 1                                                  | -          |
+| @actual                                              | Int        | -                                                  | -          |
 -------------------------------------------------------------------------------------------------------------------------------------

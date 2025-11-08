@@ -12,16 +12,11 @@ init { #+|+#
 
 
 #+ ---------------------------------------- +#
-#+ While +#
+#+ Llamada a funcion equalExpressions() +#
 #+ ---------------------------------------- +#
-a := 1
+a := 2
 b := 3
 
-while (a > b)
-{
-    write("a es mas grande que b")
-    a := a + 1
-}
+write(a)
 
-
-
+y := equalExpressions(0, 1, 0)
