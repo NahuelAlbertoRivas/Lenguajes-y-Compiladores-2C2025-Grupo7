@@ -34,25 +34,25 @@ typedef struct {
 // Asembler
 // Estructura para mapear nombres de la tabla de simbolos a nombres de variables ASM
 typedef struct {
-    char indice[100];
+    char indice[50];
     char variable[100];
 } datoAsm;
 
 // Vector para la tabla de variables ASM
 typedef struct {
-    datoAsm items[TAM_TABLA];
+    datoAsm items[500];
     int count;
 } VectorDatosAsm;
 
 // Pila de strings (para operandos de la pila ASM)
 typedef struct {
-    char items[250][100];
+    char items[70][100];
     int count;
 } PilaStrings;
 
 // Vector de strings (para etiquetas de ciclos/saltos)
 typedef struct {
-    char items[250][100];
+    char items[70][100];
     int count;
 } VectorStrings;
 
@@ -252,6 +252,7 @@ programa:
     def_init lista_sentencias
     {
         printf("R1. Programa -> Def_Init Lista_Sentencias\n");
+        printf("\nSACO TERCETO %d\n");
         generar_assembler("final.asm", "Symbol-Table.txt","intermediate-code.txt");
     }
     ;
@@ -2050,7 +2051,7 @@ void VectorDatos_Add(VectorDatosAsm* vec, datoAsm dato) {
 
 const char* VectorDatos_Buscar(VectorDatosAsm* vec, const char* indice) {
     for (int i = 0; i < vec->count; i++) {
-        if (strcmp(vec->items[i].indice, indice) == 0) {
+        if (strcmpi(vec->items[i].indice, indice) == 0) {
             return vec->items[i].variable;
         }
     }
@@ -2082,14 +2083,16 @@ void VectorStr_Eliminar(VectorStrings* vec, const char* str) {
     vec->count--;
 }
 
-void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, char* nombre_archivo_tercetos) {
-
+void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, char* nombre_archivo_tercetos) 
+{
+    printf("\nSACO TERCETO %d\n");
     FILE *fileASM = fopen(nombre_archivo_asm, "w");
     if (fileASM == NULL) {
         printf("Error al intentar guardar el codigo assemblr en archivo %s.", nombre_archivo_asm);
         return;
     }
 
+    printf("\nSACO TERCETO %d\n");
     HashMap *hashmapCteString = create_HashMap(3);
 
     fprintf(fileASM, "include number.asm\n");
@@ -2102,6 +2105,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
     fprintf(fileASM, "\n.DATA\n");
 
     // Hasta aca esta bien
+
+    printf("\nSACO TERCETO %d\n");
 
     VectorDatosAsm ListaVariables;
     ListaVariables.count = 0;
@@ -2387,6 +2392,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         else if (strcmp(_terceto->operador, "ENTRADA_SALIDA") == 0 && strcmp(_terceto->operandoIzq, "READ") == 0) 
         {
             Pila_Pop(&pilaASM, operadorIzq);
+            Pila_Pop(&pilaASM, operadorDer);
+            printf("\n READ 1   %s\n", operadorIzq);
             varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
             if (strncmp(varAsm, "s_", 2) == 0) {
                 fprintf(fileASM, "getString %s\n", varAsm);
@@ -2399,10 +2406,16 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         {
             Pila_Pop(&pilaASM, operadorIzq);
             varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
-            if (strncmp(varAsm, "s_", 2) == 0 || strncmp(varAsm, "_cte_cad_", 9) == 0) {
-                fprintf(fileASM, "displayString %s\n", varAsm);
-            } else {
-                fprintf(fileASM, "DisplayFloat %s, 2\n", varAsm);
+            printf("\n WRITE 1    %s\n", operadorIzq);
+            if(varAsm)
+            {
+                if(strncmp(varAsm, "s_", 2) == 0 || strncmp(varAsm, "_cte_cad_", 9) == 0)
+                {
+                    fprintf(fileASM, "displayString %s\n", varAsm);
+                } else 
+                {
+                    fprintf(fileASM, "DisplayFloat %s, 2\n", varAsm);
+                }
             }
             fprintf(fileASM, "newLine\n\n");
         } 

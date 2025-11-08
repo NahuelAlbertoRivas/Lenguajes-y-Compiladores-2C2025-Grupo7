@@ -80,6 +80,14 @@ if (a > b)
 	}
 }
 
+if (a > b)
+{
+    if (a > b)
+	{
+    	write("a es mas grande que b y c")
+	}
+}
+
 
 #+ -------------------------- +#
 #+ Asignaciones +#
@@ -105,13 +113,11 @@ x := e / f
 #+ Entrada y Salida +#
 #+ ---------------------------------------- +#
 
+write("Ingrese un nro")
 read(base)  #+ base es una variable Str+#
 
 write("ewr")  #+ "ewr" es una cte string +#
 write(varInt)  #+ varInt es una variable numerica definida previamente +#
-
-
-
 
 
 
@@ -179,6 +185,3 @@ write(varInt)  #+ varInt es una variable numerica definida previamente +#
 
 #+ Esta es un condicional NOT incorrecto +#
 #+  a =! b +#
-
-
-

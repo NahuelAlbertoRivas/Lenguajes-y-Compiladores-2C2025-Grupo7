@@ -25,6 +25,24 @@ y		dd		?
 _cte_1		dd		1.0
 _cte_3		dd		3.0
 _cte_cad_1		db		"a es mas grande que b",'$', 23 dup (?)
+_cte_cad_2		db		"a es mas grande que b (a > b)",'$', 31 dup (?)
+_cte_cad_3		db		"a es mas chico o igual a b (a <= b)",'$', 37 dup (?)
+_cte_cad_4		db		"a y c mas grandes que b [a > b & c > b]",'$', 41 dup (?)
+_cte_cad_5		db		"a es mas grande que b y c es mas grande que b",'$', 47 dup (?)
+_cte_cad_6		db		"a no es mas grande que b -> !(a > b)",'$', 38 dup (?)
+_cte_0		dd		0.0
+_cte_5		dd		5.0
+_cte_cad_7		db		"a es mas grande que b y c",'$', 27 dup (?)
+_cte_99999_990000000		dd		99999.990000000
+_cte_99_000000000		dd		99.000000000
+_cte_0_999900000		dd		0.999900000
+_cte_cad_8		db		"@sdadasjfla%dfg",'$', 17 dup (?)
+_cte_cad_9		db		"asldk  fh sjf",'$', 15 dup (?)
+_cte_27		dd		27.0
+_cte_500		dd		500.0
+_cte_34		dd		34.0
+_cte_cad_10		db		"ingrese un nro",'$', 16 dup (?)
+_cte_cad_11		db		"ewr",'$', 5 dup (?)
 
 .CODE
 
@@ -238,6 +256,34 @@ displayString _cte_cad_7
 newLine
 
 ETIQUETA_97:
+fld a
+fld b
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+jbe ETIQUETA_109
+
+jmp ETIQUETA_102
+
+ETIQUETA_102:
+fld a
+fld b
+fxch
+fcom
+fstsw ax
+sahf
+ffree
+jbe ETIQUETA_109
+
+jmp ETIQUETA_107
+
+ETIQUETA_107:
+displayString _cte_cad_7
+newLine
+
+ETIQUETA_109:
 fld _cte_99999_990000000
 fstp varFloat
 
@@ -279,16 +325,18 @@ fdiv
 
 fstp x
 
+displayString _cte_cad_10
+newLine
+
 getString s_base
 newLine
 
-displayString _cte_cad_10
+displayString _cte_cad_11
 newLine
 
 DisplayFloat varInt, 2
 newLine
 
-ETIQUETA_20:
 mov  ax, 4c00h
 int  21h
 STRLEN PROC NEAR
