@@ -83,12 +83,13 @@ int agregar_a_tabla(Tabla *tabla, const char* nombre, char* tipo_token){
             nombre1 = malloc(strlen(salida) + 1);
             if (!nombre1) { perror("malloc"); return SIN_MEMORIA; }
 
+            tabla->filas[lexemas_ingresados].valor = malloc(strlen(salida) + 1);
             tabla->filas[lexemas_ingresados].nombre = malloc(strlen(salida) + 1);
             tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
-            tabla->filas[lexemas_ingresados].valor = malloc(strlen(salida) + 1);
             tabla->filas[lexemas_ingresados].longitud = 0;
 
             strcpy(nombre1, salida);            
+            reemplazar(nombre1, '.', '_');
             strcpy(tabla->filas[lexemas_ingresados].nombre, nombre1);
             strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
             strcpy(tabla->filas[lexemas_ingresados].valor, salida);
@@ -246,4 +247,12 @@ void guardar_tabla_en_archivo(const Tabla *tabla, const char *nombreArchivo) {
     fprintf(f, "-------------------------------------------------------------------------------------------------------------------------------------\n");
 
     fclose(f);
+}
+
+void reemplazar(char* palabra, char buscar, char reemplazar){
+    for (char* p = palabra; *p != '\0'; ++p) {
+        if (*p == buscar) {
+            *p = reemplazar;
+        }
+    }
 }
