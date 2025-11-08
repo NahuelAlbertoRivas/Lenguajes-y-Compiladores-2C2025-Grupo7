@@ -2337,9 +2337,10 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             {
                 Pila_Pop(&pilaASM, operadorIzq);
                 Pila_Pop(&pilaASM, operadorDer);
-                if (strcmp(operadorIzq, "@@@") == 0) 
+
+                if (strcmp(operadorDer, "@@@") == 0) 
                 {
-                    fprintf(fileASM, "fstp %s\n\n", varIzq);
+                    fprintf(fileASM, "fstp %s\n\n", operadorIzq);
                 } 
                 else // asignacion simple
                 {
