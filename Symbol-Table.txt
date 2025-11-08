@@ -17,4 +17,21 @@
 | 1                                                    | CTE_INT    | 1                                                  | -          |
 | 3                                                    | CTE_INT    | 3                                                  | -          |
 | _"a es mas grande que b"                             | CTE_STRING | "a es mas grande que b"                            | 23         |
+| _"a es mas grande que b (a > b)"                     | CTE_STRING | "a es mas grande que b (a > b)"                    | 31         |
+| _"a es mas chico o igual a b (a <= b)"               | CTE_STRING | "a es mas chico o igual a b (a <= b)"              | 37         |
+| _"a y c mas grandes que b [a > b & c > b]"           | CTE_STRING | "a y c mas grandes que b [a > b & c > b]"          | 41         |
+| _"a es mas grande que b y c es mas grande que b"     | CTE_STRING | "a es mas grande que b y c es mas grande que b"    | 47         |
+| _"a no es mas grande que b -> !(a > b)"              | CTE_STRING | "a no es mas grande que b -> !(a > b)"             | 38         |
+| 0                                                    | CTE_INT    | 0                                                  | -          |
+| 5                                                    | CTE_INT    | 5                                                  | -          |
+| _"a es mas grande que b y c"                         | CTE_STRING | "a es mas grande que b y c"                        | 27         |
+| 99999_990000000                                      | CTE_REAL   | 99999.990000000                                    | -          |
+| 99_000000000                                         | CTE_REAL   | 99.000000000                                       | -          |
+| 0_999900000                                          | CTE_REAL   | 0.999900000                                        | -          |
+| _"@sdadasjfla%dfg"                                   | CTE_STRING | "@sdadasjfla%dfg"                                  | 17         |
+| _"asldk  fh sjf"                                     | CTE_STRING | "asldk  fh sjf"                                    | 15         |
+| 27                                                   | CTE_INT    | 27                                                 | -          |
+| 500                                                  | CTE_INT    | 500                                                | -          |
+| 34                                                   | CTE_INT    | 34                                                 | -          |
+| _"ewr"                                               | CTE_STRING | "ewr"                                              | 5          |
 -------------------------------------------------------------------------------------------------------------------------------------
