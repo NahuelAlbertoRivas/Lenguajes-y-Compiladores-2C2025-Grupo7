@@ -12,9 +12,9 @@ init { #+|+#
 
 
 #+ ---------------------------------------- +#
-#+ Llamada a funcion equalExpressions() +#
+#+ While +#
 #+ ---------------------------------------- +#
-a := 2
+a := 1
 b := 3
 
 while (a > b)
@@ -89,8 +89,8 @@ varFloat := 99.
 varFloat := .9999
 
 varStr := "@sdADaSjfla%dfg"
-
 varStr := "asldk  fh sjf"
+
 
 #+ ---------------------------------------- +#
 #+ Operaciones Aritmeticas +#
@@ -110,10 +110,16 @@ read(base)  #+ base es una variable Str+#
 write("ewr")  #+ "ewr" es una cte string +#
 write(varInt)  #+ varInt es una variable numerica definida previamente +#
 
+#+ ---------------------------------------- +#
+#+ Llamada a funcion equalExpressions() +#
+#+ ---------------------------------------- +#
+a := 2
+b := 3
 
+y := equalExpressions(a + b, 5, b * 2, 3 + 2, a + b) 
+y := equalExpressions(0, -5, a + b)
 
-
-
+y := equalExpressions(0, 0, -5, 1, 5, 0)
 
 #+ ---------------------------------------------- +#
 #+ ---------------------------------------------- +#
@@ -179,7 +185,3 @@ write(varInt)  #+ varInt es una variable numerica definida previamente +#
 
 #+ Esta es un condicional NOT incorrecto +#
 #+  a =! b +#
-
-
-
-y := equalExpressions(0, 1, 0)
