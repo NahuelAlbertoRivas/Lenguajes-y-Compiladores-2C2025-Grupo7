@@ -99,8 +99,8 @@ varFloat := 99.
 varFloat := .9999
 
 varStr := "@sdADaSjfla%dfg"
-
 varStr := "asldk  fh sjf"
+
 
 #+ ---------------------------------------- +#
 #+ Operaciones Aritmeticas +#
