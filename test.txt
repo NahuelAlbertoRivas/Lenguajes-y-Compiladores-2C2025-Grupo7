@@ -5,7 +5,7 @@
 #+ ---------------------------------------- +#
 init { #+|+#
 	varFloat, j, G: Float
-	varInt, a, b, c, d, e, f, x: Int
+	varInt, a, b, c, d, e, f, x, h: Int
 	varStr, base, p1, p2, p3 : String 
 	varBool, y, res : Boolean
 }
@@ -14,15 +14,30 @@ init { #+|+#
 #+ ---------------------------------------- +#
 #+ While +#
 #+ ---------------------------------------- +#
-a := 4
-b := 3
+a := 9
+b := 5
+c := 3
+d := 2
 
 while (a > b)
 {
     write("a es mas grande que b")
     a--
+	x := 33 / a
+	write(x)
+	while(c > 0)
+	{
+		write("c es menor a 6")
+    	c--
+		while(d < 5)
+		{
+			write("d es menor a 5")
+			d++
+		}
+	}
+	write("PASO FIN DE A > B")
+	#+ h := 5 / c   resulta excepcion por div 0 +# 
 }
-
 
 #+ ---------------------------------------- +#
 #+ If +#
@@ -117,6 +132,8 @@ d := 1
 
 x := d + 500
 
+write("x es igual a 500?")
+
 if(x == 500)
     write("x es 500")
 else
@@ -124,19 +141,6 @@ else
     write("x en realidad es el siguiente nro:")
     write(x)
 }
-
-x := 34 * 3
-
-write("34 * 3 =")
-write(x)
-
-e := 5
-f := 8
-
-x := e / f
-
-write("5/8 =")
-write(x)
 
 #+ ---------------------------------------- +#
 #+ Entrada y Salida +#
@@ -146,9 +150,14 @@ write("Ingrese un nro")
 read(base)  #+ base es una variable Str+#
 
 write("ewr es una cte string")  #+ "ewr" es una cte string +#
-write(varInt)  #+ varInt es una variable numerica definida previamente +#
 
-equalExpressions(a + b, 100)
+a := 50
+b := 50
+
+if(equalExpressions(a + b, 100) == true)
+{
+	write("a + b = 100")
+}
 
 res := true
 c := 1
@@ -184,6 +193,10 @@ if (isZero(55) != true)
 {
     write("efectivamente no es 0")
 }
+
+x := 34 * 344 / 5 - 56 * 2 * 100 + 55 * 1000
+write("34 * 344 / 5 - 56 * 2 * 100 + 55 * 1000 = ")
+write(x)
 
 #+ ---------------------------------------------- +#
 #+ ---------------------------------------------- +#

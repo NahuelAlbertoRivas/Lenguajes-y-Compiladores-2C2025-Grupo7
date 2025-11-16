@@ -23,6 +23,7 @@
 #define MEMORIA_NO_SUFICIENTE -999
 #define PARAMETRO_NO_VALIDO -111
 #define IGUALES 0
+#define DIV_CERO -2131
 
 #define DINTEGER "Int"
 #define DSTRING "String"

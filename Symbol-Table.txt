@@ -5,6 +5,10 @@
 | @resIsZero                                           | Boolean    | -                                                  | -          |
 | @pivote                                              | Int        | -                                                  | -          |
 | @actual                                              | Int        | -                                                  | -          |
+| @resMul                                              | Int        | -                                                  | -          |
+| @resAritmPrev                                        | Int        | -                                                  | -          |
+| 1                                                    | CTE_INT    | 1                                                  | -          |
+| 0                                                    | CTE_INT    | 0                                                  | -          |
 | varFloat                                             | Float      | -                                                  | -          |
 | j                                                    | Float      | -                                                  | -          |
 | G                                                    | Float      | -                                                  | -          |
@@ -16,6 +20,7 @@
 | e                                                    | Int        | -                                                  | -          |
 | f                                                    | Int        | -                                                  | -          |
 | x                                                    | Int        | -                                                  | -          |
+| h                                                    | Int        | -                                                  | -          |
 | varStr                                               | String     | -                                                  | -          |
 | base                                                 | String     | -                                                  | -          |
 | p1                                                   | String     | -                                                  | -          |
@@ -24,18 +29,22 @@
 | varBool                                              | Boolean    | -                                                  | -          |
 | y                                                    | Boolean    | -                                                  | -          |
 | res                                                  | Boolean    | -                                                  | -          |
-| 4                                                    | CTE_INT    | 4                                                  | -          |
+| 9                                                    | CTE_INT    | 9                                                  | -          |
+| 5                                                    | CTE_INT    | 5                                                  | -          |
 | 3                                                    | CTE_INT    | 3                                                  | -          |
+| 2                                                    | CTE_INT    | 2                                                  | -          |
 | _"a es mas grande que b"                             | CTE_STRING | "a es mas grande que b"                            | 23         |
+| 33                                                   | CTE_INT    | 33                                                 | -          |
+| _"c es menor a 6"                                    | CTE_STRING | "c es menor a 6"                                   | 16         |
+| _"d es menor a 5"                                    | CTE_STRING | "d es menor a 5"                                   | 16         |
+| _"paso fin de a > b"                                 | CTE_STRING | "paso fin de a > b"                                | 19         |
 | _"a es mas grande que b (a > b)"                     | CTE_STRING | "a es mas grande que b (a > b)"                    | 31         |
 | _"a es mas chico o igual a b (a <= b)"               | CTE_STRING | "a es mas chico o igual a b (a <= b)"              | 37         |
+| 4                                                    | CTE_INT    | 4                                                  | -          |
 | _"a y c mas grandes que b [a > b & c > b]"           | CTE_STRING | "a y c mas grandes que b [a > b & c > b]"          | 41         |
-| 0                                                    | CTE_INT    | 0                                                  | -          |
 | _"a es mas grande que b o c es mas grande que b"     | CTE_STRING | "a es mas grande que b o c es mas grande que b"    | 47         |
 | _"a no es mas grande que b -> !(a > b)"              | CTE_STRING | "a no es mas grande que b -> !(a > b)"             | 38         |
-| 5                                                    | CTE_INT    | 5                                                  | -          |
 | _"b ahora vale 1"                                    | CTE_STRING | "b ahora vale 1"                                   | 16         |
-| 1                                                    | CTE_INT    | 1                                                  | -          |
 | 10                                                   | CTE_INT    | 10                                                 | -          |
 | _"a es mas grande que b y c"                         | CTE_STRING | "a es mas grande que b y c"                        | 27         |
 | 99999_990000000                                      | CTE_REAL   | 99999.990000000                                    | -          |
@@ -47,15 +56,14 @@
 | 27                                                   | CTE_INT    | 27                                                 | -          |
 | _"27 - c = 3"                                        | CTE_STRING | "27 - c = 3"                                       | 12         |
 | 500                                                  | CTE_INT    | 500                                                | -          |
+| _"x es igual a 500?"                                 | CTE_STRING | "x es igual a 500?"                                | 19         |
 | _"x es 500"                                          | CTE_STRING | "x es 500"                                         | 10         |
 | _"x en realidad es el siguiente nro:"                | CTE_STRING | "x en realidad es el siguiente nro:"               | 36         |
-| 34                                                   | CTE_INT    | 34                                                 | -          |
-| _"34 * 3 ="                                          | CTE_STRING | "34 * 3 ="                                         | 10         |
-| 8                                                    | CTE_INT    | 8                                                  | -          |
-| _"5/8 ="                                             | CTE_STRING | "5/8 ="                                            | 7          |
 | _"ingrese un nro"                                    | CTE_STRING | "ingrese un nro"                                   | 16         |
 | _"ewr es una cte string"                             | CTE_STRING | "ewr es una cte string"                            | 23         |
+| 50                                                   | CTE_INT    | 50                                                 | -          |
 | 100                                                  | CTE_INT    | 100                                                | -          |
+| _"a + b = 100"                                       | CTE_STRING | "a + b = 100"                                      | 13         |
 | 101                                                  | CTE_INT    | 101                                                | -          |
 | 45                                                   | CTE_INT    | 45                                                 | -          |
 | 99                                                   | CTE_INT    | 99                                                 | -          |
@@ -64,4 +72,9 @@
 | _"parte else estructura mas interna"                 | CTE_STRING | "parte else estructura mas interna"                | 35         |
 | 55                                                   | CTE_INT    | 55                                                 | -          |
 | _"efectivamente no es 0"                             | CTE_STRING | "efectivamente no es 0"                            | 23         |
+| 34                                                   | CTE_INT    | 34                                                 | -          |
+| 344                                                  | CTE_INT    | 344                                                | -          |
+| 56                                                   | CTE_INT    | 56                                                 | -          |
+| 1000                                                 | CTE_INT    | 1000                                               | -          |
+| _"34 * 344 / 5 - 56 * 2 * 100 + 55 * 1000 = "        | CTE_STRING | "34 * 344 / 5 - 56 * 2 * 100 + 55 * 1000 = "       | 44         |
 -------------------------------------------------------------------------------------------------------------------------------------

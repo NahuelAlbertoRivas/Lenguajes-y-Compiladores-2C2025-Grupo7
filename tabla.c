@@ -190,6 +190,45 @@ const char *obtener_tipo_dato(Tabla *tabla, int pos)
     return tabla->filas[pos].tipoDato;
 }
 
+void agregar_a_tabla_constantes_internas(Tabla *tabla, char* nombre, char* tipo_token, char *valor)
+{
+    int lexemas_ingresados = tabla->nFilas;
+    
+    tabla->filas[lexemas_ingresados].nombre = malloc(strlen(nombre) + 2);
+
+    if(tabla->filas[lexemas_ingresados].nombre == NULL)
+    {
+        return;
+    }
+
+    tabla->filas[lexemas_ingresados].tipoDato = malloc(strlen(tipo_token) + 1);
+
+    if(tabla->filas[lexemas_ingresados].tipoDato == NULL)
+    {
+        free(tabla->filas[lexemas_ingresados].nombre);
+        return;
+    }
+
+    tabla->filas[lexemas_ingresados].valor = malloc(strlen(valor) + 1);
+
+    if(tabla->filas[lexemas_ingresados].valor == NULL)
+    {
+        free(tabla->filas[lexemas_ingresados].nombre);
+        free(tabla->filas[lexemas_ingresados].tipoDato);
+        return;
+    }
+
+    strcpy(tabla->filas[lexemas_ingresados].nombre, nombre);
+    strcpy(tabla->filas[lexemas_ingresados].tipoDato, tipo_token);
+    strcpy(tabla->filas[lexemas_ingresados].valor, valor);
+    tabla->filas[lexemas_ingresados].longitud = 0;
+
+    printf("\n%s    %s      %d\n", tabla->filas[lexemas_ingresados].nombre, 
+                                    tabla->filas[lexemas_ingresados].tipoDato, lexemas_ingresados);
+
+    tabla->nFilas++;
+}
+
 void agregar_a_tabla_variables_internas(Tabla *tabla, char* nombre, char* tipo_token)
 {
     int lexemas_ingresados = tabla->nFilas;

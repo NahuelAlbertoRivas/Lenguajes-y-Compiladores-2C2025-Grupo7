@@ -71,6 +71,7 @@ int acciones_asignacion_literal(const char *id, int codValidacionId, int codValC
 int acciones_definicion_tipo_retorno(const char *id, int codValidacion);
 int acciones_verificacion_compatibilidad_tipo(int codValidacion, const char *tipoCte);
 int acciones_parametro_read(const char *id, int codValidacion);
+int acciones_verificacion_es_cero(const char *nro);
 void recorrer_lista_argumentos_equalexpressions(tPila *pilaIndiceTercetosFuncionesEspeciales);
 void completar_bi_equalexpressions(tPila *pilaBI);
 int establecer_nuevo_operando_izquierdo(void *nro_terceto, void *nro_branch_actualizado);
@@ -160,6 +161,7 @@ tPila pilaIndiceTercetosFuncionesEspeciales;
 tPila pilaBI;
 tPila pilaEstructurasAnidadas;
 tPila pilaSecuenciaAnd;
+tPila pilaInicioBucle;
 
 int indice=0;
 int indiceActual=0;
@@ -181,9 +183,8 @@ bool _expresionAnidada = false;
 bool _accionesExpresionAnidada = false;
 
 char _resExpresionRelacional[MAX_RES_EXP];
-char _resExpresionLogica[MAX_RES_EXP];
-char _expresionEmparentadaActual[4];
 
+bool _potencialDivCero = false;
 
 Tabla tabla;
 HashMap *hashmap;
@@ -256,7 +257,7 @@ programa:
     def_init lista_sentencias
     {
         printf("R1. Programa -> Def_Init Lista_Sentencias\n");
-        generar_assembler("final.asm", "Symbol-Table.txt","intermediate-code.txt");
+        generar_assembler("./asm/final.asm", "Symbol-Table.txt","intermediate-code.txt");
     }
     ;
     
@@ -423,12 +424,14 @@ asignacion:
             free($1.str); 
             YYABORT;
         }
-        int idInd = crearTercetoUnitarioStr($1.str);
-        sprintf(operandoIzqAux, "[%d]", idInd);
         int cteInd = crearTercetoUnitarioStr("1");
         sprintf(operandoDerAux, "[%d]", cteInd);
+        int idInd = crearTercetoUnitarioStr($1.str);
+        sprintf(operandoIzqAux, "[%d]", idInd);
         AsignacionInd = crearTerceto("+", operandoIzqAux, operandoDerAux);
         sprintf(operandoDerAux, "[%d]", AsignacionInd);
+        idInd = crearTercetoUnitarioStr($1.str);
+        sprintf(operandoIzqAux, "[%d]", idInd);
         AsignacionInd = crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR20. Asignacion -> [ID: '%s']++\n",$1.str);
         free($1.str);
@@ -440,12 +443,14 @@ asignacion:
             free($1.str); 
             YYABORT;
         }
-        int idInd = crearTercetoUnitarioStr($1.str);
-        sprintf(operandoIzqAux, "[%d]", idInd);
         int cteInd = crearTercetoUnitarioStr("1");
         sprintf(operandoDerAux, "[%d]", cteInd);
+        int idInd = crearTercetoUnitarioStr($1.str);
+        sprintf(operandoIzqAux, "[%d]", idInd);
         AsignacionInd = crearTerceto("-", operandoIzqAux, operandoDerAux);
         sprintf(operandoDerAux, "[%d]", AsignacionInd);
+        idInd = crearTercetoUnitarioStr($1.str);
+        sprintf(operandoIzqAux, "[%d]", idInd);
         AsignacionInd = crearTerceto("=", operandoIzqAux, operandoDerAux);
         printf("\t\t\tR21. Asignacion -> [ID: '%s']--\n",$1.str);
         free($1.str);
@@ -605,6 +610,7 @@ bucle:
         sprintf(operadorAux, "Bucle_%d:", _contadorBucles);
         _inicioBucle = crearTercetoUnitarioStr(operadorAux); // me guardo el inicio del bucle
         BucleInd = _inicioBucle;
+        poner_en_pila(&pilaInicioBucle, &_inicioBucle, sizeof(_inicioBucle));
         _contadorBucles++;
     }
     PAR_ABR expresion PAR_CIE 
@@ -638,10 +644,11 @@ bucle:
     bloque_asociado
     {
         char aux[20];
-        int i = _contadorElseTotal, tieneEstructuraDatosApilada = 0;
+        int i = _contadorElseTotal, tieneEstructuraDatosApilada = 0, auxIniBucle;
         DatosEstructura auxDatosEstructura;
 
-        sprintf(operandoIzqAux, "[%d]", _inicioBucle);
+        sacar_de_pila(&pilaInicioBucle, &auxIniBucle, sizeof(auxIniBucle));
+        sprintf(operandoIzqAux, "[%d]", auxIniBucle);
         indiceActual = crearTerceto("BI", operandoIzqAux, "_");
         sprintf(operandoIzqAux, "[%d]", indiceActual + 1); // la siguiente instrucción después del BI al final del bucle
         
@@ -1574,11 +1581,16 @@ termino:
         TerminoInd = crearTerceto("*", operandoIzqAux, operandoDerAux);
         printf("\t\t\t\t\t\tR54. Termino -> Termino * Factor\n");
     }
-    | termino OP_DIV factor 
+    | termino OP_DIV 
+    {
+        _potencialDivCero = true;
+    }
+    factor 
     {
         sprintf(operandoIzqAux, "[%d]", TerminoInd);
         sprintf(operandoDerAux, "[%d]", FactorInd);
         TerminoInd = crearTerceto("/", operandoIzqAux, operandoDerAux);
+        _potencialDivCero = false;
         printf("\t\t\t\t\t\tR55. Termino -> Termino / Factor\n");
     }
     | termino OP_MOD factor 
@@ -1607,7 +1619,8 @@ factor:
     }
     | CTE_INT 
     {
-        if(acciones_verificacion_compatibilidad_tipo($1.codValidacion, DINTEGER) != ACCION_EXITOSA)
+        if((acciones_verificacion_compatibilidad_tipo($1.codValidacion, DINTEGER) != ACCION_EXITOSA)
+            || (_potencialDivCero && (acciones_verificacion_es_cero($1.str) != ACCION_EXITOSA)))
         {
             if($1.str)
             {
@@ -1621,7 +1634,8 @@ factor:
     }
     | CTE_REAL 
     {
-        if(acciones_verificacion_compatibilidad_tipo($1.codValidacion, DFLOAT) != ACCION_EXITOSA)
+        if((acciones_verificacion_compatibilidad_tipo($1.codValidacion, DFLOAT) != ACCION_EXITOSA)
+            || (_potencialDivCero && (acciones_verificacion_es_cero($1.str) != ACCION_EXITOSA)))
         {
             if($1.str)
             {
@@ -1689,6 +1703,7 @@ int main(int argc, char *argv[])
     crear_pila(&pilaValoresBooleanos);
     crear_pila(&pilaEstructurasAnidadas);
     crear_pila(&pilaSecuenciaAnd);
+    crear_pila(&pilaInicioBucle);
     hashmapEstructurasAnidadas = create_HashMap(HASHMAP_SIZE);
 
     printf("\n-----------------------------------------------------------------------------------------------------------------\n");
@@ -1726,8 +1741,8 @@ int main(int argc, char *argv[])
     vaciar_pila(&pilaValoresBooleanos);
     vaciar_pila(&pilaEstructurasAnidadas);
     vaciar_pila(&pilaSecuenciaAnd);
+    vaciar_pila(&pilaInicioBucle);
     destroy_HashMap(hashmapEstructurasAnidadas);
-
     imprimirTercetos();
 
     return PROCESO_EXITOSO;
@@ -1740,29 +1755,25 @@ int yyerror(void)
 
 void inicializar_recursos_internos()
 {
-    if(get_HashMapEntry_value(hashmap, "@resEqualExpressions") == HM_KEY_NOT_FOUND)
-    {
-	    add_HashMapEntry(hashmap, "@resEqualExpressions", 0);
-        agregar_a_tabla_variables_internas(&tabla, "@resEqualExpressions", "Boolean");
-    }
+    add_HashMapEntry(hashmap, "@resEqualExpressions", 0);
+    agregar_a_tabla_variables_internas(&tabla, "@resEqualExpressions", "Boolean");
 
-    if(get_HashMapEntry_value(hashmap, "@resIsZero") == HM_KEY_NOT_FOUND)
-    {
-        add_HashMapEntry(hashmap, "@resIsZero", 0);
-        agregar_a_tabla_variables_internas(&tabla, "@resIsZero", "Boolean");
-    }
+    add_HashMapEntry(hashmap, "@resIsZero", 0);
+    agregar_a_tabla_variables_internas(&tabla, "@resIsZero", "Boolean");
 
-    if(get_HashMapEntry_value(hashmap, "@pivote") == HM_KEY_NOT_FOUND)
-    {
-        add_HashMapEntry(hashmap, "@pivote", 0);
-        agregar_a_tabla_variables_internas(&tabla, "@pivote", "Int");
-    }
+    add_HashMapEntry(hashmap, "@pivote", 0);
+    agregar_a_tabla_variables_internas(&tabla, "@pivote", "Int");
 
-    if(get_HashMapEntry_value(hashmap, "@actual") == HM_KEY_NOT_FOUND)
-    {
-        add_HashMapEntry(hashmap, "@actual", 0);
-        agregar_a_tabla_variables_internas(&tabla, "@actual", "Int");
-    }
+    add_HashMapEntry(hashmap, "@actual", 0);
+    agregar_a_tabla_variables_internas(&tabla, "@actual", "Int");
+
+    add_HashMapEntry(hashmap, "@resMul", 0);
+    agregar_a_tabla_variables_internas(&tabla, "@resMul", "Int");
+
+    agregar_a_tabla_variables_internas(&tabla, "@resAritmPrev", "Int");
+
+    agregar_a_tabla_constantes_internas(&tabla, "1", DCTEINT, "1");
+    agregar_a_tabla_constantes_internas(&tabla, "0", DCTEINT, "0");
 }
 
 /*----------------------------------------------------------------------------
@@ -1800,6 +1811,17 @@ int acciones_definicion_variable(const char *id, int codValidacion)
     {
         fprintf(stderr, "\nERROR INESPERADO\n");
         return res;
+    }
+
+    return ACCION_EXITOSA;
+}
+
+int acciones_verificacion_es_cero(const char *nro)
+{
+    if(strcmp(nro, "0") == 0)
+    {
+        fprintf(stderr, "\nINTENTO DE DIVISION POR CERO\n");
+        return DIV_CERO;
     }
 
     return ACCION_EXITOSA;
@@ -2108,7 +2130,8 @@ void VectorStr_Eliminar(VectorStrings* vec, const char* str) {
     int i = VectorStr_Buscar(vec, str);
     if (i == -1) return;
 
-    for (int j = i; j < vec->count - 1; j++) {
+    for (int j = i; j < vec->count - 1; j++) 
+    {
         strcpy(vec->items[j], vec->items[j + 1]);
     }
     vec->count--;
@@ -2141,30 +2164,16 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
     datoAsm dato;
     int contCteCad = 1;
 
-    printf("\n[DEBUG-ASM] Iniciando generacion .DATA. Total de filas en tabla: %d\n", tabla.nFilas);
     fflush(stdout); // Forzamos la salida por si acaso
 
     for (int i = 0; i < tabla.nFilas; i++) 
     {
         InformacionToken* _simbolo = &tabla.filas[i];
 
-        // DEBUG: Imprimir datos crudos del simbolo actual
-        printf("\n[DEBUG-ASM] Procesando fila %d: Nombre='%s'\n", i, _simbolo->nombre);
-        printf("    -> TipoDato='%s', Valor='%s', Longitud=%d\n", 
-               _simbolo->tipoDato ? _simbolo->tipoDato : "(null)", 
-               _simbolo->valor ? _simbolo->valor : "(null)", 
-               _simbolo->longitud);
-
         if (_simbolo->valor && (strcmp(_simbolo->valor, "-") == 0)) 
         {
-            
-            // DEBUG: Detectado como VARIABLE
-            printf("    -> Detectado como: VARIABLE\n");
-
             // Aseguramos que tipoDato no sea NULL antes de compararlo
             if (_simbolo->tipoDato && strcmp(_simbolo->tipoDato, DSTRING) == 0) {
-                // DEBUG: Es un DSTRING
-                printf("    -> Tipo: DSTRING. Escribiendo en ASM: s_%s\n", _simbolo->nombre);
                 
                 fprintf(fileASM, "s_%s\t\tdb MAXTEXTSIZE dup (?), '$'\n", _simbolo->nombre);
                 strcpy(dato.indice, _simbolo->nombre);
@@ -2173,9 +2182,6 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             } 
             else 
             {
-                // DEBUG: Es otra variable
-                printf("    -> Tipo: OTRO (Int/Float). Escribiendo en ASM: %s\n", _simbolo->nombre);
-
                 fprintf(fileASM, "%s\t\tdd\t\t?\n", _simbolo->nombre);
                 strcpy(dato.indice, _simbolo->nombre);
                 strcpy(dato.variable, _simbolo->nombre);
@@ -2184,17 +2190,11 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         } 
         else 
         {
-            // DEBUG: Detectado como CONSTANTE
-            printf("    -> Detectado como: CONSTANTE\n");
-
             char nombre_limpio[100];
             strcpy(nombre_limpio, _simbolo->nombre);
 
             if (_simbolo->longitud > 0) 
             {
-                // DEBUG: Constante de String
-                printf("    -> Tipo: CONSTANTE STRING. Valor: %s\n", _simbolo->valor);
-
                 reemplazarGuionBajo(nombre_limpio);
                 fprintf(fileASM, "_cte_cad_%d\t\tdb\t\t%s,'$', %d dup (?)\n", contCteCad, _simbolo->valor, _simbolo->longitud);
                 
@@ -2207,9 +2207,6 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             } 
             else 
             {
-                // DEBUG: Constante numerica
-                printf("    -> Tipo: CONSTANTE NUMERICA. Valor: %s\n", _simbolo->valor);
-
                 if (strchr(_simbolo->valor, '.') == NULL) 
                 {
                     strcpy(dato.indice, _simbolo->nombre);
@@ -2240,8 +2237,9 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         fflush(fileASM); 
     }
 
-    // DEBUG: Fin del bucle
-    printf("\n[DEBUG-ASM] Fin del bucle de generacion .DATA.\n");
+    fprintf(fileASM, "msgDivCero db \"Error: division por cero detectada. Abortando...\",'$', 50 dup (?)");
+    fflush(fileASM);
+
     fflush(stdout);
 
     fprintf(fileASM, "\n.CODE\n");
@@ -2260,6 +2258,8 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
     char etiquetaComparacion[100];
     int band;
     const char* varAsm;
+    int contadorTerminos = 1;
+    bool ultimoEsOperando = false;
     // Recorre el vector global 'tercetos'
     for (int i = 0; i < indiceTerceto; i++) 
     {
@@ -2277,22 +2277,31 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         if (strcmp(_terceto->operador, "+") == 0) 
         {
             Pila_Pop(&pilaASM, operadorDer);
-            Pila_Pop(&pilaASM, operadorIzq);
+            int opPreviaSum = strcmp(operadorDer, "@@@");
 
-            if (strcmp(operadorIzq, "@@@") != 0) 
+            if((opPreviaSum == 0) && (contadorTerminos == 2))
             {
-                varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
-                fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorIzq);
-                if (strcmp(operadorDer, "@@@") == 0) 
+                fprintf(fileASM, "fld @resAritmPrev\n\n");
+                fprintf(fileASM, "fxch\n\n");
+                contadorTerminos = 1;
+            }
+            else
+            {
+                if (opPreviaSum != 0) 
                 {
-                    fprintf(fileASM, "fxch\n");
+                    varAsm = VectorDatos_Buscar(&ListaVariables, operadorDer);
+                    fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorDer);
+                    Pila_Pop(&pilaASM, operadorIzq);
+                }
+
+                if (strcmp(operadorIzq, "@@@") != 0) 
+                {
+                    varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
+                    fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorIzq);
                 }
             }
 
-            if (strcmp(operadorDer, "@@@") != 0) {
-                varAsm = VectorDatos_Buscar(&ListaVariables, operadorDer);
-                fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorDer);
-            }
+            ultimoEsOperando = false;
 
             fprintf(fileASM, "fadd\n\n");
             Pila_Push(&pilaASM, "@@@");
@@ -2300,23 +2309,31 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         else if (strcmp(_terceto->operador, "-") == 0) 
         {
             Pila_Pop(&pilaASM, operadorDer);
-            Pila_Pop(&pilaASM, operadorIzq);
-
-            if (strcmp(operadorIzq, "@@@") != 0) 
+            int opPreviaRes = strcmp(operadorDer, "@@@");
+            
+            if((opPreviaRes == 0) && (contadorTerminos == 2))
             {
-                varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
-                fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorIzq);
-                if (strcmp(operadorDer, "@@@") == 0) 
+                fprintf(fileASM, "fld @resAritmPrev\n\n");
+                fprintf(fileASM, "fxch\n\n");
+                contadorTerminos = 1;
+            }
+            else
+            {
+                if(opPreviaRes != 0)
                 {
-                    fprintf(fileASM, "fxch\n");
+                    varAsm = VectorDatos_Buscar(&ListaVariables, operadorDer);
+                    fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorDer);
+                    Pila_Pop(&pilaASM, operadorIzq);
+                }
+
+                if (strcmp(operadorIzq, "@@@") != 0) 
+                {
+                    varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
+                    fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorIzq);
                 }
             }
 
-            if (strcmp(operadorDer, "@@@") != 0) 
-            {
-                varAsm = VectorDatos_Buscar(&ListaVariables, operadorDer);
-                fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorDer);
-            }
+            ultimoEsOperando = false;
 
             fprintf(fileASM, "fsub\n\n");
             Pila_Push(&pilaASM, "@@@");
@@ -2324,20 +2341,21 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         else if (strcmp(_terceto->operador, "*") == 0) 
         {
             Pila_Pop(&pilaASM, operadorDer);
-            Pila_Pop(&pilaASM, operadorIzq);
 
-            if (strcmp(operadorIzq, "@@@") != 0) {
-                varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
-                fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorIzq);
-                if (strcmp(operadorDer, "@@@") == 0) {
-                    fprintf(fileASM, "fxch\n");
-                }
-            }
-
-            if (strcmp(operadorDer, "@@@") != 0) {
+            if (strcmp(operadorDer, "@@@") != 0) 
+            {
                 varAsm = VectorDatos_Buscar(&ListaVariables, operadorDer);
                 fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorDer);
+                Pila_Pop(&pilaASM, operadorIzq);
             }
+
+            if (strcmp(operadorIzq, "@@@") != 0) 
+            {
+                varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
+                fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorIzq);
+            }
+
+            ultimoEsOperando = false;
 
             fprintf(fileASM, "fmul\n\n");
             Pila_Push(&pilaASM, "@@@");
@@ -2345,21 +2363,53 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
         else if (strcmp(_terceto->operador, "/") == 0) 
         {
             Pila_Pop(&pilaASM, operadorDer);
-            Pila_Pop(&pilaASM, operadorIzq);
+            bool posibleDivCero = false;
 
-            if (strcmp(operadorIzq, "@@@") != 0) {
+            if (strcmp(operadorDer, "@@@") != 0) 
+            {
+                varAsm = VectorDatos_Buscar(&ListaVariables, operadorDer);
+
+                fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorDer);
+
+                if(operadorDer && (strcmpi(operadorDer, "_cte_0") == 0))
+                {
+                    printf("\nINTENTO DE DIVISION POR CERO, saliendo...\n");
+                    destroy_HashMap(hashmapCteString);
+                    fclose(fileASM);
+                    return;
+                }
+
+                fprintf(fileASM, "\ncall CheckDivZero\n\n");
+                Pila_Pop(&pilaASM, operadorIzq);
+            }
+            else
+            {
+                posibleDivCero = true;
+            }
+
+            if (strcmp(operadorIzq, "@@@") != 0)
+            {
                 varAsm = VectorDatos_Buscar(&ListaVariables, operadorIzq);
+
                 fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorIzq);
-                if (strcmp(operadorDer, "@@@") == 0) {
-                    fprintf(fileASM, "fxch\n");
+
+                if(posibleDivCero)
+                {
+                    if((operadorIzq && (strcmpi(operadorIzq, "_cte_0") == 0))
+                        || (varAsm && (strcmpi(varAsm, "_cte_0") == 0)))
+                    {
+                        printf("\nINTENTO DE DIVISION POR CERO, saliendo...\n");
+                        destroy_HashMap(hashmapCteString);
+                        fclose(fileASM);
+                        return;
+                    }
+
+                    fprintf(fileASM, "\ncall CheckDivZero\n\n");
                 }
             }
 
-            if (strcmp(operadorDer, "@@@") != 0) {
-                varAsm = VectorDatos_Buscar(&ListaVariables, operadorDer);
-                fprintf(fileASM, "fld %s\n", varAsm ? varAsm : operadorDer);
-            }
-
+            ultimoEsOperando = false;
+            
             fprintf(fileASM, "fdiv\n\n");
             Pila_Push(&pilaASM, "@@@");
         } 
@@ -2573,21 +2623,36 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
             }
             else
             {
-                strcpy(ultOp, "###");
+                strcpy(ultOp, "base");
             }
 
             // si la operación previa fue arimética
             if(strcmp(ultOp, "@@@") == 0)
             {
-                strcpy(operadorIzq, _terceto->operador);
+                if(ultimoEsOperando == true)
+                {
+                    contadorTerminos++;
+                    // guardo resultado pila en var
+                    fprintf(fileASM, "fstp @resAritmPrev\n\n");
+                    Pila_Push(&pilaASM, operadorIzq);
+                    strcpy(ultOp, _terceto->operador);
+                }
+                else
+                {
+                    strcpy(operadorIzq, _terceto->operador);
+                }
+
+                ultimoEsOperando = true;
+                
                 Pila_Push(&pilaASM, ultOp);
             } 
             else
             {  // si la operación previa NO fue aritmética
                 if(strcmp(ultOp, "###") != 0)
-                {  // y además NO fue una asignación o caso base
+                {  // y además NO fue una asignación o fue un caso base
                     Pila_Push(&pilaASM, ultOp);
                 }
+
                 Pila_Push(&pilaASM, _terceto->operador);
             }
         }
@@ -2630,10 +2695,30 @@ void generar_assembler(char* nombre_archivo_asm, char* nombre_archivo_tabla, cha
     fprintf(fileASM, "    ret\n");
     fprintf(fileASM, "COPIAR ENDP\n\n");
 
+    // div por cero
+
+    fprintf(fileASM, "CheckDivZero PROC NEAR\n");
+    fprintf(fileASM, "    push ax\n");
+    fprintf(fileASM, "    push dx\n\n");
+    fprintf(fileASM, "    fldz \n");
+    fprintf(fileASM, "    fcompp\n\n");
+    fprintf(fileASM, "    fstsw ax\n");
+    fprintf(fileASM, "    sahf\n");
+    fprintf(fileASM, "    jne CDZ_OK\n\n");
+    fprintf(fileASM, "    mov dx, offset msgDivCero\n");
+    fprintf(fileASM, "    mov ah, 9\n");
+    fprintf(fileASM, "    int 21h\n");
+    fprintf(fileASM, "    mov ax, 4C00h\n");
+    fprintf(fileASM, "    int 21h\n\n");
+    fprintf(fileASM, "    CDZ_OK:\n");
+    fprintf(fileASM, "    pop dx\n");
+    fprintf(fileASM, "    pop ax\n");
+    fprintf(fileASM, "    ret\n");
+    fprintf(fileASM, "CheckDivZero ENDP\n\n");
+
     fprintf(fileASM, "END START\n");
 
     fclose(fileASM);
-    printf("El archivo %s ha sido generado.\n", nombre_archivo_asm);
 }
 
 int esNumero(const char *str) {
